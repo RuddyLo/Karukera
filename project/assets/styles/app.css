@@ -1,3 +1,12 @@
+:root {
+    --primary-blue: #26c4ec;
+    --white: #ffffff;
+}
+
 body {
     background-color: white;
+}
+
+.primary-blue {
+    color: var(--primary-blue);
 }
