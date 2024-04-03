@@ -17,5 +17,12 @@
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production --progress"
+    },
+    "dependencies": {
+        "aos": "^2.3.4",
+        "glightbox": "^3.3.0",
+        "isotope-layout": "^3.0.6",
+        "jquery": "^3.7.1",
+        "swiper": "^11.1.0"
     }
 }
