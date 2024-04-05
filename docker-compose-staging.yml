@@ -5,9 +5,9 @@ services:
   www:
     build: docker
     image: karukera-www-staging
-    container_name: www_karukera
-    ports:
-      - "8000:80"
+    container_name: www_karukera_staging
+    #ports:
+      #- "8000:80"
     volumes:
       - ./docker/vhosts:/etc/apache2/sites-enabled
       - ./:/var/www
@@ -16,7 +16,7 @@ services:
     
   db:
     image: mysql
-    container_name: mysql_karukera
+    container_name: mysql_karukera_staging
     restart: always
     volumes:
       - db-data:/var/lib/mysql
@@ -27,11 +27,11 @@ services:
 
   phpmyadmin:
     image: phpmyadmin
-    container_name: phpmyadmnin
+    container_name: phpmyadmnin_staging
     depends_on:
       - db
-    ports:
-      - 8080:80
+    #ports:
+      #- 8080:80
     environment:
       PMA_HOST: db
     networks:
