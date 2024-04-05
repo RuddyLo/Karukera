@@ -4,6 +4,7 @@ services:
    #PHP-APACHE
   www:
     build: docker
+    image: karukera-www-staging
     container_name: www_karukera
     ports:
       - "8000:80"
