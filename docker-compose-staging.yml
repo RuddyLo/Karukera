@@ -41,7 +41,7 @@ services:
 
 networks:
   dev:
-     externale: true
+     external: true
      name: karukera_dev
 
 volumes:
