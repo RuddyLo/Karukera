@@ -40,6 +40,8 @@ services:
 
 networks:
   dev:
+     externale: true
+     name: karukera_dev
 
 volumes:
   db-data:
