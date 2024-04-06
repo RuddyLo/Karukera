@@ -1557,7 +1557,7 @@ HERO
 
 .hero {
   position: relative;
-  background: url(../images/img/services-1.jpg) center/cover no-repeat;
+  background: url(../images/img/hero-bg-2.jpeg) center/cover no-repeat;
   height: 100vh;
   display: flex;
   align-items: center;
