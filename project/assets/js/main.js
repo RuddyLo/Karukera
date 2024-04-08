@@ -7,7 +7,7 @@
 */
 import GLightbox from 'glightbox';
 import Swiper from 'swiper';
-import AOS from 'aos';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     "use strict";
@@ -285,19 +285,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /**
-     * Animation on scroll function and init
-     */
-    function aos_init() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true,
-            mirror: false
-        });
-    }
-    window.addEventListener('load', () => {
-        aos_init();
-    });
 
 });
