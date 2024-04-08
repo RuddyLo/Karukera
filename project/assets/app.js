@@ -6,15 +6,15 @@
  */
 
 import './styles/variables.css';
-import './vendor/bootstrap/css/bootstrap.min.css';
-import './vendor/bootstrap-icons/bootstrap-icons.css';
-import './vendor/aos/aos.css';
-import './vendor/glightbox/css/glightbox.min.css';
-import './vendor/swiper/swiper-bundle.min.css';
+import './externals/bootstrap/css/bootstrap.min.css';
+import './externals/bootstrap-icons/bootstrap-icons.css';
+import './externals/aos/aos.css';
+import './externals/glightbox/css/glightbox.min.css';
+import './externals/swiper/swiper-bundle.min.css';
 
-import './vendor/bootstrap/js/bootstrap.bundle.min.js';
-import './vendor/isotope-layout/isotope.pkgd.min.js';
-import './vendor/php-email-form/validate.js';
+import './externals/bootstrap/js/bootstrap.bundle.min.js';
+import './externals/isotope-layout/isotope.pkgd.min.js';
+import './externals/php-email-form/validate.js';
 
 import './js/main.js';
 import './styles/main.css';
