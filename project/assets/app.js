@@ -8,8 +8,7 @@
 import './styles/variables.css';
 import './externals/bootstrap/css/bootstrap.min.css';
 import './externals/bootstrap-icons/bootstrap-icons.css';
-import './externals/aos/aos.css';
-import './externals/glightbox/css/glightbox.min.css';
+
 import './externals/swiper/swiper-bundle.min.css';
 
 import './externals/bootstrap/js/bootstrap.bundle.min.js';
