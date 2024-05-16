@@ -82,7 +82,7 @@ section {
 }
 
 .section-header h2 {
-  font-size: 48px;
+  font-size: 1.5rem;
   font-weight: 300;
   margin-bottom: 20px;
   color: var(--color-secondary);
