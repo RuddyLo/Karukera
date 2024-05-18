@@ -77,19 +77,19 @@ section {
 }
 
 .section-header {
-  text-align: center;
+  text-align: start;
   padding-bottom: 40px;
 }
 
 .section-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 300;
   margin-bottom: 20px;
   color: var(--color-secondary);
 }
 
 .section-header p {
-  margin: 0 auto;
+
   color: var(--color-secondary-light);
 }
 
@@ -97,6 +97,28 @@ section {
   .section-header p {
     max-width: 80%;
   }
+}
+
+
+/*--------------------------------------------------------------
+# On the top
+--------------------------------------------------------------*/
+.on-top {
+  /* background-color: #d3d3d3; */
+
+}
+
+.appart-card:hover {
+  cursor: pointer;
+}
+
+.appart-card :hover>.appart-name {
+  color: var(--color-primary);
+
+}
+
+.appart-name {
+  font-size: 1.4rem;
 }
 
 /*--------------------------------------------------------------
@@ -621,7 +643,7 @@ HERO
   background-color: var(--color-secondary);
   border-radius: 5px;
   transition: background-color 0.3s ease-in-out;
-  width: 250px;
+  width: auto;
 }
 
 .hero-button:hover {
@@ -647,7 +669,7 @@ HERO
   align-items: center;
   justify-content: center;
   align-items: stretch;
-  width: 100%;
+  width: auto;
   margin-bottom: 70px;
 }
 
@@ -658,6 +680,7 @@ HERO
   background-color: var(--color-white);
   border-radius: 20px;
   padding: 10px;
+  width: auto;
 }
 
 .search_input {
@@ -770,24 +793,16 @@ HERO
 /*--------------------------------------------------------------
 # Testimonials Section
 --------------------------------------------------------------*/
-.testimonials {
-  padding: 80px 0;
-  background: url("../images/img/testimonials-bg.jpg") no-repeat;
-  background-position: center center;
-  background-size: cover;
-  position: relative;
+
+
+.testimonials>.container {
+  width: 80%;
+  border-radius: 15px;
+  background-color: #d3d3d3;
+
 }
 
-.testimonials::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(var(--color-secondary-dark-rgb), 0.8);
-}
 
-.testimonials .section-header {
-  margin-bottom: 40px;
-}
 
 .testimonials .testimonials-carousel,
 .testimonials .testimonials-slider {
@@ -795,8 +810,15 @@ HERO
 }
 
 .testimonials .testimonial-item {
-  text-align: center;
-  color: var(--color-white);
+  padding: 20px;
+  text-align: start;
+  color: var(--color-gray);
+}
+
+.user-name {
+  color: var(--color-white) !important;
+  font-size: large !important;
+
 }
 
 .testimonials .testimonial-item .testimonial-img {
