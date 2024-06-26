@@ -70,10 +70,8 @@
       </nav><!-- .navbar -->
     </div>
     <!-- hero -->
-    
-    <section class="hero">
-      <div class="hero-content">
-          <h1 class="hero-title">Louez votre appartement au meilleur prix!</h1>
+    <div class="content-above-slider">
+       <h1 class="hero-title">Louez votre appartement au meilleur prix!</h1>
           <div class="searchbar-container rounded">
             <div class="searchbar bounce">
               <input class="search_input" data-bs-toggle="dropdown" aria-expanded="false" type="text" name="" placeholder="Trouver un appartement...">
@@ -81,27 +79,32 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Oasis de la roche blonval</a></li>
                 <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Oasis de Bellevue</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Penthouse de Karukera</a></li>
               </ul>
             </div>
            
           </div>
           <a href="#services" class="hero-button">Découvrez d'autres Services <i class="bi bi-arrow-down"></i></a>
-          
-      </div>
-      
-    </section>
+    </div>
+    <div class="slider">
+          <div class="slide"></div>
+          <div class="slide"></div>
+          <div class="slide"></div>
+          <div class="slide"></div>
+          <div class="slide"></div>
+    </div>
     <!-- end hero  -->
   </header>
   <!-- End Header -->
 
-  <section id="on-top" class="on-top">
+  <section id="on-top" class="on-top d-flex justify-content-center">
       <div class="container text-start ">
-        <div class="row justify-content-center">
-          <div class="col-md-4 my-auto">
+        <div class=" my-auto">
             <h2 class="font-weight-bold">Profitez d'un séjour exeptionnel dans les meilleurs appartements !</h2>
             <p class="text-secondary">Ea vitae aspernatur deserunt voluptatem impedit deserunt magnam occaecati dssumenda quas ut ad dolores adipisci aliquam.</p>
-          </div>
-          <div class="card-container col-sm-2 col-md-4 col-lg-3 d-flex" >
+        </div>
+        <div class="row ">
+          <div class="card-container col-sm-2 col-md-4 d-flex mb-2" >
             <a href="#oasisblonval">
               <div class="card appart-card border-0">
                 <div class="rounded">
@@ -119,7 +122,7 @@
             </a>
           </div><!-- End appart item -->
 
-          <div class="card-container col-sm-2 col-md-4 col-lg-3 d-flex" >
+          <div class="card-container col-sm-2 col-md-4 d-flex mb-2" >
             <a href="#oasisbellevue">
               <div class="card appart-card border-0 ">
                 <div class="member-img">
@@ -135,6 +138,24 @@
               </div>
             </a>
           </div><!-- End appart item -->
+
+          <div class="card-container col-sm-2 col-md-4  d-flex mb-2" >
+            <a href="#penthousekarukera">
+              <div class="card appart-card border-0 ">
+                <div class="member-img">
+                  <img src="{{asset('images/img/appartement-1.jpeg')}}" class="img-fluid rounded" alt="">
+                </div>
+                <div class="card-info p-2">
+                  <div class="badges my-2">
+                    <span class="text-primary"><i class="bi bi-star"></i></span>
+                  </div>
+                  <span class="appart-name">Penthouse de Karukera</span></br>
+                  <span class="text-xs">Description ...</span>
+                </div>
+              </div>
+            </a>
+          </div><!-- End appart item -->
+
         </div>
 
       </div>
@@ -160,7 +181,6 @@
               <a href="#" class="stretched-link">
                 <h3>Location d'appartement</h3>
               </a>
-              <p>Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores iure perferendis.</p>
             </div>
           </div>
         </div><!-- End Service Item -->
@@ -177,7 +197,6 @@
               <a href="#" class="stretched-link">
                 <h3>Restauration</h3>
               </a>
-              <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.</p>
             </div>
           </div>
         </div><!-- End Service Item -->
@@ -194,7 +213,6 @@
               <a href="#" class="stretched-link">
                 <h3>Récupération à l'aeroport</h3>
               </a>
-              <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.</p>
             </div>
           </div>
         </div><!-- End Service Item -->
@@ -211,7 +229,7 @@
               <a href="#" class="stretched-link">
                 <h3>Services Annexes</h3>
               </a>
-              <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
+              
               <a href="#" class="stretched-link"></a>
             </div>
           </div>
