@@ -134,13 +134,13 @@ section {
 
 .floating-whatsapp-button {
   position: fixed;
-  right: 20px;
+  right: 10px;
   /* Ajustez cette valeur pour positionner le bouton à droite */
   top: 65%;
   /* Position au milieu vertical */
   transform: translateY(-50%);
   /* Centre le bouton verticalement */
-  z-index: 1000;
+  z-index: 100;
   /* Assurez-vous que le bouton WhatsApp est au-dessus des autres éléments */
 }
 
