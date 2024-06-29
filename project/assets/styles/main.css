@@ -127,6 +127,42 @@ section {
   font-size: 1.2rem;
 }
 
+/******************************************* 
+#       Whatsapp Float Button
+*******************************************/
+/* styles.css ou styles.scss */
+
+.floating-whatsapp-button {
+  position: fixed;
+  right: 20px;
+  /* Ajustez cette valeur pour positionner le bouton à droite */
+  top: 65%;
+  /* Position au milieu vertical */
+  transform: translateY(-50%);
+  /* Centre le bouton verticalement */
+  z-index: 1000;
+  /* Assurez-vous que le bouton WhatsApp est au-dessus des autres éléments */
+}
+
+.floating-whatsapp-button img {
+  width: 60px;
+  /* Ajustez la taille de l'icône WhatsApp selon vos besoins */
+  height: auto;
+  border-radius: 50%;
+  /* Pour arrondir l'icône */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  /* Effet ombre portée */
+  cursor: pointer;
+}
+
+
+/* ********************************
+#       End whatsapp
+**********************************/
+
+
+
+
 /*--------------------------------------------------------------
 # Breadcrumbs
 --------------------------------------------------------------*/
