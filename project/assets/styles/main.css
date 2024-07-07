@@ -684,22 +684,22 @@ HERO
 }
 
 .slider .slide:nth-child(2) {
-  background: url(../images/img/hero-bg-2-optimized.jpg) center/cover no-repeat;
+  background: url(../images/img/appart/laroche.jpeg) center/cover no-repeat;
   animation-delay: -5.5s;
 }
 
 .slider .slide:nth-child(3) {
-  background: url(../images/img/service-1.jpg) center/cover no-repeat;
+  background: url(../images/img/appart/appartement-1.jpeg) center/cover no-repeat;
   animation-delay: -11s;
 }
 
 .slider .slide:nth-child(4) {
-  background: url(../images/img/hero-bg-2-optimized.jpg) center/cover no-repeat;
+  background: url(../images/img/hero-1.jpeg) center/cover no-repeat;
   animation-delay: -16.5s;
 }
 
 .slider .slide:nth-child(5) {
-  background: url(../images/img/hero-bg-2-optimized.jpg) center/cover no-repeat;
+  background: url(../images/img/hero-2.jpeg) center/cover no-repeat;
   animation-delay: -22s;
 }
 
