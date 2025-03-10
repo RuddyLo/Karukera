@@ -18,9 +18,7 @@ import './externals/php-email-form/validate.js';
 import $ from 'jquery';
 global.$ = global.jQuery = $;
 
-$(document).ready(function () {
-    console.log("Table.js fonctionne avec jQuery !");
-});
+
 import 'datatables.net';
 // import 'datatables.net-dt/css/jquery.dataTables.min.css'; 
 import './js/main.js';

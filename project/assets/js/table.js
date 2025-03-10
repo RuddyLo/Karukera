@@ -1,6 +1,6 @@
 const { ajax } = require("jquery");
-
-$(document).ready(() =>{
+import $ from 'jquery';
+$(document).ready(() => {
     let apartmentDataTable = $("#apartment-table").DataTable({
         responsive: true,
         "aaSorting": [],
