@@ -45,4 +45,95 @@ class ApartmentRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function countApartmentFiltered($search): int
+    {
+        $entityName = Apartment::class;
+
+        $dql = "
+        SELECT
+            COUNT('*')
+        FROM
+            $entityName a
+        WHERE
+            a.name IS NOT NULL AND
+            a.name != ''
+        ";
+
+        if ($search != '') {
+            $dql .= "
+            AND (
+                a.name LIKE :search
+            )
+        ";
+        }
+
+        $em = $this->getEntityManager()->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+        return (int) $em->getSingleScalarResult();
+    }
+
+      /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function findAllFiltered($page, $nombreMaxPage, $orderBy, $search = ''): array
+    {
+        $entityName = Apartment::class;
+
+        if ($orderBy) {
+            $exploded_order         = explode(' ', $orderBy);
+            $exploded_order[0]      = $exploded_order[0] == 'apartment.name' ? 'apartment.id' : $exploded_order[0];
+            $orderBy                = implode(' ', $exploded_order);
+        }
+
+        $orderBy = $orderBy ?: "apartment.id DESC";
+
+        $dql = "
+            SELECT DISTINCT
+                apartment.id,
+                apartment.name,
+                apartment.description,
+                apartment.is_active,
+                apartment.is_favorite
+               
+            FROM
+                $entityName apartment
+            
+            WHERE
+                apartment.name IS NOT NULL AND
+                apartment.name != '' 
+                
+                
+        ";
+
+        if ($search != '') {
+            $dql .= "
+                AND (
+                    apartment.name LIKE :search 
+                )
+            ";
+        }
+
+
+        $dql .= " ORDER BY $orderBy ";
+
+        $em = $this->getEntityManager()
+        ->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+
+
+        $em->setMaxResults($nombreMaxPage)
+           ->setFirstResult($page);
+        ;
+        
+        return [$em->getResult(), $this->countApartmentFiltered($search)];
+    }
 }

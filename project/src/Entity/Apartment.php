@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: ApartmentRepository::class)]
-#[Broadcast]
 class Apartment
 {
     #[ORM\Id]
@@ -27,9 +26,7 @@ class Apartment
     #[ORM\Column]
     private ?bool $is_favorite = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageUrl = null;
-
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -83,15 +80,5 @@ class Apartment
         return $this;
     }
 
-    public function getImageUrl(): ?string
-    {
-        return $this->imageUrl;
-    }
-
-    public function setImageUrl(?string $imageUrl): static
-    {
-        $this->imageUrl = $imageUrl;
-
-        return $this;
-    }
+    
 }

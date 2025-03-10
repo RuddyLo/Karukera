@@ -1,0 +1,27 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}Apartment index{% endblock %}
+
+{% block content %}
+    <h1>Apartment index</h1>
+
+    <div class="m-4 ">
+        <div class="table-container container w-100">
+        <table style="width: 100%;" id="apartment-table" class="table table-hover  ">
+            <thead class="bg-dark text-white font-weight-bold">
+                <tr>
+                    <th class="">Id</th>
+                    <th class="">Nom</th>
+                    <th class="">Description</th>
+                    <th class="">Actif</th>
+                    <th class="">Favoris</th>
+                    <th class="">Actions</th>
+                </tr>
+            </thead>
+        </table>
+        </div>
+    <div>
+
+    <a href="{{ path('admin.apartment.new') }}">Create new</a>
+{% endblock %}
+

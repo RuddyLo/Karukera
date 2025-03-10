@@ -15,7 +15,16 @@ import './externals/bootstrap/js/bootstrap.bundle.min.js';
 import './externals/isotope-layout/isotope.pkgd.min.js';
 import './externals/php-email-form/validate.js';
 
+import $ from 'jquery';
+global.$ = global.jQuery = $;
+
+$(document).ready(function () {
+    console.log("Table.js fonctionne avec jQuery !");
+});
+import 'datatables.net';
+// import 'datatables.net-dt/css/jquery.dataTables.min.css'; 
 import './js/main.js';
+import './js/table.js';
 import './styles/main.css';
 
 

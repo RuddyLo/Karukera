@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Apartment{% endblock %}
+
+{% block body %}
+    <h1>Apartment</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ apartment.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ apartment.name }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ apartment.description }}</td>
+            </tr>
+            <tr>
+                <th>Is_active</th>
+                <td>{{ apartment.isActive ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Is_favorite</th>
+                <td>{{ apartment.isFavorite ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_apartment_index') }}">back to list</a>
+
+    <a href="{{ path('app_apartment_edit', {'id': apartment.id}) }}">edit</a>
+
+    {{ include('apartment/_delete_form.html.twig') }}
+{% endblock %}
