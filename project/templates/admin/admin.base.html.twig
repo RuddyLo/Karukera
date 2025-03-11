@@ -19,10 +19,10 @@
 
     {% block body %}
     <div class="container-fluid">
-        <div class="row flex-nowrap vh-100 ">
+        <div class="row flex-nowrap  overflow-auto">
 
             {# Sidebar #}
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark fixed sidebar">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-2 pt-2 text-white">
                     <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                         <span class="fs-5 d-none d-sm-inline">Logo et lien vers la page accueil</span>
@@ -59,7 +59,7 @@
             </div>
 
             {# Contenu principal #}
-            <div class="col py-3 w-100">
+            <div class="col py-3 w-100 content-wrapper">
                 {% block content %}
             
                 {% endblock %}

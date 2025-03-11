@@ -3,10 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Apartment;
+use Doctrine\DBAL\Types\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType as TypeTextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,10 +21,10 @@ class ApartmentFormType extends AbstractType
             'Oui' => true
         ];
         $builder
-            ->add('name', TextareaType::class, [
+            ->add('name', TypeTextType::class, [
                 'label' => "Dénomination de l'appartement",
                 'row_attr' => [
-                    'class' => 'form-group col-sm-12',
+                    'class' => 'form-group col-sm-12 m-2',
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -32,7 +34,7 @@ class ApartmentFormType extends AbstractType
                 ->add('description', TextareaType::class, [
                     'label' => 'Description',
                     'row_attr' => [
-                        'class' => 'form-group col-12'
+                        'class' => 'form-group col-12 m-2'
                     ],
                     'attr' => [
                         'class' => 'form-control',
@@ -42,7 +44,7 @@ class ApartmentFormType extends AbstractType
                 ->add('is_active', ChoiceType::class, [
                     'label' => 'Afficher',
                     'row_attr' => [
-                        'class' => 'form-group col-md-6'
+                        'class' => 'form-group col-md-6 my-2'
                     ],
                     'attr' => [
                         'class' => 'form-control',
@@ -52,7 +54,7 @@ class ApartmentFormType extends AbstractType
                 ->add('is_favorite', ChoiceType::class, [
                     'label' => 'Mettre dans à la une',
                     'row_attr' => [
-                        'class' => 'form-group col-md-6'
+                        'class' => 'form-group col-md-6 my-2'
                     ],
                     'attr' => [
                         'class' => 'form-control',

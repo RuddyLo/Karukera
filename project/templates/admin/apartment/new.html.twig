@@ -1,11 +1,11 @@
 {% extends 'admin/admin.base.html.twig' %}
 
-{% block title %}New Apartment{% endblock %}
+{% block title %}Nouvel Appartement{% endblock %}
 
 {% block content %}
-    <h1>Create new Apartment</h1>
+<div class="card p-4 shadow-lg vh-80">
+    <h1>Créer un nouvel Appartement</h1>
 
     {{ include('admin/apartment/_form.html.twig') }}
-
-    <a href="{{ path('admin.apartment') }}">back to list</a>
+</div>
 {% endblock %}

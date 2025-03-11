@@ -30,6 +30,28 @@ h6 {
   max-height: 500px;
   padding: 10px;
 }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  max-width: 16.5rem; /* Largeur de la sidebar */
+  background-color: #212529; /* Couleur de Bootstrap "bg-dark" */
+  overflow-y: auto;
+  padding-top: 1rem;
+}
+
+/* Ajuster la zone de contenu pour éviter qu'elle passe sous la sidebar */
+.content-wrapper {
+  margin-left: 16.5rem; /* Doit être égal à la largeur de la sidebar */
+  width: calc(100% - 16.5rem); /* Ajuste la largeur */
+  padding: 2rem; /* Espacement interne */
+}
+
+.image-toggler {
+  max-width: 200px;
+}
 /*--------------------------------------------------------------
 # Preloader
 --------------------------------------------------------------*/
