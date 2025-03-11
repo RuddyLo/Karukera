@@ -1,5 +1,6 @@
 const { ajax } = require("jquery");
 import $ from 'jquery';
+
 $(document).ready(() => {
     let apartmentDataTable = $("#apartment-table").DataTable({
         responsive: true,
@@ -52,9 +53,16 @@ $(document).ready(() => {
                     return `
                       <div class="d-flex justify-content-center list-action-group">
                           <span>
-                           
-                             
-                            </span>
+                                <a title="Visualisation" href='${ajaxLink.apartment.show.replace('1',row[0]) }' id='${data}' class='btn btn-primary'>
+                                   <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <a title="Modification" href='${ajaxLink.apartment.edit.replace('1',row[0]) }' id='${data}' class='btn btn-secondary'>
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button title="Suppression" id='delete-apartment' class='btn btn-danger event-delete-apartment' data-uuid=${data}>
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                              </span>
                       </div>
                       
                       

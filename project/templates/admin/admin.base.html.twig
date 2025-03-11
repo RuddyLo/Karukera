@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mon Application{% endblock %}</title>
+    <link href="{{asset('images/icons/favicon.png')}}" rel="icon">
     {% block stylesheets %}
-    {{ encore_entry_link_tags('app') }}
    
-{% endblock %}
+        {{ encore_entry_link_tags('app') }}   
+    {% endblock %}
         {% block javascripts %}
-        
             {{ encore_entry_script_tags('app') }}
             {{ include('./ajaxLink.html.twig') }}
 

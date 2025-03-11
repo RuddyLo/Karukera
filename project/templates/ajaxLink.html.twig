@@ -27,6 +27,8 @@
         
         apartment: {
             list        : "{{ path('admin.ajax.apartment') }}" ,
+            show        : "{{ path('admin.apartment.show', {id : 1}) }}" ,
+            edit        : "{{ path('admin.apartment.edit', {id : 1}) }}" ,
             
         },
 

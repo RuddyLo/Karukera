@@ -19,7 +19,7 @@ import $ from 'jquery';
 global.$ = global.jQuery = $;
 
 
-import 'datatables.net';
+import 'datatables.net-bs5';
 // import 'datatables.net-dt/css/jquery.dataTables.min.css'; 
 import './js/main.js';
 import './js/table.js';

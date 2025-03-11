@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ApartmentRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
@@ -25,6 +26,9 @@ class Apartment
 
     #[ORM\Column]
     private ?bool $is_favorite = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $imageUrl = null;
 
     
     public function getId(): ?int
@@ -76,6 +80,18 @@ class Apartment
     public function setIsFavorite(bool $is_favorite): static
     {
         $this->is_favorite = $is_favorite;
+
+        return $this;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    public function setImageUrl(?string $imageUrl): static
+    {
+        $this->imageUrl = $imageUrl;
 
         return $this;
     }
