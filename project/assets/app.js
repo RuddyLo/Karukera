@@ -23,6 +23,8 @@ import 'datatables.net-bs5';
 // import 'datatables.net-dt/css/jquery.dataTables.min.css'; 
 import './js/main.js';
 import './js/table.js';
+import './js/upload.js'
+
 import './styles/main.css';
 
 

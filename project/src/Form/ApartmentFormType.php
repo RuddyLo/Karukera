@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Apartment;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -57,6 +58,19 @@ class ApartmentFormType extends AbstractType
                         'class' => 'form-control',
                     ],
                     'choices' => $yes_or_not
+                ])
+                ->add('imageUrl', FileType::class, [
+                    'mapped' => false,
+                    'label' => false,
+                    'required' => false,
+                    'row_attr' => [
+                        'class' => 'form-group col-12',
+                    ],
+                    'attr'      => [
+                        'accept' => 'image/*',
+                        'class' => 'd-none',
+                        
+                    ]
                 ])
             
             

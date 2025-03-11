@@ -5,20 +5,28 @@ namespace App\Controller\Admin;
 use App\Entity\Apartment;
 use App\Form\ApartmentFormType;
 use App\Repository\ApartmentRepository;
+use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[Route('/admin/apartment')]
 class AdminApartmentController extends AbstractController
 {
+    private Slugify $slugify;
+    private String $apartmentImageDirectory;
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private ApartmentRepository $apartmentRepository
+        private ApartmentRepository $apartmentRepository,
+        private readonly ParameterBagInterface $parameterBag,
     ){  
+        $this->slugify = new Slugify();
+        $kernelDir = $this->parameterBag->get('kernel.project_dir');
+        $this->apartmentImageDirectory = $kernelDir . '/public/uploads/images/';
     }
     #[Route('/', name: 'admin.apartment', methods: ['GET'])]
     public function index(ApartmentRepository $apartmentRepository): Response
@@ -34,6 +42,29 @@ class AdminApartmentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            if ($form->get('imageUrl')->getData()) {
+                if (!file_exists($this->apartmentImageDirectory)) {
+                    mkdir($this->apartmentImageDirectory, 0777, true);
+                }
+                $image = $form->all()['imageUrl']->getData();
+
+                $image
+                    ->move(
+                        $this->apartmentImageDirectory,
+                        $this->slugify->slugify(
+                            $image->getClientOriginalName()
+                        )
+                    );
+                // set image
+
+                $apartment
+                    ->setImageUrl(
+                        $this->apartmentImageDirectory . $this->slugify->slugify($image->getClientOriginalName())
+                    );
+            }
+
+
             $entityManager->persist($apartment);
             $entityManager->flush();
 
