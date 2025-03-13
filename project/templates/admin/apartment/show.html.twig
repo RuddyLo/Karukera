@@ -1,38 +1,34 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/admin.base.html.twig' %}
 
 {% block title %}Apartment{% endblock %}
 
-{% block body %}
-    <h1>Apartment</h1>
+{% block content %}
+<div class="card-container flex justify-content-center align-item-center col-sm-2 col-md-6  d-flex mt-4 p-4" >
+      <div class="card appart-card border-0 ">
+        <div class="member-img">
+            {% if apartment.imageUrl != null and apartment.imageUrl != "" %}
+            <img src="{{asset(apartment.imageUrl)}}" class="img-fluid rounded" alt=""> 
+            {% else %}
+            <img rc="{{ asset('images/img/placeholder-image.png') }}" class="img-fluid rounded" alt="">
+            {% endif %}
+          
+        </div>
+        <div class="card-info p-2">
+          <div class="badges my-2">
+            {% if apartment.isActive %}
+                <span class="text-succes font-">Actif</span>
+            
+            {% else %}
+            <span class="text-danger bold-500">Pas actif</span>
+            {% endif %}
+          </div>
+          <span class="appart-name">{{apartment.name}}</span></br>
+          <span class="text-xs">{{apartment.description}}</span>
+        </div>
+      </div>
+  </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ apartment.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ apartment.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ apartment.description }}</td>
-            </tr>
-            <tr>
-                <th>Is_active</th>
-                <td>{{ apartment.isActive ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>Is_favorite</th>
-                <td>{{ apartment.isFavorite ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('admin.apartment') }}">back to list</a>
-
-    <a href="{{ path('admin.apartment.edit', {'id': apartment.id}) }}">edit</a>
+  <a class="btn btn-secondary mt-4" href="{{ path('admin.apartment') }}">Retour</a>
 
     {{ include('admin/apartment/_delete_form.html.twig') }}
 {% endblock %}

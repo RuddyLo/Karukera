@@ -19,6 +19,7 @@ class AdminApartmentController extends AbstractController
 {
     private Slugify $slugify;
     private String $apartmentImageDirectory;
+    private String $imageUrlDirectory;
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ApartmentRepository $apartmentRepository,
@@ -27,6 +28,7 @@ class AdminApartmentController extends AbstractController
         $this->slugify = new Slugify();
         $kernelDir = $this->parameterBag->get('kernel.project_dir');
         $this->apartmentImageDirectory = $kernelDir . '/public/uploads/images/';
+        $this->imageUrlDirectory = '/uploads/images/';
     }
     #[Route('/', name: 'admin.apartment', methods: ['GET'])]
     public function index(ApartmentRepository $apartmentRepository): Response
@@ -60,7 +62,7 @@ class AdminApartmentController extends AbstractController
 
                 $apartment
                     ->setImageUrl(
-                        $this->apartmentImageDirectory . $this->slugify->slugify($image->getClientOriginalName())
+                        $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
                     );
             }
 
@@ -92,6 +94,26 @@ class AdminApartmentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->get('imageUrl')->getData()) {
+                if (!file_exists($this->apartmentImageDirectory)) {
+                    mkdir($this->apartmentImageDirectory, 0777, true);
+                }
+                $image = $form->all()['imageUrl']->getData();
+
+                $image
+                    ->move(
+                        $this->apartmentImageDirectory,
+                        $this->slugify->slugify(
+                            $image->getClientOriginalName()
+                        )
+                    );
+                // set image
+
+                $apartment
+                    ->setImageUrl(
+                        $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
+                    );
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('admin.apartment', [], Response::HTTP_SEE_OTHER);

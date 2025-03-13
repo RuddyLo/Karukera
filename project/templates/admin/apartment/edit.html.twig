@@ -1,13 +1,14 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/admin.base.html.twig' %}
 
-{% block title %}Edit Apartment{% endblock %}
+{% block title %}Mise à jour de l'Appartement{% endblock %}
 
-{% block body %}
-    <h1>Edit Apartment</h1>
+{% block content %}
+   
+<div class="card p-4 shadow-lg vh-80">
+    <h1>Mise à jour de  l'Appartement</h1>
 
     {{ include('admin/apartment/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('admin.apartment') }}">back to list</a>
-
-    {{ include('admin/apartment/_delete_form.html.twig') }}
+</div>
+    
+    
 {% endblock %}
