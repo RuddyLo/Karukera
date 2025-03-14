@@ -24,6 +24,7 @@ import 'datatables.net-bs5';
 import './js/main.js';
 import './js/table.js';
 import './js/upload.js'
+import './js/button.js';
 
 import './styles/main.css';
 

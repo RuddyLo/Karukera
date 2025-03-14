@@ -18,7 +18,12 @@
             {# <span class="text-muted mb-2"><span class="text-danger text-xs">max 171x213 pixels format .png *</span></span> #}
             <div class="d-flex row align-items-center">
                 <button type="button" class="image-toggler btn btn-primary mr-4">Choisir une image</button>
+                {% if apartment.imageUrl != null and apartment.imageUrl !=""  %}
+                <img id="image-preview"  src="{{ asset(apartment.imageUrl) }}" alt="Choisir une image au format attendu" class="w-4 h-4 rr-apartment-image mx-auto" />
+                {% else %}
                 <img id="image-preview"  src="{{ asset('images/img/placeholder-image.png') }}" alt="Choisir une image au format attendu" class="w-4 h-4 rr-apartment-image mx-auto" />
+                {% endif %}
+                
             </div>
         </div>
         <div class="row">
@@ -30,7 +35,7 @@
     
     
 
-    <button type="submit" class="btn btn-primary mt-4">Enregistrer</button>
+    <button type="submit" class="btn btn-success mt-4">Enregistrer</button>
     <a class="btn btn-secondary mt-4" href="{{ path('admin.apartment') }}">Annuler</a>
     {{ form_end(form) }}
 
