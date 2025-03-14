@@ -1,39 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Les Oasis de Karukera{% endblock %}
-
-{% block content %}
-
-       
-<body>
-     <!-- ======= Header ======= -->
+{% block header %}
   <header id="header" class="header " data-scrollto-offset="0">
-    {% include "components/navbar.html.twig" %}
-    {% include "components/hero.html.twig" %}
-  </header>
-  <!-- End Header -->
-  <!-- ======= On Top Section ======= -->
-  {% if apartments_on_top %}
-  {% include "components/onTop.html.twig" %}
-  {% endif %}
-  
-  <!-- ======= Services Section ======= -->
-  {% include "components/services.html.twig" %}
-  <!-- ======= Testimonials Section ======= -->
-  {% include "components/testimonials.html.twig" %}
-  <!-- ======= Recent Blog Posts Section ======= -->
-  {% include "components/blogPosts.html.twig" %}
+      {% include "components/navbar.html.twig" %}
+      {% include "components/hero.html.twig" %}
+    </header>
+           
+{% endblock header %}
+{% block content %}  
+  <body>
+    <!-- ======= On Top Section ======= -->
+    {% if apartments_on_top %}
+    {% include "components/onTop.html.twig" %}
+    {% endif %}
+    
+    <!-- ======= Services Section ======= -->
+    {% include "components/services.html.twig" %}
+    <!-- ======= Testimonials Section ======= -->
+    {% include "components/testimonials.html.twig" %}
+    <!-- ======= Recent Blog Posts Section ======= -->
+    {% include "components/blogPosts.html.twig" %}
 
-  <!-- ======= Contact Section ======= -->
-  {% include "components/contact.html.twig" %}
+    <!-- ======= Contact Section ======= -->
+    {% include "components/contact.html.twig" %}
 
-  <!-- ======= Footer ======= -->
-  {% include "components/footer.html.twig" %}
-
-  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-
-
-</body>
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  </body>
 
 {% endblock %}

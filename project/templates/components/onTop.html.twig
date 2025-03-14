@@ -31,9 +31,9 @@
       
     {% if display_more %}
     <div class="container d-flex flex-column align-items-center" style="margin-top: 6rem;">
-        <button class="mt-auto btn show-all-apartments">
-            Voir tous les appartements <i class="mx-2 bi bi-arrow-right-square-fill"></i>
-        </button>
+        <a href="{{ path('app.apartments') }}"><button class="mt-auto btn show-all-apartments">
+          Voir tous les appartements <i class="mx-2 bi bi-arrow-right-square-fill"></i>
+        </button> </a> 
     </div>
     {% endif %}
 
