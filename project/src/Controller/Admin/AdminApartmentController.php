@@ -39,13 +39,14 @@ class AdminApartmentController extends AbstractController
     #[Route('/new', name: 'admin.apartment.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $apartment = new Apartment();
-        $form = $this->createForm(ApartmentFormType::class, $apartment);
+        
+        $form = $this->createForm(ApartmentFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
             if ($form->get('imageUrl')->getData()) {
+                $apartment = $form->getData();
                 if (!file_exists($this->apartmentImageDirectory)) {
                     mkdir($this->apartmentImageDirectory, 0777, true);
                 }
@@ -64,17 +65,19 @@ class AdminApartmentController extends AbstractController
                     ->setImageUrl(
                         $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
                     );
+
+                $entityManager->persist($apartment);
+                $entityManager->flush();
+        
             }
 
 
-            $entityManager->persist($apartment);
-            $entityManager->flush();
-
+           
             return $this->redirectToRoute('admin.apartment', []);
         }
 
         return $this->render('admin/apartment/new.html.twig', [
-            'apartment' => $apartment,
+            
             'form' => $form,
         ]);
     }

@@ -166,6 +166,11 @@ section {
 .appart-name {
   font-size: 1.2rem;
 }
+.on-top-img {
+  max-width: 100%; /* L'image ne dépassera jamais son conteneur */
+  height: 250px;
+  
+}
 
 /******************************************* 
 #       Whatsapp Float Button

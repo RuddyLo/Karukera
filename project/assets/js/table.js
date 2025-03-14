@@ -42,7 +42,7 @@ $(document).ready(() => {
             },
             {
                 targets: 4,
-                name: 'apartment.is_favorite',
+                name: 'apartment.on_top',
                 orderable: true,
             },
             {

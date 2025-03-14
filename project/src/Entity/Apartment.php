@@ -25,7 +25,7 @@ class Apartment
     private ?bool $is_active = null;
 
     #[ORM\Column]
-    private ?bool $is_favorite = null;
+    private ?bool $on_top = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $imageUrl = null;
@@ -74,12 +74,12 @@ class Apartment
 
     public function isIsFavorite(): ?bool
     {
-        return $this->is_favorite;
+        return $this->on_top;
     }
 
-    public function setIsFavorite(bool $is_favorite): static
+    public function setIsFavorite(bool $on_top): static
     {
-        $this->is_favorite = $is_favorite;
+        $this->on_top = $on_top;
 
         return $this;
     }

@@ -3,12 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Apartment;
-use Doctrine\DBAL\Types\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType as TypeTextType;
+use Symfony\Component\Form\Extension\Core\Type\TextType ;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,15 +20,16 @@ class ApartmentFormType extends AbstractType
             'Oui' => true
         ];
         $builder
-            ->add('name', TypeTextType::class, [
-                'label' => "Dénomination de l'appartement",
-                'row_attr' => [
-                    'class' => 'form-group col-sm-12 m-2',
-                ],
-                'attr' => [
-                    'class' => 'form-control',
+                ->add('name', TextType::class, [
+                    'label' => "Dénomination de l'appartement",
+                    'row_attr' => [
+                        'class' => 'form-group col-sm-12 m-2',
+                    ],
+                    'attr' => [
+                        'class' => 'form-control',
+                        'required' => true,
+                    ],
                     
-                ]
                 ])
                 ->add('description', TextareaType::class, [
                     'label' => 'Description',
@@ -38,8 +38,10 @@ class ApartmentFormType extends AbstractType
                     ],
                     'attr' => [
                         'class' => 'form-control',
-                        'rows' => 6
-                    ]
+                        'rows' => 6,
+                        'required' => true,
+                    ],
+                    
                 ])
                 ->add('is_active', ChoiceType::class, [
                     'label' => 'Afficher',

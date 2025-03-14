@@ -98,7 +98,7 @@ class ApartmentRepository extends ServiceEntityRepository
                 apartment.name,
                 apartment.description,
                 apartment.is_active,
-                apartment.is_favorite
+                apartment.on_top
                
             FROM
                 $entityName apartment

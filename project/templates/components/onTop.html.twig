@@ -1,66 +1,42 @@
 
 <section id="on-top" class="on-top d-flex justify-content-center ">
-    <div class="container text-start ">
+    <div class="container  ">
       <div class=" my-auto">
           <h2 class="font-weight-bold">Profitez d'un séjour exeptionnel dans les meilleurs appartements !</h2>
           <p class="text-secondary">Ea vitae aspernatur deserunt voluptatem impedit deserunt magnam occaecati dssumenda quas ut ad dolores adipisci aliquam.</p>
       </div>
       <div class="row ">
-        <div class="card-container col-sm-2 col-md-4 d-flex mb-2" >
-          <a href="#oasisblonval">
-            <div class="card appart-card border-0">
-              <div class="rounded">
-                <img src="{{asset('images/img/appart/laroche.jpeg')}}" class="img-fluid rounded" alt="">
-              </div>
-              <div class="card-info p-2">
-                <div class="badges my-2">
-                  <span class="text-primary"><i class="bi bi-star"></i></span>
-                  <span class="text-primary"><i class="bi bi-open"></i></span>
+      {% for apartment in apartments_on_top %}
+        
+        <div class="card-container d-flex col-md-4 mb-2" >
+            <a href="#oasisblonval">
+                <div class="card appart-card border-0">
+                    <div class="rounded">
+                        <img src="{{asset(apartment.imageUrl)}}" class="on-top-img rounded" alt="">
+                    </div>
+                    <div class="card-info p-2">
+                        <div class="badges my-2">
+                            <span class="text-primary"><i class="bi bi-star"></i></span>
+                            <span class="text-primary"><i class="bi bi-open"></i></span>
+                        </div>
+                        <span class="appart-name">{{apartment.name}}</span></br>
+                        <span>{{apartment.description}}</span>
+                    </div>
                 </div>
-                <span class="appart-name">Oasis de la roche blonval</span></br>
-                <span>Description ...</span>
-              </div>
-            </div>
-          </a>
-        </div><!-- End appart item -->
+            </a>
+        </div>
+        
+      {% endfor %}
+    </div><!-- End appart item -->
+      
+    {% if display_more %}
+    <div class="container d-flex flex-column align-items-center" style="margin-top: 6rem;">
+        <button class="mt-auto btn show-all-apartments">
+            Voir tous les appartements <i class="mx-2 bi bi-arrow-right-square-fill"></i>
+        </button>
+    </div>
+    {% endif %}
 
-        <div class="card-container col-sm-2 col-md-4 d-flex mb-2" >
-          <a href="#oasisbellevue">
-            <div class="card appart-card border-0 ">
-              <div class="member-img">
-                <img src="{{asset('images/img/appart/appartement-1.jpeg')}}" class="img-fluid rounded" alt="">
-              </div>
-              <div class="card-info p-2">
-                <div class="badges my-2">
-                  <span class="text-primary"><i class="bi bi-star"></i></span>
-                </div>
-                <span class="appart-name">Oasis de Bellevue</span></br>
-                <span>Description ...</span>
-              </div>
-            </div>
-          </a>
-        </div><!-- End appart item -->
-
-        <div class="card-container col-sm-2 col-md-4  d-flex mb-2" >
-          <a href="#penthousekarukera">
-            <div class="card appart-card border-0 ">
-              <div class="member-img">
-                <img src="{{asset('images/img/appart/penthouse.jpeg')}}" class="img-fluid rounded" alt="">
-              </div>
-              <div class="card-info p-2">
-                <div class="badges my-2">
-                  <span class="text-primary"><i class="bi bi-star"></i></span>
-                </div>
-                <span class="appart-name">Penthouse de Karukera</span></br>
-                <span class="text-xs">Description ...</span>
-              </div>
-            </div>
-          </a>
-        </div><!-- End appart item -->
-
-      </div>
-      <div class="container d-flex justify-content-center align-item-center "><button class="mx-auto mt-4 btn show-all-apartments">Voir tous les appartements <i class="mx-2 bi bi-arrow-right-square-fill"></i></button></div>
-    
     </div>
     
 
