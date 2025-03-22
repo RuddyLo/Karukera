@@ -218,6 +218,7 @@ section {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 15vh;
 }
 
 /*--------------------------------------------------------------
@@ -871,6 +872,19 @@ HERO
   width: auto;
 }
 
+.searchbar-fixed {
+  margin-bottom: auto;
+  margin-top: auto;
+  height: 60px;
+  background-color: var(--color-white);
+  border-radius: 20px;
+  padding: 10px;
+  width: auto;
+  z-index: 1000;
+  position: fixed;
+}
+
+
 .search_input {
   color: var(--color-secondary-dark);
   border: 0;
@@ -884,8 +898,38 @@ HERO
   padding: 0 10px;
 }
 
+.search_input-darker {
+  color: var(--color-secondary-dark);
+  border: 0;
+  outline: 0;
+  background: rgba(var(--color-gray-rgb), 0.15);
+  width: 0;
+  caret-color: transparent;
+  line-height: 40px;
+  transition: width 0.4s linear;
+  width: 30vw;
+  border-radius: 20px;
+  padding: 0 10px;
 
-.searchbar:hover>.search_icon {
+}
+
+
+.search_icon-darker {
+  height: 40px;
+  width: 40px;
+  float: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: var(--color-secondary);
+  text-decoration: none;
+
+}
+
+
+.searchbar:hover,
+.searchbar-fixed:hover>.search_icon {
   background: var(--color-primary);
   color: var(--color-white);
 }
@@ -2240,4 +2284,10 @@ HERO
 .footer .footer-legal .social-links a:hover {
   background: var(--color-primary);
   text-decoration: none;
+}
+
+.apartments-list-container {
+  padding-top: 10vh;
+  padding-left: 2vw;
+
 }

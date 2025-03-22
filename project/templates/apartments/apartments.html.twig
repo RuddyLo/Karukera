@@ -1,7 +1,51 @@
 {% extends "base.html.twig" %}
 {% block content %}
-<div class="container mt-4">
-
+<div class="container row p-4">
+    <div class="d-flex flex-col">
+        <div class="searchbar-fixed bounce">
+            <input class="search_input-darker" data-bs-toggle="dropdown" aria-expanded="false" type="text" name="" placeholder="rechercher dans une ville...">
+            <a href="#" class="search_icon"><i class="bi bi-search"></i></i></a>
+            <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Ville ou quartier</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Ville ou quartier</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Ville ou quartier</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="container apartments-list-container ">
+    
+        <div class="row">
+        {% for apartment in apartments %}
+            
+            <div class="card-container d-flex col-md-4 mb-4" >
+                <a href="#oasisblonval">
+                    <div class="card appart-card border-0">
+                        
+                        <div class="rounded">
+                        {% if apartment is defined and apartment.imageUrl is not empty %}
+                            <img src="{{asset(apartment.imageUrl)}}" class="on-top-img rounded" alt="">
+                            {% else %}
+                            <img src="{{asset('images/img/placeholder-image.png')}}" class="on-top-img rounded" alt="">
+                        
+                        {% endif %}
+                        
+                        </div>
+                        <div class="card-info p-2">
+                            <div class="badges my-2">
+                                <span class="text-primary"><i class="bi bi-star"></i></span>
+                                <span class="text-primary"><i class="bi bi-open"></i></span>
+                            </div>
+                            <span class="appart-name">{{apartment.name}}</span></br>
+                            <span>{{apartment.description}}</span>
+                        </div>
+                    </div>
+                </a>
+        
+            </div>
+        {% endfor %}
+            
+        </div>
+    </div>
 </div>
 
 {% endblock content %}
