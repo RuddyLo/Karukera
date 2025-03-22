@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import toastr from 'toastr'
 /**
      * 
      * @param {*} imageInputSelector 
@@ -6,7 +7,7 @@ import $ from 'jquery'
      * @param {*} imageSizeLimit 
      * @param {*} allowedFileType 
      */
-function initializeImageUploader(imageInputSelector, imageElementSelector, imageSizeLimit = 2 , allowedFileType = '.png') {
+function initializeImageUploader(imageInputSelector, imageElementSelector, imageSizeLimit = 2, allowedFileType = '.png') {
     let imageUrl = $(imageInputSelector);
     let image = $(imageElementSelector);
 
@@ -15,7 +16,7 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
     });
 
     $(document).on('change', imageInputSelector, function () {
-        
+
         const file = this.files[0];
 
         if (file.size > imageSizeLimit * 1024 * 1024) {
@@ -41,5 +42,5 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
         console.log(imageUrl.val());
     });
 }
-    
-initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2 , '.png');
+
+initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2, '.png');

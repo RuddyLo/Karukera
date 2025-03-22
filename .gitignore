@@ -54,3 +54,6 @@
 #env
 /.env
 /.env.local
+
+#uploads
+/public/uploads/
