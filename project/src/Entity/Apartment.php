@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ApartmentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
@@ -29,6 +31,14 @@ class Apartment
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $imageUrl = null;
+
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'apartment')]
+    private Collection $images;
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
     
     public function getId(): ?int
@@ -92,6 +102,36 @@ class Apartment
     public function setImageUrl(?string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setApartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getApartment() === $this) {
+                $image->setApartment(null);
+            }
+        }
 
         return $this;
     }

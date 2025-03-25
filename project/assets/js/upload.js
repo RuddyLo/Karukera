@@ -44,3 +44,23 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
 }
 
 initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2, '.png');
+
+document.addEventListener("DOMContentLoaded", function () {
+    const imageInput = document.getElementById("apartment_form_images");
+    const previewContainer = document.getElementById("apartment-images-preview");
+    console.log(previewContainer);
+
+    imageInput.addEventListener("change", function (event) {
+        previewContainer.innerHTML = ""; // Vider la prévisualisation actuelle
+        Array.from(event.target.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.classList.add("img-fluid", "rounded", "shadow-sm", "col-md-3", "m-1");
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+});

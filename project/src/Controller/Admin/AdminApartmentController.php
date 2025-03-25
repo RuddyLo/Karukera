@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Apartment;
+use App\Entity\Image;
 use App\Form\ApartmentFormType;
 use App\Repository\ApartmentRepository;
 use Cocur\Slugify\Slugify;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/admin/apartment')]
 class AdminApartmentController extends AbstractController
@@ -24,7 +26,7 @@ class AdminApartmentController extends AbstractController
         private EntityManagerInterface $entityManager,
         private ApartmentRepository $apartmentRepository,
         private readonly ParameterBagInterface $parameterBag,
-    ){  
+    ) {
         $this->slugify = new Slugify();
         $kernelDir = $this->parameterBag->get('kernel.project_dir');
         $this->apartmentImageDirectory = $kernelDir . '/public/uploads/images/';
@@ -39,7 +41,7 @@ class AdminApartmentController extends AbstractController
     #[Route('/new', name: 'admin.apartment.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        
+
         $form = $this->createForm(ApartmentFormType::class);
         $form->handleRequest($request);
 
@@ -51,33 +53,54 @@ class AdminApartmentController extends AbstractController
                     mkdir($this->apartmentImageDirectory, 0777, true);
                 }
                 $image = $form->all()['imageUrl']->getData();
+                $fileName = uniqid() . '.' .  $this->slugify->slugify(
+                    $image->getClientOriginalName()
+                );
 
                 $image
                     ->move(
                         $this->apartmentImageDirectory,
-                        $this->slugify->slugify(
-                            $image->getClientOriginalName()
-                        )
+                        $fileName
                     );
                 // set image
-
                 $apartment
                     ->setImageUrl(
-                        $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
+                        $this->imageUrlDirectory . $fileName
                     );
+
+                $images = $form->get('images')->getData();
+                foreach ($images as $imageFile) {
+                    $fileName = uniqid() . '.' .  $this->slugify->slugify(
+                        $imageFile->getClientOriginalName()
+                    );
+
+                    try {
+                        $imageFile->move(
+                            $this->apartmentImageDirectory,
+                            $fileName
+                        );
+                    } catch (FileException $e) {
+                    }
+
+                    // Créer une nouvelle instance d'Image et la lier à l'Apartment
+                    $image = new Image();
+                    $image->setUrl($this->imageUrlDirectory . $fileName);
+                    $apartment->addImage($image);
+                    $entityManager->persist($image);
+                }
+
 
                 $entityManager->persist($apartment);
                 $entityManager->flush();
-        
             }
 
 
-           
+
             return $this->redirectToRoute('admin.apartment', []);
         }
 
         return $this->render('admin/apartment/new.html.twig', [
-            
+
             'form' => $form,
         ]);
     }
@@ -131,7 +154,7 @@ class AdminApartmentController extends AbstractController
     #[Route('/{id}', name: 'admin.apartment.delete', methods: ['POST'])]
     public function delete(Request $request, Apartment $apartment, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$apartment->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $apartment->getId(), $request->request->get('_token'))) {
             $entityManager->remove($apartment);
             $entityManager->flush();
         }
@@ -142,11 +165,12 @@ class AdminApartmentController extends AbstractController
     #[Route('/ajax/list', name: 'admin.ajax.apartment')]
     public function ajaxAllProgrammes(Request $request): Response
     {
-        
+
         if (!$request->isXmlHttpRequest()) {
             return new JsonResponse(
                 [
-                'message' => 'method not allowed',],
+                    'message' => 'method not allowed',
+                ],
                 403
             );
         }
@@ -164,14 +188,12 @@ class AdminApartmentController extends AbstractController
                 $search
             );
 
-            return new JsonResponse([
-                'recordsTotal'      => $apartment[1],
-                'recordsFiltered'   => $apartment[1],
-                'data'              => array_map(function ($value) {
-                    return array_values($value);
-                }, $apartment[0]),
-            ]);
+        return new JsonResponse([
+            'recordsTotal'      => $apartment[1],
+            'recordsFiltered'   => $apartment[1],
+            'data'              => array_map(function ($value) {
+                return array_values($value);
+            }, $apartment[0]),
+        ]);
     }
-
-
 }

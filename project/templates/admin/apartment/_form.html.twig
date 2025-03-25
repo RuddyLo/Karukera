@@ -17,7 +17,7 @@
             <h4>Image </h4>
             {# <span class="text-muted mb-2"><span class="text-danger text-xs">max 171x213 pixels format .png *</span></span> #}
             <div class="d-flex row align-items-center">
-                <button type="button" class="image-toggler btn btn-primary mr-4">Choisir une image</button>
+                <button type="button" class="image-toggler btn btn-primary mr-4">Choisir une image à mettre en avant</button>
                 {% if apartment is defined and apartment.imageUrl is not empty %}
                 <img id="image-preview"  src="{{ asset(apartment.imageUrl) }}" alt="Choisir une image au format attendu" class="w-4 h-4 rr-apartment-image mx-auto" />
                 {% else %}
@@ -29,6 +29,16 @@
         <div class="row">
 
             {{ form_row(form.imageUrl,{ 'id': 'apartment_form_imagerUrl' }) }}
+        </div>
+        {# Input pour uploader plusieurs images #}
+        <div class="p-4 shadow mt-3">
+            <div class="row mt-3 ">
+                {{ form_row(form.images, { 'attr': { 'multiple': 'multiple', 'id': 'apartment_form_images' } }) }}
+            </div>
+
+            <div id="apartment-images-preview" class="row mt-4">
+
+            </div>
         </div>
     </div>
     
