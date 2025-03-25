@@ -177,8 +177,13 @@ section {
   max-width: 100%;
   /* L'image ne dépassera jamais son conteneur */
   height: 250px;
-
+  object-fit: cover;
+  /* Ajuste l'image pour remplir sans déformation */
+  object-position: center;
+  /* Centre l'image si elle est coupée */
+  display: block;
 }
+
 
 /******************************************* 
 #       Whatsapp Float Button
