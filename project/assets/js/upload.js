@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import toastr from 'toastr'
+import Swal from 'sweetalert2';
 /**
      * 
      * @param {*} imageInputSelector 
@@ -48,7 +49,7 @@ initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2, '
 document.addEventListener("DOMContentLoaded", function () {
     const imageInput = document.getElementById("apartment_form_images");
     const previewContainer = document.getElementById("apartment-images-preview");
-    console.log(previewContainer);
+
 
     imageInput.addEventListener("change", function (event) {
         previewContainer.innerHTML = ""; // Vider la prévisualisation actuelle
@@ -64,3 +65,53 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-remove-apartment-image").forEach(button => {
+        
+        button.addEventListener("click", function () {
+           
+            const imageContainer = this.closest(".image-container");
+            const imageId = imageContainer.getAttribute("data-image-id");
+
+            if (!imageId) return;
+
+            Swal.fire({
+                title: "Êtes-vous sûr de vouloir supprimer?",
+                text: "Cette action est irréversible !",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#d3d3d3",
+                confirmButtonText: "Oui, supprimer",
+                cancelButtonText: "Annuler"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/apartment/images/delete/${imageId}`, {
+                        method: "DELETE",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            imageContainer.remove();
+                        } else {
+                            alert("Erreur : " + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        alert("Une erreur s'est produite lors de la suppression de l'image.");
+                    });
+                }
+            });
+
+            
+
+            
+        });
+    });
+    
+});
+

@@ -196,4 +196,32 @@ class AdminApartmentController extends AbstractController
             }, $apartment[0]),
         ]);
     }
+
+    #[Route('/images/delete/{id}', name: 'ajax.apartment.image.delete', methods: ['DELETE'])]
+    public function deleteImage(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $image = $entityManager->getRepository(Image::class)->find($id);
+
+        if (!$image) {
+            return new JsonResponse(['error' => 'Image non trouvée.'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Supprime l'image de l'appartement
+        $apartment = $image->getApartment();
+        if ($apartment) {
+            $apartment->removeImage($image);
+        }
+
+        // Supprime le fichier physique s'il existe
+        $imagePath = '/public/'. $image->getUrl();
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+
+        $entityManager->remove($image);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => 'Image supprimée avec succès.']);
+    }
+
 }
