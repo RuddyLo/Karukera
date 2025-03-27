@@ -9,7 +9,7 @@
       {% for apartment in apartments_on_top %}
         
         <div class="card-container d-flex col-md-4 mb-2" >
-            <a href="#oasisblonval">
+            <a href="{{path('app.apartment.details', {id: apartment.getId()})}}">
                 <div class="card appart-card border-0">
                     <div class="rounded">
                         <img src="{{asset(apartment.imageUrl)}}" class="on-top-img rounded" alt="">

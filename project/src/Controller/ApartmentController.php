@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Apartment;
 use App\Repository\ApartmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,15 @@ class ApartmentController extends AbstractController
         $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
         return $this->render('apartments/apartments.html.twig', [
             'apartments' => $apartments,
+        ]);
+    }
+
+    #[Route('/{id}/details', name: 'app.apartment.details')]
+    public function details(Apartment $apartment): Response
+    {
+        
+        return $this->render('apartments/details.html.twig', [
+            'apartment' => $apartment,
         ]);
     }
 }
