@@ -139,6 +139,29 @@ class AdminApartmentController extends AbstractController
                     ->setImageUrl(
                         $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
                     );
+
+                
+            }
+
+            $images = $form->get('images')->getData();
+            foreach ($images as $imageFile) {
+                $fileName = uniqid() . '.' .  $this->slugify->slugify(
+                    $imageFile->getClientOriginalName()
+                );
+
+                try {
+                    $imageFile->move(
+                        $this->apartmentImageDirectory,
+                        $fileName
+                    );
+                } catch (FileException $e) {
+                }
+
+                // Créer une nouvelle instance d'Image et la lier à l'Apartment
+                $image = new Image();
+                $image->setUrl($this->imageUrlDirectory . $fileName);
+                $apartment->addImage($image);
+                $entityManager->persist($image);
             }
             $entityManager->flush();
 
