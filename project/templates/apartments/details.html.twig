@@ -1,13 +1,81 @@
 {% extends "base.html.twig" %}
 {% block content %}
-    <div class="container mx-auto w-90 shadow p-4 rounded">
-        <div class="apartment-info">
-            <h3 class="">
-                    {{ apartment.name }}
-            </h3>
-            </hr class='bg-gray'>
+<div class="container mx-auto w-90  p-4 rounded">
+    <div class="col">
+        <div class="apartment-info row d-flex align-items-center justify-content-between  p-4">
+            <!-- Colonne de gauche -->
+            <div class="col-sm-6">
+                <h4><i class="bi bi-house"></i></h4>
+                <h2 class="fw-bold">{{ apartment.name }}</h2>
+                <hr class="w-75">
+                
+            </div>
+
+            <!-- Colonne de droite -->
+            <div class="col-sm-6 d-flex flex-column align-items-end text-gray shadow p-4 rounded">
+                <h4>Disponibilité</h4>
+                <span>25 Mars</span>
+            </div>
+        </div>
+        
+        <div class="row mt-4 rounded p-4 " id="existing-images">
+            <!-- Image principale -->
+            <div class="col-md-6 image-container">
+                <img src="{{ asset(apartment.imageUrl) }}" 
+                    alt="Image de l'appartement" 
+                    class="img-fluid rounded shadow-md preview-image m-2"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#imageModal"
+                    data-image-url="{{ asset(apartment.imageUrl) }}" />
+            </div>
+        
+            <!-- Autres images -->
+            {% for image in apartment.images %}
+                <div class="col-md-6 image-container" data-image-id="{{ image.id }}">
+                    <img src="{{ asset(image.url) }}" 
+                        alt="Image de l'appartement" 
+                        class="img-fluid rounded shadow-md preview-image m-2"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#imageModal"
+                        data-image-url="{{ asset(image.url) }}" />
+                </div>
+            {% endfor %}
+        </div>
+
+        
+        
+        <!-- Fenêtre modale Bootstrap -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" class="img-fluid rounded shadow-lg" alt="Aperçu de l'image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3 rounded-lg p-4 shadow">
             <span>{{ apartment.description }}</span>
         </div>
 
     </div>
+    
+
+</div>
+
+<!-- Script pour gérer l'affichage dans le modal -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".preview-image").forEach(image => {
+            image.addEventListener("click", function () {
+                const imageUrl = this.getAttribute("src");
+                document.getElementById("modalImage").setAttribute("src", imageUrl);
+            });
+        });
+    });
+</script>
 {% endblock content %}

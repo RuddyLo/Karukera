@@ -58,7 +58,12 @@ h6 {
 .image-toggler {
   max-width: 200px;
 }
-
+.modal-content {
+  background: rgba(255, 255, 255, 0.2); /* Fond semi-transparent */
+  backdrop-filter: blur(10px); /* Effet de flou */
+  border-radius: 10px; /* Coins arrondis */
+  /* border: 1px solid rgba(255, 255, 255, 0.3); Bordure légère */
+}
 
 /*--------------------------------------------------------------
 # Buttons

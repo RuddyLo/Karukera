@@ -180,6 +180,11 @@ new Swiper('.testimonials-slider', {
         type: 'bullets',
         clickable: true
     }
+
+    
 });
+
+
+
 
 
