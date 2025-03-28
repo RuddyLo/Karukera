@@ -20,7 +20,15 @@
       
       <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
       <li> <a class=" nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">S'inscrire</a></li>
-      <li> <a class="btn-getstarted scrollto" href="{{path("app.login")}}">Se connecter</a></li>
+      
+      {% if not app.user %}
+        <li> <a class="btn-getstarted scrollto" href="{{path("app.login")}}">Se connecter</a></li>
+        {% else %}
+        <li> <a class="btn btn-danger text-white scrollto" href="{{path("app.logout")}}">Se déconnecter</a></li>
+      {% endif %}
+      
+      
+      <li> <a class="nav-link scrollto color-orange border-primary fw-bold" href="{{path("app.login")}}">Administration</a></li>
      
       <li>
         <span class="langage-selector">

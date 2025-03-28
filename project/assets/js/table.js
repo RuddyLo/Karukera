@@ -73,4 +73,61 @@ $(document).ready(() => {
 
     });
 
+    let userDataTable = $("#user-table").DataTable({
+        responsive: true,
+        "aaSorting": [],
+        "bProcessing": true,
+        "bFilter": true,
+        "bServerSide": true,
+        "iDisplayLength": 10,
+        order: [[0, 'desc']],
+
+        "ajax": {
+            url: ajaxLink.apartment.list,
+            data: function (data) {
+                if (data.order && data?.order[0]) {
+                    data.order_by = data.columns[data.order[0].column].name + ' ' + data.order[0].dir;
+                }
+            },
+        },
+        "columnDefs": [
+            {
+                targets: 0,
+                name: 'apartment.id',
+                orderable: true,
+            },
+            {
+                targets: 1,
+                name: 'apartment.name',
+                orderable: true,
+            },
+            
+            {
+                targets: 3,
+                name: 'apartment.action',
+                orderable: false,
+                render: function (data, type, row) {
+                    return `
+                      <div class="d-flex justify-content-center list-action-group">
+                          <span>
+                                <a title="Visualisation" href='${ajaxLink.apartment.show.replace('1',row[0]) }' id='${data}' class='btn btn-primary'>
+                                   <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <a title="Modification" href='${ajaxLink.apartment.edit.replace('1',row[0]) }' id='${data}' class='btn btn-secondary'>
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button title="Suppression" id='delete-apartment' class='btn btn-danger event-delete-apartment' data-uuid=${data}>
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                              </span>
+                      </div>
+                      
+                      
+                  `
+                }
+            },
+        ],
+
+    });
+
 });
