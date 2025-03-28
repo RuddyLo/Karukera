@@ -5,7 +5,7 @@
         <div class="apartment-info row d-flex align-items-center justify-content-between  p-4">
             <!-- Colonne de gauche -->
             <div class="col-sm-6">
-                <h4><i class="bi bi-house"></i></h4>
+                
                 <h2 class="fw-bold">{{ apartment.name }}</h2>
                 <hr class="w-75">
                 
@@ -13,34 +13,58 @@
 
             <!-- Colonne de droite -->
             <div class="col-sm-6 d-flex flex-column align-items-end text-gray rounded">
-                <h4>Disponibilité</h4>
-                <span>25 Mars</span>
+                <h4>256.00 €</h4>
+                <span>La nuitée</span>
             </div>
         </div>
         
-        <div class="row mt-4 rounded p-4 " id="existing-images">
-            <!-- Image principale -->
-            <div class="col-md-6 image-container">
+        <div class="row mt-4 rounded p-4" id="existing-images">
+            <div class="col-md-6 image-container" style="height: 400px;"> 
                 <img src="{{ asset(apartment.imageUrl) }}" 
                     alt="Image de l'appartement" 
-                    class="img-fluid rounded shadow-md preview-image m-2"
+                    class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
                     data-bs-toggle="modal" 
                     data-bs-target="#imageModal"
                     data-image-url="{{ asset(apartment.imageUrl) }}" />
             </div>
-        
-            <!-- Autres images -->
-            {% for image in apartment.images %}
-                <div class="col-md-6 image-container" data-image-id="{{ image.id }}">
+
+            <div class="col-md-6">
+                <div class="row">
+                    {% set totalImages = apartment.images|length %}
+                    {% set imagesToShow = 4 %} {# Afficher 4 images initialement #}
+
+                    {% for image in apartment.images[:imagesToShow] %}
+                        <div class="col-md-6 image-container mb-2" style="height: 200px;"> 
+                            <img src="{{ asset(image.url) }}" 
+                                alt="Image de l'appartement" 
+                                class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#imageModal"
+                                data-image-url="{{ asset(image.url) }}" />
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div id="more-images" class="row mt-2 p-4 d-none">
+            {% for image in apartment.images[imagesToShow:] %}
+                <div class="col-md-4 image-container" style="height: 200px;">
                     <img src="{{ asset(image.url) }}" 
                         alt="Image de l'appartement" 
-                        class="img-fluid rounded shadow-md preview-image m-2"
+                        class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
                         data-bs-toggle="modal" 
                         data-bs-target="#imageModal"
                         data-image-url="{{ asset(image.url) }}" />
                 </div>
             {% endfor %}
         </div>
+
+        {% if totalImages > imagesToShow %}
+            <div class="text-center mt-3">
+                <button id="load-more-btn" class="btn ">Afficher plus...</button>
+            </div>
+        {% endif %}
 
         
         
@@ -58,8 +82,30 @@
             </div>
         </div>
 
-        <div class="row mt-3 rounded-lg p-4 shadow">
-            <span>{{ apartment.description }}</span>
+        <div class="row mt-3 rounded p-4 shadow">
+            <div class="col-md-6">
+                <span>{{ apartment.description }}</span>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-white rounded p-3">
+                    
+                    <div class="row border border-radius-2 p-2">
+                        <span class="p-2 text-muted text-sm">Réservez votre séjour dès maintenant !</span>
+                        <div class="col-md-6 form-group">
+                            <span class="text-xs p-2">Date du début</span>
+                            <input type="date" name="name" class="form-control" id="name" placeholder="Date de début" required>
+                        </div>
+                        <div class="col-md-6 form-group mt-3 mt-md-0">
+                            <span class="text-xs p-2">Date de fin</span>
+                            <input type="date" class="form-control" name="email" id="email" placeholder="Date de fin" required>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4">
+                        Valider ma réservation
+                    </button>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -77,5 +123,37 @@
             });
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    const moreImagesContainer = document.getElementById("more-images");
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", function () {
+            // Affiche le bloc des images cachées
+            moreImagesContainer.classList.remove("d-none");
+
+            // Vérifie s'il reste encore d'autres images à afficher
+            let hiddenImages = moreImagesContainer.querySelectorAll(".image-container.d-none");
+            if (hiddenImages.length > 0) {
+                // Affiche seulement 5 images supplémentaires
+                hiddenImages.forEach((image, index) => {
+                    if (index < 5) {
+                        image.classList.remove("d-none");
+                    }
+                });
+
+                // S'il n'y a plus d'images cachées, cacher le bouton
+                if (moreImagesContainer.querySelectorAll(".image-container.d-none").length === 0) {
+                    loadMoreBtn.style.display = "none";
+                }
+            } else {
+                // S'il n'y a plus d'images, cacher le bouton
+                loadMoreBtn.style.display = "none";
+            }
+        });
+    }
+});
+
 </script>
 {% endblock content %}
