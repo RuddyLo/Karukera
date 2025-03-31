@@ -139,8 +139,6 @@ class AdminApartmentController extends AbstractController
                     ->setImageUrl(
                         $this->imageUrlDirectory . $this->slugify->slugify($image->getClientOriginalName())
                     );
-
-                
             }
 
             $images = $form->get('images')->getData();
@@ -236,7 +234,7 @@ class AdminApartmentController extends AbstractController
         }
 
         // Supprime le fichier physique s'il existe
-        $imagePath = '/public/'. $image->getUrl();
+        $imagePath = '/public/' . $image->getUrl();
         if (file_exists($imagePath)) {
             unlink($imagePath);
         }
@@ -246,5 +244,4 @@ class AdminApartmentController extends AbstractController
 
         return new JsonResponse(['success' => 'Image supprimée avec succès.']);
     }
-
 }

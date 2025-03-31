@@ -29,25 +29,16 @@
                     </a>
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                         <li class="nav-item py-2">
-                            <a href="#" class="nav-link px-0 align-middle text-white">
-                                <i class="bi bi-user"></i> <span class="ms-1 d-none d-sm-inline">Utilisateurs</span>
+                            <a href="{{ path('admin.user')}}" class="nav-link px-0 align-middle text-white">
+                                <i class="bi bi-people-fill mx-4"></i><span class="ms-1 d-none d-sm-inline">Utilisateurs</span>
                             </a>
                         </li>
                         <li class="nav-item py-2">
                             <a href="{{ path('admin.apartment') }}" class="nav-link align-middle px-0 text-white hover-text-blue">
-                                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline">Appartements</span>
+                                <i class="fs-4 bi-house mx-4"></i> <span class="ms-1 d-none d-sm-inline">Appartements</span>
                             </a>
                         </li>
-                        <li class="nav-item py-2">
-                            <a href="#" class="nav-link px-0 align-middle text-white">
-                                <i class="bi bi-pen-fill"></i> <span class="ms-1 d-none d-sm-inline">Récupération à l'aéroport</span>
-                            </a>
-                        </li>
-                        <li class="nav-item py-2">
-                            <a href="#" class="nav-link px-0 align-middle text-white">
-                                <i class="bi bi-pen-fill"></i> <span class="ms-1 d-none d-sm-inline">Services Annexes</span>
-                            </a>
-                        </li>
+                        
                         <li class="nav-item py-2 w-100 text-center">
                             <a href="{{ path('app.logout') }}" class="nav-link px-4 align-middle bg-danger w-100 text-white">
                                 <i class="bi bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Déconnexion</span>

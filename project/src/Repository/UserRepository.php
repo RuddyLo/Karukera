@@ -62,4 +62,93 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function countUserFiltered($search): int
+    {
+        $entityName = User::class;
+
+        $dql = "
+        SELECT
+            COUNT('*')
+        FROM
+            $entityName u
+        WHERE
+            u.email IS NOT NULL AND
+            u.email != ''
+        ";
+
+        if ($search != '') {
+            $dql .= "
+            AND (
+                u.email LIKE :search
+            )
+        ";
+        }
+
+        $em = $this->getEntityManager()->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+        return (int) $em->getSingleScalarResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function findAllFiltered($page, $nombreMaxPage, $orderBy, $search = ''): array
+    {
+        $entityName = User::class;
+
+        if ($orderBy) {
+            $exploded_order         = explode(' ', $orderBy);
+            $exploded_order[0]      = $exploded_order[0] == 'user.email' ? 'user.id' : $exploded_order[0];
+            $orderBy                = implode(' ', $exploded_order);
+        }
+
+        $orderBy = $orderBy ?: "User.id DESC";
+
+        $dql = "
+            SELECT DISTINCT
+                user.id,
+                user.email
+                
+               
+            FROM
+                $entityName user
+            
+            WHERE
+                user.email IS NOT NULL AND
+                user.email != '' 
+                
+                
+        ";
+
+        if ($search != '') {
+            $dql .= "
+                AND (
+                    user.email LIKE :search 
+                )
+            ";
+        }
+
+
+        $dql .= " ORDER BY $orderBy ";
+
+        $em = $this->getEntityManager()
+            ->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+
+
+        $em->setMaxResults($nombreMaxPage)
+            ->setFirstResult($page);;
+
+        return [$em->getResult(), $this->countUserFiltered($search)];
+    }
 }

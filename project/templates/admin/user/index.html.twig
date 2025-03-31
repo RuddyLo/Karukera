@@ -1,6 +1,6 @@
 {% extends 'admin/admin.base.html.twig' %}
 
-{% block title %}Utilisateurs{% endblock %}
+{% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block content %}
     
@@ -8,16 +8,16 @@
     <div class="m-4 ">
         <div class="table-container container w-100">
             <h1 class="py-4">Liste des utilisateurs</h1>
-            <table style="width: 100%;" id="apartment-table" class="table table-hover able-striped  ">
+            <table style="width: 100%;" id="user-table" class="table table-hover able-striped  ">
                 <thead class="table-dark text-white font-weight-bold">
                     <tr>
                         <th class="">Id</th>
-                        <th class="">email</th>
+                        <th class="">Email</th>
                         <th class="">Actions</th>
                     </tr>
                 </thead>
             </table>
-            <button class="btn btn-info text-white"><a class=" text-white" href="{{ path('admin.apartment.new') }}">Créer un nouveau</a></button>
+            
         </div>
         
     <div>

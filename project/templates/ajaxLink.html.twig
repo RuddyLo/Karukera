@@ -27,10 +27,14 @@
         
         apartment: {
             list        : "{{ path('admin.ajax.apartment') }}" ,
-            show        : "{{ path('admin.apartment.show', {id : 1}) }}" ,
-            edit        : "{{ path('admin.apartment.edit', {id : 1}) }}" ,
+            show        : "{{ path('admin.apartment.show', {id : 123456789}) }}" ,
+            edit        : "{{ path('admin.apartment.edit', {id : 123456789}) }}" ,
             
         },
+        user: {
+            list        :"{{ path('admin.ajax.user')}}",
+            delete      :"{{ path('admin.user.delete',{id: 123456789})}}"
+        }
 
     }
 
