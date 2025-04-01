@@ -33,7 +33,7 @@ class AdminEquipmentConrtoller extends AbstractController
     #[Route('/', name: 'admin.equipment', methods: ['GET'])]
     public function index(EquipmentRepository $equipmentRepository): Response
     {
-        return $this->render('equipment/index.html.twig', [
+        return $this->render('admin/equipment/index.html.twig', [
             'equipment' => $equipmentRepository->findAll(),
         ]);
     }
