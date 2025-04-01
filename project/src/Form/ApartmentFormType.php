@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Apartment;
+use App\Entity\Equipment;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -87,7 +89,16 @@ class ApartmentFormType extends AbstractType
                     'accept' => 'image/*',
                     'class' => 'form-control mt-4',
                 ],
-            ]);;
+            ])
+
+            ->add('equipments', EntityType::class, [
+                'class' => Equipment::class, // On indique l'entité Equipment
+                'choice_label' => 'name', // Affiche le nom des équipements
+                'multiple' => true, // Permet la sélection multiple
+                'expanded' => false, // Utilisation d'une liste déroulante
+                'attr' => ['class' => 'dropdown-checkbox form-select'], // Ajout d’une classe pour le style
+                'label' => 'Équipements',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
