@@ -32,6 +32,12 @@ h6 {
   padding: 10px;
 }
 
+#icon-preview
+{
+  max-width: 150px;
+  max-height: 150px;
+  padding: 20px;
+}
 .sidebar {
   position: fixed;
   top: 0;

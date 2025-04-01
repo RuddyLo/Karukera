@@ -35,9 +35,13 @@ class Apartment
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'apartment')]
     private Collection $images;
 
+    #[ORM\ManyToMany(targetEntity: Equipment::class, inversedBy: 'apartments')]
+    private Collection $equipments;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->equipments = new ArrayCollection();
     }
 
     
@@ -132,6 +136,30 @@ class Apartment
                 $image->setApartment(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipment>
+     */
+    public function getEquipments(): Collection
+    {
+        return $this->equipments;
+    }
+
+    public function addEquipment(Equipment $equipment): static
+    {
+        if (!$this->equipments->contains($equipment)) {
+            $this->equipments->add($equipment);
+        }
+
+        return $this;
+    }
+
+    public function removeEquipment(Equipment $equipment): static
+    {
+        $this->equipments->removeElement($equipment);
 
         return $this;
     }

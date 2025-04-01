@@ -1,0 +1,23 @@
+{{ form_start(form) }}
+    <div class="row">
+        {{ form_row(form.name) }}
+    </div>
+    <div class="rr-homepage-image-container ">
+        {# <span class="text-muted mb-2"><span class="text-danger text-xs">max 171x213 pixels format .png *</span></span> #}
+        <div class="d-flex row align-items-center">
+            <button type="button" class="image-toggler icon-toggler btn bg-orange mr-4 text-white">Choisir une icon</button>
+            {% if equipment is defined and equipment.iconUrl is not empty %}
+            <img id="icon-preview"  src="{{ asset(equipment.imageUrl) }}" alt="Choisir une image au format attendu" class="w-4 h-4 rr-equipment-icon "/>
+            {% else %}
+            <img id="icon-preview"  src="{{ asset('images/img/placeholder-image.png') }}" alt="Choisir une image au format attendu" class="w-4 h-4 rr-equipment-icon " />
+            {% endif %}
+            
+        </div>
+    </div>
+    <div class="row">
+        {{ form_row(form.iconUrl,{ 'id': 'equipment_form_iconUrl' }) }}
+    </div>
+    
+    <button class="btn btn-secondary mt-4 ml-2 " type="submit">Retour</button>
+    <button class="btn btn-success mt-4 ml-2 " type="submit">Enregistrer</button>
+{{ form_end(form) }}

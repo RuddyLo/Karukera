@@ -16,6 +16,10 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
         imageUrl.click();
     });
 
+    $(document).on('click', '.icon-toggler', function () {
+        imageUrl.click();
+    });
+
     $(document).on('change', imageInputSelector, function () {
 
         const file = this.files[0];
@@ -45,6 +49,7 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
 }
 
 initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2, '.png');
+initializeImageUploader('#equipment_form_iconUrl', '.rr-equipment-icon', 1, '.png');
 
 document.addEventListener("DOMContentLoaded", function () {
     const imageInput = document.getElementById("apartment_form_images");
