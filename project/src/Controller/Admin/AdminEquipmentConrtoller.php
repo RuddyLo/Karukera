@@ -126,15 +126,23 @@ class AdminEquipmentConrtoller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_equipment_delete', methods: ['POST'])]
-    public function delete(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
+    #[Route('/delete', name: 'admin.equipment.delete', methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$equipment->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($equipment);
-            $entityManager->flush();
+        $token = $request->get('csrf-token');
+        $id = $request->get('id');
+        
+        
+        if ($this->isCsrfTokenValid('delete-equipment-karukera', $token)) {
+            $equipment = $this->equipmentRepository->findOneBy(['id' => $id]);
+            if ($equipment) {
+                $this->equipmentRepository->remove($equipment, true);
+                $this->addFlash('success', "L'equipement a  été supprimé avec succès");
+            }
         }
+       
 
-        return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('admin.equipment', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/ajax/list', name: 'admin.ajax.equipment')]

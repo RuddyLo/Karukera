@@ -31,3 +31,25 @@ $(document).on('click', '#toggle-apartment-delete', function (event) {
         }
     });
 });
+
+$(document).on('click', '.event-delete-equipment', function () {
+    
+    let dataUuid = $(this);
+    console.log(dataUuid.data('uuid'));
+    Swal.fire({
+        title: 'Suppression',
+        text: "Voulez vous vraiment supprimer cet équipement?",
+        icon: "warning",
+        confirmButtonText: "Confirmer",
+        showCancelButton: true,
+        cancelButtonText: "Non",
+        confirmButtonColor: 'green',
+        cancelButtonColor: '#ddd',
+    }).then((result) => {
+        if(result.isConfirmed) {
+            
+            $("#delete-equipment-form").find("#delete-equipment-id").val(dataUuid.data('uuid'));
+            $("#delete-equipment-form").submit();
+        }
+    })
+});

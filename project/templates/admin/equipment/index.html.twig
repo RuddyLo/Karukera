@@ -17,6 +17,12 @@
         </table>
         <button class="btn btn-info text-white"><a class=" text-white" href="{{ path('admin.equipment.new') }}">Créer un nouveau</a></button>
     </div>
+    <form method="post" id="delete-equipment-form" action="{{ path('admin.equipment.delete') }}" hidden>
+        <input type="hidden" name="csrf-token" id="delete-equipment-karukera" value={{csrf_token('delete-equipment-karukera')}}>
+        <input name="id" type="hidden" id="delete-equipment-id">
+    </form>
     
 <div>
+    
 {% endblock %}
+

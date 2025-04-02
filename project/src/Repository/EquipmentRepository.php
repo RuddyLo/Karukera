@@ -134,4 +134,13 @@ class EquipmentRepository extends ServiceEntityRepository
         
         return [$em->getResult(), $this->countEquipmentFiltered($search)];
     }
+
+    public function remove(Equipment $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }
