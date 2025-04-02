@@ -65,8 +65,11 @@
                 <button id="load-more-btn" class="btn ">Afficher plus...</button>
             </div>
         {% endif %}
-
         
+
+        <div class="p-4 m-4">
+            <span>{{ apartment.description }}</span>
+        </div>
         
         <!-- Fenêtre modale Bootstrap -->
         <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -83,9 +86,25 @@
         </div>
 
         <div class="row mt-3 rounded p-4 shadow">
-            <div class="col-md-6">
-                <span>{{ apartment.description }}</span>
+            <div class="card col-md-6">
+                <div class="row p-4">
+                    <h5>Ce que propose cet appartement</h5>
+                    
+                    <div class="row g-3"> {# Ajoute un gap pour espacer les équipements #}
+                        {% for equipment in apartment.equipments %}
+                            <div class="col-12 col-md-6 d-flex align-items-center">
+                                <img src="{{ asset(equipment.iconUrl) }}" 
+                                     alt="Équipement"
+                                     class="equipment-icon mx-2"
+                                     />
+                                <span class="text-md p-2">{{ equipment.name }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
+            
+            
             <div class="col-md-6">
                 <div class="bg-white rounded p-3">
                     
