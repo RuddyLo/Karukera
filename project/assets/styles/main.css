@@ -41,6 +41,45 @@ h6 {
 
 .dropdown-checkbox input {
   margin-right: 8px;
+  padding: 20px;
+}
+
+.select2-container {
+  width: 100% !important; /* S'assurer que le select prend toute la largeur */
+}
+
+.select2-selection {
+  padding: 8px; /* Ajouter un padding à l'intérieur */
+  /* Couleur de bordure */
+  background-color: #fff; 
+}
+
+.select2-selection__choice {
+  background-color:var(--color-primary) !important; /* Couleur de fond des choix sélectionnés */
+  color: #fff !important; /* Texte en blanc */
+ /* Arrondi */
+  padding: 20px;
+}
+
+.select2-selection__choice__remove {
+  color: #fff !important; /* Icône de suppression en blanc */
+  margin-right: 5px;
+}
+
+.select2-dropdown {
+  border: 1px solid #007bff; /* Bordure bleue */
+  border-radius: 8px; /* Arrondi */
+}
+
+.select2-results__option--highlighted {
+  background-color: #007bff !important; /* Fond bleu lors du survol */
+  color: white !important;
+}
+
+.select2-search__field {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 #selected-equipments {

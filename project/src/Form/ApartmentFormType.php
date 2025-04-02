@@ -92,11 +92,12 @@ class ApartmentFormType extends AbstractType
             ])
 
             ->add('equipments', EntityType::class, [
-                'class' => Equipment::class, // On indique l'entité Equipment
-                'choice_label' => 'name', // Affiche le nom des équipements
-                'multiple' => true, // Permet la sélection multiple
-                'expanded' => false, // Utilisation d'une liste déroulante
-                'attr' => ['class' => 'dropdown-checkbox form-select'], // Ajout d’une classe pour le style
+                'class' => Equipment::class, 
+                'choice_label' => 'name', 
+                'multiple' => true, 
+                'expanded' => false, 
+                'row_attr' => ['class' => 'form-group'],
+                'attr' => ['class' => 'dropdown-checkbox-select form-select'],
                 'label' => 'Équipements',
             ]);
     }

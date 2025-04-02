@@ -6,12 +6,14 @@
     <title>{% block title %}Mon Application{% endblock %}</title>
     <link href="{{asset('images/icons/favicon.png')}}" rel="icon">
     {% block stylesheets %}
-   
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         {{ encore_entry_link_tags('app') }}   
+       
     {% endblock %}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
             {{ include('./ajaxLink.html.twig') }}
+            
 
         {% endblock %}
 </head>
@@ -62,6 +64,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     {% endblock body %}
 
 

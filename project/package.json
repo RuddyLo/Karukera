@@ -24,6 +24,7 @@
         "glightbox": "^3.3.0",
         "isotope-layout": "^3.0.6",
         "jquery": "^3.7.1",
+        "select2": "^4.1.0-rc.0",
         "sweetalert2": "^11.17.2",
         "swiper": "^11.1.0",
         "toastr": "^2.1.4"

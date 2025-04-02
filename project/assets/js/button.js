@@ -1,5 +1,17 @@
 import Swal from 'sweetalert2';
 import $ from 'jquery';
+import select2 from 'select2';
+
+$(document).ready(function() {
+    $('.dropdown-checkbox').select2({
+        placeholder: "Sélectionnez les équipements",
+        allowClear: true,
+        width: '100%',
+        
+    });
+});
+
+
 
 $(document).on('click', '#toggle-apartment-delete', function (event) {
     event.preventDefault(); // Empêche le comportement par défaut du bouton

@@ -12,9 +12,9 @@
         {{ form_row(form.is_favorite) }}
     </div>
 
-    <div class="row">
-        {{ form_row(form.equipments) }}
-        
+    <div class="row p-4 shadow rounded">
+        <label for="{{ form.equipments.vars.id }}">{{ form.equipments.vars.label }}</label>
+        {{ form_widget(form.equipments, {'attr': {'class': 'dropdown-checkbox form-control'}}) }}
     </div>
 
     <div class="col-sm-12 col-lg-6 image-uploader w-auto p-4"> 
