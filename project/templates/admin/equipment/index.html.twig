@@ -3,35 +3,20 @@
 {% block title %}Equipment index{% endblock %}
 
 {% block content %}
-    <h1>Tous les Equipments</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>IconUrl</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for equipment in equipment %}
-            <tr>
-                <td>{{ equipment.id }}</td>
-                <td>{{ equipment.name }}</td>
-                <td>{{ equipment.iconUrl }}</td>
-                <td>
-                    <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">show</a>
-                    <a href="{{ path('app_equipment_edit', {'id': equipment.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('admin.equipment.new') }}">Create new</a>
+<div class="m-4 ">
+    <div class="table-container container w-100">
+        <h1 class="py-4">Liste des Équipements</h1>
+        <table style="width: 100%;" id="equipment-table" class="table table-hover able-striped  ">
+            <thead class="table-dark text-white font-weight-bold">
+                <tr>
+                    <th class="">Id</th>
+                    <th class="">Nom</th>
+                    <th class="">Actions</th>
+                </tr>
+            </thead>
+        </table>
+        <button class="btn btn-info text-white"><a class=" text-white" href="{{ path('admin.equipment.new') }}">Créer un nouveau</a></button>
+    </div>
+    
+<div>
 {% endblock %}

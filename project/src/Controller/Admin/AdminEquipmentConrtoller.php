@@ -9,6 +9,7 @@ use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,7 +23,7 @@ class AdminEquipmentConrtoller extends AbstractController
     
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private EquipmentRepository $apartmentRepository,
+        private EquipmentRepository $equipmentRepository,
         private readonly ParameterBagInterface $parameterBag,
     ) {
         $this->slugify = new Slugify();
@@ -86,19 +87,40 @@ class AdminEquipmentConrtoller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_equipment_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'admin.equipment.edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EquipmentFormType::class, $equipment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            if (!file_exists($this->equipmentIconDirectory)) {
+                mkdir($this->equipmentIconDirectory, 0777, true);
+            }
+            $image = $form->all()['iconUrl']->getData();
+            if ($image) {
+                $fileName = uniqid() . '.' .  $this->slugify->slugify(
+                    $image->getClientOriginalName()
+                );
+                $image
+                    ->move(
+                        $this->equipmentIconDirectory,
+                        $fileName
+                    );
+                // set image
+                $equipment
+                    ->setIconUrl(
+                        $this->iconUrlDirectory . $fileName
+                    );
+            }
+            
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('admin.equipment', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('equipment/edit.html.twig', [
+        return $this->render('admin/equipment/edit.html.twig', [
             'equipment' => $equipment,
             'form' => $form,
         ]);
@@ -113,5 +135,40 @@ class AdminEquipmentConrtoller extends AbstractController
         }
 
         return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/ajax/list', name: 'admin.ajax.equipment')]
+    public function ajaxAllEquipment(Request $request): Response
+    {
+
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(
+                [
+                    'message' => 'method not allowed',
+                ],
+                403
+            );
+        }
+
+        $page           = $request->get('start');
+        $nombreMaxPage  = $request->get('length');
+        $search         = $request->get('search')['value'] ?? '';
+        $orderBy        = $request->get('order_by');
+
+        $equipment = $this->equipmentRepository
+            ->findAllFiltered(
+                $page,
+                $nombreMaxPage,
+                $orderBy,
+                $search
+            );
+
+        return new JsonResponse([
+            'recordsTotal'      => $equipment[1],
+            'recordsFiltered'   => $equipment[1],
+            'data'              => array_map(function ($value) {
+                return array_values($value);
+            }, $equipment[0]),
+        ]);
     }
 }

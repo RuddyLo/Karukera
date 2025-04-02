@@ -34,6 +34,10 @@
         user: {
             list        :"{{ path('admin.ajax.user')}}",
             delete      :"{{ path('admin.user.delete',{id: 123456789})}}"
+        },
+        equipment: {
+            list            :"{{path('admin.ajax.equipment')}}" ,
+            edit            :"{{path('admin.equipment.edit', {id:123456789} )}}"
         }
 
     }

@@ -45,4 +45,93 @@ class EquipmentRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function countEquipmentFiltered($search): int
+    {
+        $entityName = Equipment::class;
+
+        $dql = "
+        SELECT
+            COUNT('*')
+        FROM
+            $entityName e
+        WHERE
+            e.name IS NOT NULL AND
+            e.name != ''
+        ";
+
+        if ($search != '') {
+            $dql .= "
+            AND (
+                e.name LIKE :search
+            )
+        ";
+        }
+
+        $em = $this->getEntityManager()->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+        return (int) $em->getSingleScalarResult();
+    }
+
+      /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function findAllFiltered($page, $nombreMaxPage, $orderBy, $search = ''): array
+    {
+        $entityName = Equipment::class;
+
+        if ($orderBy) {
+            $exploded_order         = explode(' ', $orderBy);
+            $exploded_order[0]      = $exploded_order[0] == 'e.name' ? 'e.id' : $exploded_order[0];
+            $orderBy                = implode(' ', $exploded_order);
+        }
+
+        $orderBy = $orderBy ?: "e.id DESC";
+
+        $dql = "
+            SELECT DISTINCT
+                e.id,
+                e.name
+               
+            FROM
+                $entityName e
+            
+            WHERE
+                e.name IS NOT NULL AND
+                e.name != '' 
+                
+                
+        ";
+
+        if ($search != '') {
+            $dql .= "
+                AND (
+                    e.name LIKE :search 
+                )
+            ";
+        }
+
+
+        $dql .= " ORDER BY $orderBy ";
+
+        $em = $this->getEntityManager()
+        ->createQuery($dql);
+
+        if ($search != '') {
+            $em->setParameter('search', "%$search%");
+        }
+
+
+
+        $em->setMaxResults($nombreMaxPage)
+           ->setFirstResult($page);
+        ;
+        
+        return [$em->getResult(), $this->countEquipmentFiltered($search)];
+    }
 }
