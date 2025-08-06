@@ -38,10 +38,14 @@ class Apartment
     #[ORM\ManyToMany(targetEntity: Equipment::class, inversedBy: 'apartments')]
     private Collection $equipments;
 
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'appartments')]
+    private Collection $reservations;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
         $this->equipments = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     
@@ -160,6 +164,36 @@ class Apartment
     public function removeEquipment(Equipment $equipment): static
     {
         $this->equipments->removeElement($equipment);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setAppartments($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getAppartments() === $this) {
+                $reservation->setAppartments(null);
+            }
+        }
 
         return $this;
     }
