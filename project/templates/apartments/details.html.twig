@@ -108,21 +108,30 @@
             <div class="col-md-6">
                 <div class="bg-white rounded p-3">
                     
+                {{ form_start(form) }}
+                
                     <div class="row border border-radius-2 p-2">
                         <span class="p-2 text-muted text-sm">Réservez votre séjour dès maintenant !</span>
                         <div class="col-md-6 form-group">
                             <span class="text-xs p-2">Date du début</span>
-                            <input type="date" name="name" class="form-control" id="name" placeholder="Date de début" required>
+                            {{ form_row(form.startDate) }}
                         </div>
                         <div class="col-md-6 form-group mt-3 mt-md-0">
                             <span class="text-xs p-2">Date de fin</span>
-                            <input type="date" class="form-control" name="email" id="email" placeholder="Date de fin" required>
+                            {{ form_row(form.endDate) }}
                         </div>
                     </div>
-
-                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4">
-                        Valider ma réservation
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} mt-2">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="submit">
+                        Faire ma réservation
                     </button>
+                {{ form_end(form) }}
                 </div>
             </div>
         </div>

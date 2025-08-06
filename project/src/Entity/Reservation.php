@@ -16,11 +16,11 @@ class Reservation
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $users = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Apartment $apartments = null;
+    private ?Apartment $apartment = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $startDate = null;
@@ -36,26 +36,26 @@ class Reservation
         return $this->id;
     }
 
-    public function getUsers(): ?User
+    public function getUser(): ?User
     {
-        return $this->users;
+        return $this->user;
     }
 
-    public function setUsers(?User $users): static
+    public function setUser(?User $user): static
     {
-        $this->users = $users;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getapartments(): ?Apartment
+    public function getApartment(): ?Apartment
     {
-        return $this->apartments;
+        return $this->apartment;
     }
 
-    public function setapartments(?Apartment $apartments): static
+    public function setApartment(?Apartment $apartment): static
     {
-        $this->apartments = $apartments;
+        $this->apartment = $apartment;
 
         return $this;
     }

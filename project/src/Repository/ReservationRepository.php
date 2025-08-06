@@ -45,4 +45,19 @@ class ReservationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+    public function findReservationsBetweenDates($apartment, \DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.apartment = :apartment')
+            ->andWhere('
+                (r.startDate < :end AND r.endDate > :start)
+            ')
+            ->setParameter('apartment', $apartment)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getResult();
+    }
 }
