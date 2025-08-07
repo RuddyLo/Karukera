@@ -49,8 +49,8 @@ class ApartmentController extends AbstractController
             } else {
                 $em->persist($reservation);
                 $em->flush();
-                $this->addFlash('success', 'Réservation enregistrée !');
-                return $this->redirectToRoute('app.apartments');
+                $this->addFlash('success', 'Réservation enregistrée ! Vous pouvez consulter la liste de vos réservations dans votre compte.');
+                return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
             }
         }
         

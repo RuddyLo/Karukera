@@ -157,8 +157,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Date de début :</strong> <span id="recap-start"></span></p>
-                    <p><strong>Date de fin :</strong> <span id="recap-end"></span></p>
+                    <div class="row">
+                        <!-- Colonne gauche : infos logement -->
+                        <div class="col-md-6 pe-md-4 border-end">
+                            <h5 class="fw-bold mb-2">{{ apartment.name }}</h5>
+                            <span class="text-muted">250.00€ par nuit</span>
+                        </div>
+
+                        <!-- Colonne droite : récapitulatif des dates -->
+                        <div class="col-md-6 ps-md-4">
+                            <p><strong>Date de début :</strong> <span id="recap-start"></span></p>
+                            <p><strong>Date de fin :</strong> <span id="recap-end"></span></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
