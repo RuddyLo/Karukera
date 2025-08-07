@@ -58,6 +58,7 @@ class ApartmentController extends AbstractController
         return $this->render('apartments/details.html.twig', [
             'form' => $form->createView(),
             'apartment' => $apartment,
+            'stripe_public_key' => $this->getParameter('stripe_publishable_key'),
         ]);
     }
 
