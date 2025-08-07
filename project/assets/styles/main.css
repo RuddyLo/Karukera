@@ -81,6 +81,9 @@ h6 {
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+.border-important{
+  border-color:  var(--color-primary);
+}
 
 #selected-equipments {
   display: block;

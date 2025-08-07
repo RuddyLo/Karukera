@@ -44,7 +44,7 @@ class ApartmentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$reservationCheckerService->isAvailable($reservation)) {
-                $this->addFlash('danger', 'L\'appartement est déjà réservé sur cette période.');
+                $this->addFlash('danger', 'L\'appartement est déjà réservé sur cette période. Veuillez choisir une autre periode.');
                 return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
             } else {
                 $em->persist($reservation);

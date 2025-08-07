@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const imageInput = document.getElementById("apartment_form_images");
     const previewContainer = document.getElementById("apartment-images-preview");
 
+    if(!$('#apartment_form_images')[0]) { return; }
 
     imageInput.addEventListener("change", function (event) {
         previewContainer.innerHTML = ""; // Vider la prévisualisation actuelle

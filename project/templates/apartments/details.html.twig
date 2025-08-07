@@ -3,6 +3,13 @@
 <div class="container mx-auto w-90  p-4 rounded">
     <div class="col">
         <div class="apartment-info row d-flex align-items-center justify-content-between  p-4">
+        {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} mt-2">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
             <!-- Colonne de gauche -->
             <div class="col-sm-6">
                 
@@ -62,7 +69,7 @@
 
         {% if totalImages > imagesToShow %}
             <div class="text-center mt-3">
-                <button id="load-more-btn" class="btn ">Afficher plus...</button>
+                <button id="load-more-btn" class="btn border border-orange text-orange">Afficher plus...</button>
             </div>
         {% endif %}
         
@@ -108,17 +115,17 @@
             <div class="col-md-6">
                 <div class="bg-white rounded p-3">
                     
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
                 
-                    <div class="row border border-radius-2 p-2">
-                        <span class="p-2 text-muted text-sm">Réservez votre séjour dès maintenant !</span>
+                    <div class="row border border-radius-4 border-info p-4">
+                        <span class="p-2 mb-4 text-muted text-lg fw-bold h4">Réservez votre séjour dès maintenant !</span>
                         <div class="col-md-6 form-group">
-                            <span class="text-xs p-2">Date du début</span>
-                            {{ form_row(form.startDate) }}
+                            <span class="text-xs p-2">Date de début</span>
+                            {{ form_widget(form.startDate) }}
                         </div>
                         <div class="col-md-6 form-group mt-3 mt-md-0">
-                            <span class="text-xs p-2">Date de fin</span>
-                            {{ form_row(form.endDate) }}
+                            <span class="text-xs p-2 mb-2">Date de fin</span>
+                            {{ form_widget(form.endDate) }}
                         </div>
                     </div>
                     {% for label, messages in app.flashes %}
@@ -128,14 +135,37 @@
                             </div>
                         {% endfor %}
                     {% endfor %}
-                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="submit">
+                    <div class="alert-no-date mt-2 d-none">
+                        <span class="text-xs p-2 text-danger font-semibold">Selectionnez les dates</span>
+                    </div>
+                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="button" id="preview-reservation-btn" >
                         Faire ma réservation
                     </button>
+                    
                 {{ form_end(form) }}
                 </div>
             </div>
         </div>
 
+    </div>
+    {# Modal Reservation preview #}
+    <div class="modal fade" id="reservation-modal" tabindex="-1" aria-labelledby="recapModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recapModalLabel">Récapitulatif de votre réservation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Date de début :</strong> <span id="recap-start"></span></p>
+                    <p><strong>Date de fin :</strong> <span id="recap-end"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-info text-white" id="confirm-reservation">Confirmer la réservation</button>
+                </div>
+            </div>
+        </div>
     </div>
     
 
