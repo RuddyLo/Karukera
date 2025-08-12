@@ -22,6 +22,7 @@ class ReservationFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mb-2 mt-2',
                     'placeholder' => 'Choisissez une date de début',
+                    'readonly' => true,
                 ]
             ])
             ->add('endDate', DateType::class, [
@@ -30,6 +31,7 @@ class ReservationFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mb-2 mt-2',
                     'placeholder' => 'Choisissez une date de fin',
+                    'readonly' => true,
                 ]
     ])
             
