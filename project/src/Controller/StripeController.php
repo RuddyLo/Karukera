@@ -16,6 +16,25 @@ use Stripe\Checkout\Session;
 use Stripe\Webhook;
 use Symfony\Component\HttpFoundation\Response;
 
+
+/*
+
+L’utilisateur paie → Stripe crée et gère la session.
+
+Paiement validé → Stripe envoie en arrière-plan un checkout.session.completed vers ton endpoint /stripe/webhook.
+
+Ton code dans /stripe/webhook :
+
+Vérifie la signature.
+
+Lit les infos (dates, utilisateur, etc.).
+
+Crée la réservation en base de données.
+
+Tu renvoies un 200 OK à Stripe.
+
+*/
+
 class StripeController extends AbstractController
 {
     #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
