@@ -1,0 +1,43 @@
+{# templates/blog/category.html.twig #}
+{% extends 'blog/base.html.twig' %}
+
+{% block page_title %}{{ category.name }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">{{ category.name }}</li>
+{% endblock %}
+
+{% block blog_content %}
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}
+        <p class="lead">{{ category.description }}</p>
+    {% endif %}
+
+    <div class="row">
+        {% for article in articles %}
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    {% if article.featuredImage %}
+                        <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" 
+                             class="card-img-top" alt="{{ article.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ path('blog_article', {slug: article.slug}) }}">
+                                {{ article.title }}
+                            </a>
+                        </h5>
+                        {% if article.excerpt %}
+                            <p class="card-text">{{ article.excerpt }}</p>
+                        {% endif %}
+                        <small class="text-muted">
+                            {{ article.publishedAt|date('d/m/Y') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucun article dans cette catégorie.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

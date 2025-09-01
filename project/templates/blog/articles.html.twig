@@ -1,0 +1,63 @@
+{# templates/blog/article.html.twig #}
+{% extends 'blog/base.html.twig' %}
+
+{% block page_title %}{{ article.metaTitle ?? article.title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item">
+        <a href="{{ path('blog_category', {slug: article.category.slug}) }}">
+            {{ article.category.name }}
+        </a>
+    </li>
+    <li class="breadcrumb-item active">{{ article.title }}</li>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    {% if article.metaDescription %}
+        <meta name="description" content="{{ article.metaDescription }}">
+    {% endif %}
+    <meta property="og:title" content="{{ article.metaTitle ?? article.title }}">
+    <meta property="og:type" content="article">
+    {% if article.featuredImage %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog/' ~ article.featuredImage)) }}">
+    {% endif %}
+{% endblock %}
+
+{% block blog_content %}
+    <article>
+        <header class="mb-4">
+            <h1>{{ article.title }}</h1>
+            <div class="text-muted mb-3">
+                Publié le {{ article.publishedAt|date('d/m/Y à H:i') }}
+                dans <a href="{{ path('blog_category', {slug: article.category.slug}) }}">
+                    {{ article.category.name }}
+                </a>
+            </div>
+            {% if article.featuredImage %}
+                <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" 
+                     class="img-fluid mb-4" alt="{{ article.title }}">
+            {% endif %}
+        </header>
+        
+        <div class="content">
+            {{ article.content|nl2br }}
+        </div>
+    </article>
+
+    <hr class="my-5">
+    
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{{ path('blog_index') }}" class="btn btn-outline-primary">
+                ← Retour au blog
+            </a>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('blog_category', {slug: article.category.slug}) }}" 
+               class="btn btn-outline-secondary">
+                Plus d'articles dans {{ article.category.name }}
+            </a>
+        </div>
+    </div>
+{% endblock %}

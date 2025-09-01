@@ -1,0 +1,24 @@
+{# templates/blog/base.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if block('page_title') is defined %}
+        {{ block('page_title') }} - Blog
+    {% else %}
+        Blog
+    {% endif %} - {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('blog_index') }}">Blog</a></li>
+                {% block breadcrumb %}{% endblock %}
+            </ol>
+        </nav>
+
+        {% block blog_content %}{% endblock %}
+    </div>
+{% endblock %}

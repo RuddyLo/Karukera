@@ -1,0 +1,55 @@
+{# templates/blog/index.html.twig #}
+{% extends 'blog/base.html.twig' %}
+
+{% block page_title %}Tous les articles{% endblock %}
+
+{% block blog_content %}
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Blog</h1>
+            
+            {% for article in articles %}
+                <article class="card mb-4">
+                    {% if article.featuredImage %}
+                        <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" 
+                             class="card-img-top" alt="{{ article.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            <a href="{{ path('blog_article', {slug: article.slug}) }}">
+                                {{ article.title }}
+                            </a>
+                        </h2>
+                        {% if article.excerpt %}
+                            <p class="card-text">{{ article.excerpt }}</p>
+                        {% endif %}
+                        <small class="text-muted">
+                            Publié le {{ article.publishedAt|date('d/m/Y') }}
+                            dans <a href="{{ path('blog_category', {slug: article.category.slug}) }}">
+                                {{ article.category.name }}
+                            </a>
+                        </small>
+                    </div>
+                </article>
+            {% else %}
+                <p>Aucun article publié pour le moment.</p>
+            {% endfor %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Catégories</h5>
+                </div>
+                <div class="card-body">
+                    {% for category in categories %}
+                        <a href="{{ path('blog_category', {slug: category.slug}) }}" 
+                           class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            {{ category.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
