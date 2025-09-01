@@ -29,7 +29,7 @@ class BlogDashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToRoute('Retour au site', 'fa fa-home', 'app_home');
+        yield MenuItem::linkToRoute('Retour au site', 'fa fa-home', 'app.home');
         yield MenuItem::section('Blog');
         yield MenuItem::linkToCrud('Articles', 'fa fa-newspaper', Article::class);
         yield MenuItem::linkToCrud('Catégories', 'fa fa-tags', Category::class);
