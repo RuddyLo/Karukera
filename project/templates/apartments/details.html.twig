@@ -20,7 +20,7 @@
 
             <!-- Colonne de droite -->
             <div class="col-sm-6 d-flex flex-column align-items-end text-gray rounded">
-                <h4>256.00 €</h4>
+                <h4>{{ apartment.price }} €</h4>
                 <span>La nuitée</span>
             </div>
         </div>
@@ -168,7 +168,7 @@
                         <!-- Colonne gauche : infos logement -->
                         <div class="col-md-6 pe-md-4 border-end">
                             <h5 class="fw-bold mb-2">{{ apartment.name }}</h5>
-                            <span class="text-muted">250.00€ par nuit</span>
+                            <span class="text-muted">{{ apartment.price }} par nuit, un total de </span>
                         </div>
 
                         <!-- Colonne droite : récapitulatif des dates -->
@@ -220,19 +220,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+{# --- Stripe --- #}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     const stripe = Stripe("{{ stripe_public_key }}");
 
     const apartmentId = {{ apartment.id }};
+    const apartmentPrice = {{ apartment.price }};
+    {# const apartmenetStripePriceId = {{ apartment.getStripePriceId() }}; #}
     const startDate = document.getElementById('reservation_form_startDate').value;
     const endDate = document.getElementById('reservation_form_endDate').value;
+
+    document.getElementById('reservation_form_startDate').value ='';
+    document.getElementById('reservation_form_endDate').value='';
 
     document.getElementById("checkout-button").addEventListener("click", () => {
         fetch("{{ path('app_stripe_checkout') }}", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                price: apartmentPrice,
                 apartment_id: apartmentId,
                 start_date: startDate,
                 end_date: endDate

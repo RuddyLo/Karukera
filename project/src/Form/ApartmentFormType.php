@@ -25,7 +25,18 @@ class ApartmentFormType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => "Dénomination de l'appartement",
                 'row_attr' => [
-                    'class' => 'form-group col-sm-12 m-2',
+                    'class' => 'form-group col-sm-6 my-2',
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'required' => true,
+                ],
+
+            ])
+            ->add('price', TextType::class, [
+                'label' => "Prix",
+                'row_attr' => [
+                    'class' => 'form-group col-sm-6 my-2',
                 ],
                 'attr' => [
                     'class' => 'form-control',

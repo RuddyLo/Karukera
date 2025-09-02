@@ -28,7 +28,3 @@ document.getElementById('preview-reservation-btn').addEventListener('click', fun
     
 });
 
-document.getElementById('confirm-reservation').addEventListener('click', function () {
-    
-    document.getElementById('reservation-form').submit();
-});

@@ -91,16 +91,30 @@ class StripeController extends AbstractController
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
         $data = json_decode($request->getContent(), true);
+        
+        $startDate = new \DateTime($data['start_date']);
+        $endDate   = new \DateTime($data['end_date']);
+
+        $interval = $startDate->diff($endDate);
+        $days = $interval->days;
+
+        $pricePerDay = $data['price']; 
+        $totalPrice = $pricePerDay * $days;
+        $unitAmount = $totalPrice * 100;
+
+        if ($unitAmount <=0) {
+            $unitAmount = $pricePerDay * 100;
+        }
 
         $session = Session::create([
-            'payment_method_types' => ['card'],
+            
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
                         'name' => 'Réservation Appartement',
                     ],
-                    'unit_amount' => 25000, // 250,00€
+                    'unit_amount' => $unitAmount, // 250,00€
                 ],
                 'quantity' => 1,
             ]],
