@@ -25,7 +25,7 @@ class PricePeriodType extends AbstractType
                 'attr' => [
                     'type'=> 'number',
                     'class' => 'form-control',
-                    'required' => true,
+                    'required' => false,
                 ],
 
             ])
@@ -37,7 +37,7 @@ class PricePeriodType extends AbstractType
                 ],
                 'attr' => [
                     'class' => 'form-control',
-                    'required' => true,
+                    'required' => false,
                     'disabled'
                 ],
             ])
@@ -50,7 +50,7 @@ class PricePeriodType extends AbstractType
                 ],
                 'attr' => [
                     'class' => 'form-control',
-                    'required' => true,
+                    'required' => false,
                 ],
             ])
             

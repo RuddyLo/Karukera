@@ -8,7 +8,9 @@ use App\Entity\PricePeriod;
 use App\Form\ApartmentFormType;
 use App\Form\PricePeriodType;
 use App\Repository\ApartmentRepository;
+use App\Repository\PricePeriodRepository;
 use Cocur\Slugify\Slugify;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +19,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Validator\Constraints\NotNull;
+
+use function Symfony\Component\Clock\now;
 
 #[Route('/admin/apartment')]
 class AdminApartmentController extends AbstractController
@@ -27,6 +32,7 @@ class AdminApartmentController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ApartmentRepository $apartmentRepository,
+        private PricePeriodRepository $pricePeriodRepository,
         private readonly ParameterBagInterface $parameterBag,
     ) {
         $this->slugify = new Slugify();
@@ -121,8 +127,12 @@ class AdminApartmentController extends AbstractController
     #[Route('/{id}', name: 'admin.apartment.show', methods: ['GET'])]
     public function show(Apartment $apartment): Response
     {
+        $today = new DateTime("today");
+        $pricePeriod = $this->pricePeriodRepository->findCurrentPricePeriod($today,$apartment);
+
         return $this->render('admin/apartment/show.html.twig', [
             'apartment' => $apartment,
+            'pricePeriod' => $pricePeriod
         ]);
     }
 
@@ -131,8 +141,6 @@ class AdminApartmentController extends AbstractController
     {
         $form = $this->createForm(ApartmentFormType::class, $apartment);
         $form->handleRequest($request);
-
-        $pricePeriod = new PricePeriod();
 
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -180,8 +188,13 @@ class AdminApartmentController extends AbstractController
             }
 
             $pricePeriod = $form->get('pricePeriod')->getData();
-            $pricePeriod->setApartment($apartment);
-            $entityManager->persist($pricePeriod);
+            
+            
+            if ($pricePeriod and $pricePeriod->getStartDate() != null  and $pricePeriod->getEndDate() != null) {
+                $pricePeriod->setApartment($apartment);
+                $entityManager->persist($pricePeriod);
+            }
+           
 
             $entityManager->flush();
 

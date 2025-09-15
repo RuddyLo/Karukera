@@ -17,14 +17,29 @@
         <div class="card-info p-2">
           <div class="badges my-2">
             {% if apartment.isActive %}
-                <span class="text-succes font-">Actif</span>
+              <span class="text-succes font-">Actif</span>
             
             {% else %}
-            <span class="text-danger bold-500">Pas actif</span>
+              <span class="text-danger bold-500">Pas actif</span>
             {% endif %}
           </div>
-          <span class="appart-name">{{apartment.name}}</span></br>
-          <span class="text-xs">{{apartment.description}}</span>
+          <div class="container flex justify-between items-center">
+              <span class="appart-name">Prix par défaut: {{ apartment.price }}</span>
+
+              {% if pricePeriod %}
+                  <span class="text-xs"> | Prix pour la période actuelle {{ pricePeriod.price }}</span>
+              {% else %}
+                  <span class="text-xs">Pas de prix spécifique pour cette période</span>
+              {% endif %}
+          </div>
+
+          <div class="container">
+              <div class="row">
+               <span class="appart-name  text-bold">{{apartment.name}}</span></br>
+                <span class="text-xs">{{apartment.description}}</span>
+              </div>
+          </div>
+         
         </div>
       </div>
   </div>
