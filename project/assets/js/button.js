@@ -53,3 +53,26 @@ $(document).on('click', '.event-delete-equipment', function () {
         }
     })
 });
+
+
+$(document).on('click', '.event-delete-price-period', function () {
+    
+    let dataUuid = $(this);
+    console.log(dataUuid.data('uuid'));
+    Swal.fire({
+        title: 'Suppression',
+        text: "Voulez vous vraiment supprimer cette Période ?",
+        icon: "warning",
+        confirmButtonText: "Confirmer",
+        showCancelButton: true,
+        cancelButtonText: "Non",
+        confirmButtonColor: 'green',
+        cancelButtonColor: '#ddd',
+    }).then((result) => {
+        if(result.isConfirmed) {
+            
+            $("#delete-price-period-form").find("#delete-price-period-id").val(dataUuid.data('uuid'));
+            $("#delete-equipment-form").submit();
+        }
+    })
+});

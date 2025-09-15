@@ -24,8 +24,7 @@
                 <td>{{ price_period.startDate ? price_period.startDate|date('Y-m-d') : '' }}</td>
                 <td>{{ price_period.endDate ? price_period.endDate|date('Y-m-d') : '' }}</td>
                 <td>
-                    <a href="{{ path('price_period_show', {'id': price_period.id}) }}">show</a>
-                    <a href="{{ path('price_period_edit', {'id': price_period.id}) }}">edit</a>
+                    <a class='btn btn-primary' href="{{ path('price_period_edit', {'id': price_period.id}) }}"><i class="bi bi-eye-fill"></i></a>
                 </td>
             </tr>
         {% else %}
@@ -36,8 +35,6 @@
         </table>
         <button class="btn btn-info text-white"><a class=" text-white" href="{{ path('price_period_new') }}">Créer un nouveau</a></button>
     </div>
-    
-    
 <div>
 
 
