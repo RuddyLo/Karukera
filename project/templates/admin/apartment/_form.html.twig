@@ -1,5 +1,20 @@
 <div class="p-2 w-100">
-    {{ form_start(form) }}
+    
+
+    {{ form_start(form,{'attr': {'id': 'apartmentForm'}}) }}
+    <div class="shadow border border-radius p-4 mb-4">
+        {# --- Calendrier --- #}
+        <div class="price-calendar-container">
+            <div id="price-calendar"></div>
+        </div>
+        <div class="row">
+             {{ form_row(form.pricePeriod.price) }}
+        </div>
+        <div class="row">
+             {{ form_row(form.pricePeriod.startDate) }}
+             {{ form_row(form.pricePeriod.endDate) }}
+        </div>
+    </div>
     <div class="row">
         {{ form_row(form.name) }}
         {{ form_row(form.price) }}
@@ -76,3 +91,32 @@
     {{ form_end(form) }}
 
 </div>
+
+{# --- FullCalendar --- #}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('price-calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        events: '{{ path("pridePeriode.json", { id: apartmentId }) }}', 
+        selectable: true,
+        selectAllow: function(selectInfo) {
+            var events = calendar.getEvents();
+            for (let event of events) {
+                if ((selectInfo.start < event.end) && (selectInfo.end > event.start)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        select: function(info) {
+            document.getElementById('apartment_form_pricePeriod_startDate').value = info.startStr;
+            document.getElementById('apartment_form_pricePeriod_endDate').value = info.endStr;
+        }
+    });
+    calendar.render();
+});
+</script>

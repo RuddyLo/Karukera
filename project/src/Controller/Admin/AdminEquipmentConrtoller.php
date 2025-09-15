@@ -79,13 +79,6 @@ class AdminEquipmentConrtoller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_equipment_show', methods: ['GET'])]
-    public function show(Equipment $equipment): Response
-    {
-        return $this->render('equipment/show.html.twig', [
-            'equipment' => $equipment,
-        ]);
-    }
 
     #[Route('/{id}/edit', name: 'admin.equipment.edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response

@@ -4,7 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Apartment;
 use App\Entity\Image;
+use App\Entity\PricePeriod;
 use App\Form\ApartmentFormType;
+use App\Form\PricePeriodType;
 use App\Repository\ApartmentRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,6 +34,7 @@ class AdminApartmentController extends AbstractController
         $this->apartmentImageDirectory = $kernelDir . '/public/uploads/images/';
         $this->imageUrlDirectory = '/uploads/images/';
     }
+
     #[Route('/', name: 'admin.apartment', methods: ['GET'])]
     public function index(ApartmentRepository $apartmentRepository): Response
     {
@@ -41,14 +44,18 @@ class AdminApartmentController extends AbstractController
     #[Route('/new', name: 'admin.apartment.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-
+        
         $form = $this->createForm(ApartmentFormType::class);
         $form->handleRequest($request);
 
+        $pricePeriod = new PricePeriod();
+        
         if ($form->isSubmitted() && $form->isValid()) {
 
             if ($form->get('imageUrl')->getData()) {
+
                 $apartment = $form->getData();
+
                 if (!file_exists($this->apartmentImageDirectory)) {
                     mkdir($this->apartmentImageDirectory, 0777, true);
                 }
@@ -89,8 +96,13 @@ class AdminApartmentController extends AbstractController
                     $entityManager->persist($image);
                 }
 
+                $pricePeriod = $form->get('pricePeriod')->getData();
+
+                // $apartment->addPricePeriod($pricePeriod);
 
                 $entityManager->persist($apartment);
+                $pricePeriod->setApartment($apartment);
+                $entityManager->persist($pricePeriod);
                 $entityManager->flush();
             }
 
@@ -102,6 +114,7 @@ class AdminApartmentController extends AbstractController
         return $this->render('admin/apartment/new.html.twig', [
 
             'form' => $form,
+            
         ]);
     }
 
@@ -119,7 +132,11 @@ class AdminApartmentController extends AbstractController
         $form = $this->createForm(ApartmentFormType::class, $apartment);
         $form->handleRequest($request);
 
+        $pricePeriod = new PricePeriod();
+
+
         if ($form->isSubmitted() && $form->isValid()) {
+
             if ($form->get('imageUrl')->getData()) {
                 if (!file_exists($this->apartmentImageDirectory)) {
                     mkdir($this->apartmentImageDirectory, 0777, true);
@@ -161,12 +178,18 @@ class AdminApartmentController extends AbstractController
                 $apartment->addImage($image);
                 $entityManager->persist($image);
             }
+
+            $pricePeriod = $form->get('pricePeriod')->getData();
+            $pricePeriod->setApartment($apartment);
+            $entityManager->persist($pricePeriod);
+
             $entityManager->flush();
 
             return $this->redirectToRoute('admin.apartment', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/apartment/edit.html.twig', [
+            'apartmentId' => $apartment->getId(),
             'apartment' => $apartment,
             'form' => $form,
         ]);

@@ -44,6 +44,9 @@ class Apartment
     #[ORM\Column(nullable: true)]
     private ?float $price = null;
 
+    #[ORM\OneToMany(targetEntity: PricePeriod::class, mappedBy: 'apartment')]
+    private Collection $pricePeriods;
+
  
 
     public function __construct()
@@ -51,6 +54,7 @@ class Apartment
         $this->images = new ArrayCollection();
         $this->equipments = new ArrayCollection();
         $this->reservations = new ArrayCollection();
+        $this->pricePeriods = new ArrayCollection();
     }
 
     
@@ -211,6 +215,36 @@ class Apartment
     public function setPrice(?float $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PricePeriod>
+     */
+    public function getPricePeriods(): Collection
+    {
+        return $this->pricePeriods;
+    }
+
+    public function addPricePeriod(PricePeriod $pricePeriod): static
+    {
+        if (!$this->pricePeriods->contains($pricePeriod)) {
+            $this->pricePeriods->add($pricePeriod);
+            $pricePeriod->setApartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removePricePeriod(PricePeriod $pricePeriod): static
+    {
+        if ($this->pricePeriods->removeElement($pricePeriod)) {
+            // set the owning side to null (unless already changed)
+            if ($pricePeriod->getApartment() === $this) {
+                $pricePeriod->setApartment(null);
+            }
+        }
 
         return $this;
     }

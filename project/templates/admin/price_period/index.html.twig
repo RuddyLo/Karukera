@@ -1,0 +1,46 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}PricePeriod index{% endblock %}
+
+{% block content %}
+    
+    <div class="m-4 ">
+    <div class="table-container container w-100">
+        <h1 class="py-4">Liste des Période</h1>
+        <table style="width: 100%;" id="" class="table table-hover able-striped  ">
+            <thead class="table-dark text-white font-weight-bold">
+                <tr>
+                <th>Id</th>
+                <th>Prix</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>actions</th>
+            </tr>
+            </thead>
+            {% for price_period in price_periods %}
+            <tr>
+                <td>{{ price_period.id }}</td>
+                <td>{{ price_period.price }}</td>
+                <td>{{ price_period.startDate ? price_period.startDate|date('Y-m-d') : '' }}</td>
+                <td>{{ price_period.endDate ? price_period.endDate|date('Y-m-d') : '' }}</td>
+                <td>
+                    <a href="{{ path('price_period_show', {'id': price_period.id}) }}">show</a>
+                    <a href="{{ path('price_period_edit', {'id': price_period.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Pas encore de donnée</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <button class="btn btn-info text-white"><a class=" text-white" href="{{ path('price_period_new') }}">Créer un nouveau</a></button>
+    </div>
+    
+    
+<div>
+
+
+
+    
+{% endblock %}

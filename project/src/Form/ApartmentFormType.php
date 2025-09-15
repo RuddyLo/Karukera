@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Apartment;
 use App\Entity\Equipment;
+use App\Entity\PricePeriod;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -22,6 +23,12 @@ class ApartmentFormType extends AbstractType
             'Oui' => true
         ];
         $builder
+            ->add('pricePeriod', PricePeriodType::class, [
+                    'label' => 'Nouvelle période de prix (optionnel)',
+                    'data_class' => PricePeriod::class,
+                    'mapped' => false, // Important : non mappé à l'entité principale
+                    'required' => false,
+                ])
             ->add('name', TextType::class, [
                 'label' => "Dénomination de l'appartement",
                 'row_attr' => [

@@ -1,0 +1,34 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}PricePeriod{% endblock %}
+
+{% block content %}
+    <h1>PricePeriod</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ price_period.id }}</td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td>{{ price_period.price }}</td>
+            </tr>
+            <tr>
+                <th>StartDate</th>
+                <td>{{ price_period.startDate ? price_period.startDate|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EndDate</th>
+                <td>{{ price_period.endDate ? price_period.endDate|date('Y-m-d') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('price_period_index') }}">back to list</a>
+
+    <a href="{{ path('price_period_edit', {'id': price_period.id}) }}">edit</a>
+
+    {{ include('admin/price_period/_delete_form.html.twig') }}
+{% endblock %}

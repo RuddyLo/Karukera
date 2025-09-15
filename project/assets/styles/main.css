@@ -2382,3 +2382,8 @@ HERO
   padding-left: 2vw;
 
 }
+
+.price-calendar-container {
+  display: flex;
+  
+}
