@@ -112,8 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         },
         select: function(info) {
+            let endDateObj = new Date(info.end); 
+            endDateObj.setDate(endDateObj.getDate()); 
+            let endDate = endDateObj.toISOString().split('T')[0]; 
             document.getElementById('apartment_form_pricePeriod_startDate').value = info.startStr;
-            document.getElementById('apartment_form_pricePeriod_endDate').value = info.endStr;
+            document.getElementById('apartment_form_pricePeriod_endDate').value = endDate;
         }
     });
     calendar.render();

@@ -60,15 +60,14 @@ class PricePeriodRepository extends ServiceEntityRepository
             ->andWhere('p.startDate <= :date')
             ->andWhere('p.endDate >= :date')
             ->setParameter('date', $date)
+            ->andWhere('p.apartment = :apartment')
+            ->setParameter('apartment', $apartment)
             ->orderBy('p.startDate', 'ASC') // En cas de périodes qui se chevauchent, prendre la première
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
         
-        if ($apartment !== null) {
-        $qb->andWhere('p.apartment = :apartment')
-           ->setParameter('apartment', $apartment);
-        }
+       
 
         return $qb->getQuery()->getOneOrNullResult();
     }

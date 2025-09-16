@@ -127,8 +127,10 @@ class AdminApartmentController extends AbstractController
     #[Route('/{id}', name: 'admin.apartment.show', methods: ['GET'])]
     public function show(Apartment $apartment): Response
     {
+        
         $today = new DateTime("today");
         $pricePeriod = $this->pricePeriodRepository->findCurrentPricePeriod($today,$apartment);
+        
 
         return $this->render('admin/apartment/show.html.twig', [
             'apartment' => $apartment,
@@ -188,7 +190,7 @@ class AdminApartmentController extends AbstractController
             }
 
             $pricePeriod = $form->get('pricePeriod')->getData();
-            
+
             
             if ($pricePeriod and $pricePeriod->getStartDate() != null  and $pricePeriod->getEndDate() != null) {
                 $pricePeriod->setApartment($apartment);

@@ -91,10 +91,13 @@ class PricePeriodController extends AbstractController
 
         foreach ($pricePeriods as $price) {
             $events[] = [
-                'title' => 'Définie',
+                'title' => $price->getPrice()."€",
                 'start' => $price->getStartDate()->format('Y-m-d'),
                 'end'   => $price->getEndDate()->format('Y-m-d'), 
-                'color' => '#b66b0aff', // rouge
+                'color' => '#b66b0aff',
+                'url'   => $this->generateUrl('price_period_edit', [
+                    'id' => $price->getId()
+                ]),
             ];
         }
 
