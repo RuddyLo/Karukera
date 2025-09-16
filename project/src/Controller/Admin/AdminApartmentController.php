@@ -120,6 +120,7 @@ class AdminApartmentController extends AbstractController
         return $this->render('admin/apartment/new.html.twig', [
 
             'form' => $form,
+            'apartmentId' => 0 
             
         ]);
     }
