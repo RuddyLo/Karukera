@@ -1,21 +1,123 @@
-<!-- hero -->
-    <div class="content-above-slider">
-       <h1 class="hero-title">Louez votre appartement au meilleur prix!</h1>
-          <div class="searchbar-container rounded">
-            <div class="searchbar bounce">
-              <input class="search_input" data-bs-toggle="dropdown" aria-expanded="false" type="text" name="" placeholder="Trouver un appartement...">
-              <a href="#" class="search_icon"><i class="bi bi-search"></i></i></a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Oasis de la roche blonval</a></li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Oasis de Bellevue</a></li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-house-fill"></i>  Penthouse de Karukera</a></li>
-              </ul>
-            </div>
-           
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+      <h1>Grands appartements pour courte durée</h1>
+
+      <!-- Searchbar -->
+      <form class="hero-search">
+
+          {# Emplacement (Dropdown) #}
+          <div class="field float-field">
+              <select required>
+                  <option value="" disabled selected hidden></option>
+                  <option>Guadeloupe</option>
+                  <option>Saint-François</option>
+                  <option>Le Gosier</option>
+              </select>
+              <label>Emplacement</label>
           </div>
-          <a href="#services" class="hero-button">Découvrez d'autres Services <i class="bi bi-arrow-down"></i></a>
-    </div>
-    <div class="slider">
-          <div class="slide"></div>
-    </div>
-<!-- end hero  -->
+
+          {# Date Range #}
+          <div class="field date-range">
+              <div class="float-field-inner date-trigger" data-type="start">
+                    <label id="startLabel">Départ</label>
+                </div>
+
+                <span class="separator"></span>
+
+                <div class="float-field-inner date-trigger" data-type="end">
+                    <label id="endLabel">Arrivée</label>
+                </div>
+
+                <!-- Tooltip with Calendar -->
+                <div id="calendar-tooltip" class="calendar-tooltip hidden">
+                    <div id="calendar"></div>
+                </div>
+          </div>
+
+          {# Invités (Dropdown) #}
+          <div class="field float-field">
+              <select required>
+                  <option value="" disabled selected hidden></option>
+                  <option value="1">1 invité</option>
+                  <option value="2">2 invités</option>
+                  <option value="3">3 invités</option>
+                  <option value="4">4 invités</option>
+              </select>
+              <label>Invités</label>
+          </div>
+
+          {# Search Button #}
+          <button type="submit" class="search-btn">
+              <i class="bi bi-search"></i> Rechercher
+          </button>
+
+      </form>
+  </div>
+</section>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const tooltip = document.getElementById('calendar-tooltip');
+    const startLabel = document.getElementById('startLabel');
+    const endLabel = document.getElementById('endLabel');
+
+    let currentSelection = null; // "start" or "end"
+
+    // ================================
+    // SHOW TOOLTIP WHEN CLICKING LABEL
+    // ================================
+    document.querySelectorAll('.date-trigger').forEach(el => {
+        el.addEventListener('click', function (event) {
+            event.stopPropagation(); // prevent auto-close
+            currentSelection = this.dataset.type;
+
+            tooltip.classList.remove('hidden');
+
+            // VERY IMPORTANT: fix the tiny calendar problem
+            setTimeout(() => {
+                calendar.updateSize();
+            }, 10);
+        });
+    });
+
+    // ================================
+    // HIDE TOOLTIP WHEN CLICKING OUTSIDE
+    // ================================
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.calendar-tooltip') && 
+            !event.target.closest('.date-trigger')) {
+            tooltip.classList.add('hidden');
+        }
+    });
+
+    // ================================
+    // INIT FULLCALENDAR
+    // ================================
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        selectable: true,
+        events: '',
+
+        select: function (info) {
+            const start = info.startStr;
+            const end = info.endStr;
+
+            startLabel.innerText = start;
+            endLabel.innerText = end;
+
+            tooltip.classList.add('hidden');
+        }
+    });
+
+    // First render
+    calendar.render();
+});
+</script>
