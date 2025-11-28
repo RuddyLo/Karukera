@@ -142,9 +142,12 @@
                     <div class="alert-no-date mt-2 d-none">
                         <span class="text-xs p-2 text-danger font-semibold">Selectionnez les dates</span>
                     </div>
-                    <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="button" id="preview-reservation-btn" >
-                        Faire ma réservation
-                    </button>
+
+                    {% if app.user %}
+                        <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="button" id="preview-reservation-btn" >
+                            Faire ma réservation
+                        </button>
+                    {% endif %}
                     
                 {{ form_end(form) }}
                 </div>
