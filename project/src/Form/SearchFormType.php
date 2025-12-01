@@ -3,9 +3,10 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class SearchFormType extends AbstractType
 {
@@ -13,35 +14,28 @@ class SearchFormType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => "Dénomination de l'appartement",
-                'row_attr' => [
-                    'class' => 'form-group col-sm-6 my-2',
-                ],
+                'label' => "Appartement",
+                'required' => false,
                 'attr' => [
-                    'class' => 'form-control',
-                    'required' => true,
+                    'placeholder' => "Nom de l'appartement",
+                    'class' => 'form-control'
                 ],
-
             ])
             ->add('startDate', DateType::class, [
-                'label' => 'Date de début',
+                'label' => 'Départ',
                 'widget' => 'single_text',
+                'required' => false,
                 'attr' => [
-                    'class' => 'form-control mb-2 mt-2',
-                    'placeholder' => 'Choisissez une date de début',
-                    'readonly' => true,
+                    'class' => 'form-control',
                 ]
             ])
             ->add('endDate', DateType::class, [
-                'label' => 'Date de fin',
+                'label' => 'Arrivée',
                 'widget' => 'single_text',
+                'required' => false,
                 'attr' => [
-                    'class' => 'form-control mb-2 mt-2',
-                    'placeholder' => 'Choisissez une date de fin',
-                    'readonly' => true,
+                    'class' => 'form-control',
                 ]
-            ])
-
-        ;
+            ]);
     }
 }
