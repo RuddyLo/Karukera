@@ -74,7 +74,7 @@ class ApartmentController extends AbstractController
             $events[] = [
                 'title' => 'Réservé',
                 'start' => $reservation->getStartDate()->format('Y-m-d'),
-                'end'   => $reservation->getEndDate()->format('Y-m-d'), 
+                'end'   => $reservation->getEndDate()->format('Y-m-d'),
                 'color' => '#ff4d4d', // rouge
             ];
         }

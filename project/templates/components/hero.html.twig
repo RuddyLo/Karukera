@@ -6,61 +6,58 @@
       <h1>Louez votre appartement au meilleur prix!</h1>
 
       <!-- Searchbar -->
-      <form class="hero-search">
+        <form class="hero-search" method="GET" action="{{ path('app.search_apartment') }}">
 
-          {# Emplacement (Dropdown) #}
-          <div class="field float-field">
-              <select required>
-                  <option value="" disabled selected hidden></option>
-                  <option>Oasis de la roche blonval</option>
-                  <option>Oasis de Bellevue</option>
-                  <option>Penthouse de Karukera</option>
-              </select>
-              <label>Appartement</label>
-          </div>
+        {# Emplacement (Dropdown) #}
+        <div class="field float-field">
+            <select name="apartment" required>
+                <option value="" disabled selected hidden></option>
+                {% for apartment in apartments %}
+                    <option value="{{ apartment.name }}">{{ apartment.name }}</option>
+                {% endfor %}
+            </select>
+            <label>Appartement</label>
+        </div>
 
-          {# Date Range #}
-          <div class="field date-range">
-              <div class="float-field-inner date-trigger" data-type="start">
-                    <label id="startLabel">Départ</label>
-                </div>
+        {# Date Range #}
+        <div class="field date-range">
 
-                <span class="separator"></span>
+            <div class="float-field-inner date-trigger" data-type="start">
+                <label id="startLabel">Départ</label>
+            </div>
 
-                <div class="float-field-inner date-trigger" data-type="end">
-                    <label id="endLabel">Arrivée</label>
-                </div>
+            <span class="separator"></span>
 
-                <!-- Tooltip with Calendar -->
-                <div id="calendar-tooltip" class="calendar-tooltip hidden">
-                    <div id="calendar"></div>
-                </div>
-          </div>
+            <div class="float-field-inner date-trigger" data-type="end">
+                <label id="endLabel">Arrivée</label>
+            </div>
 
-          {# Invités (Dropdown) #}
-          <div class="field float-field">
-              <select required>
-                  <option value="" disabled selected hidden></option>
-                  <option value="1">1 personne</option>
-                  <option value="2">2 personnes</option>
-                  <option value="3">3 personnes</option>
-                  <option value="4">4 personnes</option>
-                  <option value="5">5 personnes</option>
-                  <option value="6">6 personnes</option>
-                  <option value="7">7 personnes</option>
-                  <option value="8">8 personnes</option>
-                  <option value="9">9 personnes</option>
-                  <option value="10">10 personnes</option>
-              </select>
-              <label>Nombre de personne</label>
-          </div>
+            {# Hidden inputs that will be submitted #}
+            <input type="hidden" name="startDate" id="startDateInput">
+            <input type="hidden" name="endDate" id="endDateInput">
 
-          {# Search Button #}
-          <button type="submit" class="btn-getstarted search-btn">
-              <i class="bi bi-search"></i> Rechercher
-          </button>
+            <div id="calendar-tooltip" class="calendar-tooltip hidden">
+                <div id="calendar"></div>
+            </div>
+        </div>
 
-      </form>
+        {# Invités #}
+        <div class="field float-field">
+            <select name="guests" required>
+                <option value="" disabled selected hidden></option>
+                {% for i in 1..10 %}
+                    <option value="{{ i }}">{{ i }} personne{{ i > 1 ? 's' : '' }}</option>
+                {% endfor %}
+            </select>
+            <label>Nombre de personne</label>
+        </div>
+
+        <button type="submit" class="btn-getstarted search-btn">
+            <i class="bi bi-search"></i> Rechercher
+        </button>
+
+    </form>
+
   </div>
 </section>
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
@@ -118,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             startLabel.innerText = start;
             endLabel.innerText = end;
+
+            document.getElementById('startDateInput').value = start;
+            document.getElementById('endDateInput').value = end;
 
             tooltip.classList.add('hidden');
         }

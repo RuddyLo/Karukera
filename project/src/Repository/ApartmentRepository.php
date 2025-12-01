@@ -76,7 +76,7 @@ class ApartmentRepository extends ServiceEntityRepository
         return (int) $em->getSingleScalarResult();
     }
 
-      /**
+    /**
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
@@ -122,7 +122,7 @@ class ApartmentRepository extends ServiceEntityRepository
         $dql .= " ORDER BY $orderBy ";
 
         $em = $this->getEntityManager()
-        ->createQuery($dql);
+            ->createQuery($dql);
 
         if ($search != '') {
             $em->setParameter('search', "%$search%");
@@ -131,9 +131,41 @@ class ApartmentRepository extends ServiceEntityRepository
 
 
         $em->setMaxResults($nombreMaxPage)
-           ->setFirstResult($page);
-        ;
-        
+            ->setFirstResult($page);;
+
         return [$em->getResult(), $this->countApartmentFiltered($search)];
+    }
+
+    public function searchApartments(?string $name, ?string $start, ?string $end): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        // Prepare SQL query
+        $sql = "
+        SELECT *
+        FROM apartment
+        WHERE apartment.is_active = true
+        AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
+    ";
+        // If dates provided, exclude unavailable apartments
+        if ($start && $end) {
+            $sql .= "
+            AND apartment.id NOT IN (
+                SELECT reservation.apartment_id
+                FROM reservation
+                WHERE reservation.start_date <= :endDate
+                  AND reservation.end_date >= :startDate
+            )
+        ";
+        }
+
+        $stmt = $conn->prepare($sql);
+
+        // Execute SQL
+        return $stmt->executeQuery([
+            'name' => $name ?: null,
+            'startDate' => $start ?: null,
+            'endDate' => $end ?: null,
+        ])->fetchAllAssociative();
     }
 }
