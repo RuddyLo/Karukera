@@ -6,13 +6,6 @@
 
 <h2>Résultats pour votre recherche</h2>
 
-<p>
-    Appartement : <strong>{{ filters.apartment }}</strong><br>
-    Du : <strong>{{ filters.startDate }}</strong><br>
-    Au : <strong>{{ filters.endDate }}</strong><br>
-    Nombre de personnes : <strong>{{ filters.guests }}</strong>
-</p>
-
 <div class="results-container">
     {% if results is empty %}
         <p>Aucun appartement ne correspond à votre recherche.</p>

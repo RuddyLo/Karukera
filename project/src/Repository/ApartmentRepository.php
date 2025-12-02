@@ -160,7 +160,6 @@ class ApartmentRepository extends ServiceEntityRepository
         }
 
         $stmt = $conn->prepare($sql);
-
         // Execute SQL
         return $stmt->executeQuery([
             'name' => $name ?: null,

@@ -876,6 +876,12 @@ section {
   cursor: pointer;
 }
 
+.form-control:focus {
+  outline: none; /* Removes the default browser outline */
+  box-shadow: none; /* Removes Bootstrap's focus shadow */
+  border-color: initial; /* Or set to transparent, or a specific color if desired */
+}
+
 .float-field-inner {
   flex: 1;
   margin: 0;

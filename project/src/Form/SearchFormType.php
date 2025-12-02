@@ -4,38 +4,29 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class SearchFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, [
-                'label' => "Appartement",
-                'required' => false,
-                'attr' => [
-                    'placeholder' => "Nom de l'appartement",
-                    'class' => 'form-control'
-                ],
-            ])
-            ->add('startDate', DateType::class, [
-                'label' => 'Départ',
-                'widget' => 'single_text',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                ]
-            ])
-            ->add('endDate', DateType::class, [
-                'label' => 'Arrivée',
-                'widget' => 'single_text',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                ]
-            ]);
+            ->add('name', HiddenType::class)
+            ->add('startDate', HiddenType::class)
+            ->add('endDate', HiddenType::class)
+            ->add('guests', HiddenType::class);
+    }
+
+    public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'method' => 'GET',
+            'csrf_protection' => false,
+        ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'search_form';
     }
 }

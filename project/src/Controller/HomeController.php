@@ -43,31 +43,17 @@ class HomeController extends AbstractController
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
 
-        $results = [];
-        $filters = [];
+        $data = $form->getData();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $data = $form->getData();
-
-            // The SearchFormType defines: name, startDate, endDate
-            $name = $data['name'] ?? null;
-            $start = $data['startDate'] ? $data['startDate']->format('Y-m-d') : null;
-            $end = $data['endDate'] ? $data['endDate']->format('Y-m-d') : null;
-
-            $results = $repo->searchApartments(
-                $name,
-                $start,
-                $end
-            );
-
-            $filters = $data;
-        }
+        $results = $repo->searchApartments(
+            $data['name'] ?? null,
+            $data['startDate'] ?? null,
+            $data['endDate'] ?? null,
+        );
 
         return $this->render('search/results.html.twig', [
             'results' => $results,
-            'filters' => $filters,
-            'form' => $form->createView(),
+            'filters' => $data,
         ]);
     }
 }
