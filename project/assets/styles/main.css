@@ -882,6 +882,10 @@ section {
   border-color: initial; /* Or set to transparent, or a specific color if desired */
 }
 
+.custom-select-height {
+    height: 70px !important;
+}
+
 .float-field-inner {
   flex: 1;
   margin: 0;
