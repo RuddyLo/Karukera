@@ -1,156 +1,226 @@
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-overlay"></div>
+    <div class="hero-overlay"></div>
 
-  <div class="hero-content">
-      <h1>Louez votre appartement au meilleur prix!</h1>
+    <div class="hero-content">
+        <h1>Louez votre appartement au meilleur prix!</h1>
 
-      <!-- Searchbar -->
-      <form class="hero-search" method="GET" action="{{ path('app.search_apartment') }}">
+        <!-- Searchbar -->
+        <form
+            class="hero-search"
+            method="GET"
+            action="{{ path('app.search_apartment') }}"
+        >
 
-          {# Your UI stays completely unchanged #}
+            {# Your UI stays completely unchanged #}
 
-          <!-- Appartement -->
-          <div class="form-floating">
-              <select class="form-select custom-select-height" id="apartmentSelect" name="apartmentUI" required>
-                  <option value="" disabled selected hidden>Selectionnez un appartement</option>
-                  {% for apartment in apartments %}
-                      <option value="{{ apartment.name }}">{{ apartment.name }}</option>
-                  {% endfor %}
-              </select>
-              <label for="apartmentSelect">Appartement</label>
-          </div>
+            <!-- Appartement -->
+            <div class="form-floating"> <select
+                    class="form-select custom-select-height"
+                    id="apartmentSelect"
+                    name="apartmentUI"
+                    required
+                >
+                    <option
+                        value=""
+                        disabled
+                        selected
+                        hidden
+                    >Selectionnez un appartement</option>
+                    {% for apartment in apartments %}
+                    <option value="{{ apartment.name }}">{{ apartment.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="apartmentSelect">Appartement</label>
+            </div>
 
-          <!-- Date Range -->
-          <div class="field date-range">
-              <div class="form-floating">
-                  <input type="text" class="form-control border-0" id="startDateInput" placeholder="Départ" readonly>
-                  <label for="startDateInput" style="color: var(--color-secondary-light)">Départ</label>
-              </div>
+            <!-- Date Range -->
+            <div class="field date-range">
+                <div class="form-floating">
+                    <input
+                        type="text"
+                        class="form-control border-0"
+                        id="startDateInput"
+                        placeholder="Départ"
+                        readonly
+                    >
+                    <label
+                        for="startDateInput"
+                        style="color: var(--color-secondary-light)"
+                    >Départ</label>
+                </div>
 
-              <span class="separator"></span>
+                <span class="separator"></span>
 
-              <div class="form-floating mb-0 date-trigger" data-type="end">
-                  <input type="text" class="form-control border-0" id="endDateInput" placeholder="Arrivée" readonly>
-                  <label for="endDateInput" style="color: var(--color-secondary-light)">Arrivée</label>
-              </div>
+                <div
+                    class="form-floating mb-0 date-trigger"
+                    data-type="end"
+                >
+                    <input
+                        type="text"
+                        class="form-control border-0"
+                        id="endDateInput"
+                        placeholder="Arrivée"
+                        readonly
+                    >
+                    <label
+                        for="endDateInput"
+                        style="color: var(--color-secondary-light)"
+                    >Arrivée</label>
+                </div>
 
-              <div id="calendar-tooltip" class="calendar-tooltip hidden">
-                  <div id="calendar"></div>
-              </div>
-          </div>
+                <div
+                    id="calendar-tooltip"
+                    class="calendar-tooltip hidden"
+                >
+                    <div id="calendar"></div>
+                </div>
+            </div>
 
-          <!-- Guests -->
-          <div class="form-floating">
-              <select class="form-select custom-select-height" id="guestsInput" required>
-                  <option value="" disabled selected hidden>Nombre de personnes</option>
-                  {% for i in 1..10 %}
-                      <option value="{{ i }}">{{ i }} personne{{ i > 1 ? 's' : '' }}</option>
-                  {% endfor %}
-              </select>
-              <label for="guestsInput">Nombre</label>
-          </div>
+            <!-- Guests -->
+            <div class="form-floating">
+                <select
+                    class="form-select custom-select-height"
+                    id="guestsInput"
+                    required
+                >
+                    <option
+                        value=""
+                        disabled
+                        selected
+                        hidden
+                    >Nombre de personnes</option>
+                    {% for i in 1..10 %}
+                    <option value="{{ i }}">{{ i }}
+                        personne{{ i > 1 ? 's' : '' }}</option>
+                    {% endfor %}
+                </select>
+                <label for="guestsInput">Nombre</label>
+            </div>
 
-          <button type="submit" class="btn-getstarted search-btn">
-              <i class="bi bi-search"></i> Rechercher
-          </button>
+            <button
+                type="submit"
+                class="btn-getstarted search-btn"
+            >
+                <i class="bi bi-search"></i>
+                Rechercher
+            </button>
 
-        <input type="hidden" name="search_form[name]" id="sf_name">
-        <input type="hidden" name="search_form[startDate]" id="sf_start">
-        <input type="hidden" name="search_form[endDate]" id="sf_end">
-        <input type="hidden" name="search_form[guests]" id="sf_guests">
+            <input
+                type="hidden"
+                name="search_form[name]"
+                id="sf_name"
+            >
+            <input
+                type="hidden"
+                name="search_form[startDate]"
+                id="sf_start"
+            >
+            <input
+                type="hidden"
+                name="search_form[endDate]"
+                id="sf_end"
+            >
+            <input
+                type="hidden"
+                name="search_form[guests]"
+                id="sf_guests"
+            >
 
-      </form>
-  </div>
+        </form>
+    </div>
 </section>
 
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<link
+    href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css'
+    rel='stylesheet'
+/>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
-    // ================================
-    // SYMFONY HIDDEN FORM FIELDS
-    // ================================
-    const sfApartment = document.getElementById('sf_name');
-    const sfStart     = document.getElementById('sf_start');
-    const sfEnd       = document.getElementById('sf_end');
-    const sfGuests    = document.getElementById('sf_guests');
+        // ================================
+        // SYMFONY HIDDEN FORM FIELDS
+        // ================================
+        const sfApartment = document.getElementById('sf_name');
+        const sfStart = document.getElementById('sf_start');
+        const sfEnd = document.getElementById('sf_end');
+        const sfGuests = document.getElementById('sf_guests');
 
 
-    // ================================
-    // VISIBLE UI FIELDS
-    // ================================
-    const uiApartment = document.getElementById('apartmentSelect');
-    const startUI     = document.getElementById('startDateInput');
-    const endUI       = document.getElementById('endDateInput');
-    const guestsUI    = document.getElementById('guestsInput');
+        // ================================
+        // VISIBLE UI FIELDS
+        // ================================
+        const uiApartment = document.getElementById('apartmentSelect');
+        const startUI = document.getElementById('startDateInput');
+        const endUI = document.getElementById('endDateInput');
+        const guestsUI = document.getElementById('guestsInput');
 
-    // Sync apartment
-    uiApartment.addEventListener('change', () => {
-        sfApartment.value = uiApartment.value;
-        console.log('Apartment selected:', uiApartment.value);
-    });
-
-    // Sync guests
-    guestsUI.addEventListener('change', () => {
-        sfGuests.value = guestsUI.value;
-        console.log('Guests selected:', guestsUI.value);
-    });
-
-    // Calendar setup
-    const tooltip = document.getElementById('calendar-tooltip');
-
-    let currentSelection = null; // "start" or "end"
-
-    // ================================
-    // SHOW TOOLTIP WHEN CLICKING LABEL
-    // ================================
-    document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
-        el.addEventListener('click', function (event) {
-            event.stopPropagation(); // prevent auto-close
-            currentSelection = this.dataset.type;
-
-            tooltip.classList.remove('hidden');
-
-            // VERY IMPORTANT: fix the tiny calendar problem
-            setTimeout(() => {
-                calendar.updateSize();
-            }, 10);
+        // Sync apartment
+        uiApartment.addEventListener('change', () => {
+            sfApartment.value = uiApartment.value;
+            console.log('Apartment selected:', uiApartment.value);
         });
+
+        // Sync guests
+        guestsUI.addEventListener('change', () => {
+            sfGuests.value = guestsUI.value;
+            console.log('Guests selected:', guestsUI.value);
+        });
+
+        // Calendar setup
+        const tooltip = document.getElementById('calendar-tooltip');
+
+        let currentSelection = null;
+        // "start" or "end"
+
+        // ================================
+        // SHOW TOOLTIP WHEN CLICKING LABEL
+        // ================================
+        document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
+            el.addEventListener('click', function (event) {
+                event.stopPropagation(); // prevent auto-close
+                currentSelection = this.dataset.type;
+
+                tooltip.classList.remove('hidden');
+
+                // VERY IMPORTANT: fix the tiny calendar problem
+                setTimeout(() => {
+                    calendar.updateSize();
+                }, 10);
+            });
+        });
+
+        // ================================
+        // HIDE TOOLTIP WHEN CLICKING OUTSIDE
+        // ================================
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
+                tooltip.classList.add('hidden');
+            }
+        });
+
+        var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            locale: 'fr',
+
+            select: function (info) {
+                const start = info.startStr;
+                const end = info.endStr;
+
+                startUI.value = start;
+                endUI.value = end;
+
+                sfStart.value = start;
+                sfEnd.value = end;
+
+                tooltip.classList.add('hidden');
+            }
+        });
+
+        calendar.render();
     });
-
-    // ================================
-    // HIDE TOOLTIP WHEN CLICKING OUTSIDE
-    // ================================
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.calendar-tooltip') && 
-            !event.target.closest('.date-trigger')) {
-            tooltip.classList.add('hidden');
-        }
-    });
-
-    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        locale: 'fr',
-
-        select: function(info) {
-            const start = info.startStr;
-            const end = info.endStr;
-
-            startUI.value = start;
-            endUI.value = end;
-
-            sfStart.value = start;
-            sfEnd.value = end;
-
-            tooltip.classList.add('hidden');
-        }
-    });
-
-    calendar.render();
-});
 </script>
