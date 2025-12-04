@@ -8,33 +8,41 @@
 
 <div class="results-container">
     {% if results is empty %}
-        <p>Aucun appartement ne correspond à votre recherche.</p>
+    <p>Aucun appartement ne correspond à votre recherche.</p>
     {% endif %}
 
     <div class="container  ">
-      <div class="row ">
-      {% for apartment in results %}
-        
-        <div class="card-container d-flex col-md-4 mb-2" >
-            <a href="{{path('app.apartment.details', {id: apartment.id})}}">
-                <div class="card appart-card border-0">
-                    <div class="rounded">
-                        <img src="{{asset(apartment.image_url)}}" class="on-top-img rounded" alt="">
-                    </div>
-                    <div class="card-info p-2">
-                        <div class="badges my-2">
-                            <span class="text-primary"><i class="bi bi-star"></i></span>
-                            <span class="text-primary"><i class="bi bi-open"></i></span>
-                        </div>
-                        <span class="appart-name">{{apartment.name}}</span></br>
-                        <span>{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' : '') }}</span>
-                    </div>
-                </div>
-            </a>
-        </div>
-        
-      {% endfor %}
-    </div>
-</div>
+        <div class="row ">
+            {% for apartment in results %}
 
-{% endblock %}
+            <div class="card-container d-flex col-md-4 mb-2">
+                <a href="{{path('app.apartment.details', {id: apartment.id})}}">
+                    <div class="card appart-card border-0">
+                        <div class="rounded">
+                            <img
+                                src="{{asset(apartment.image_url)}}"
+                                class="on-top-img rounded"
+                                alt=""
+                            >
+                        </div>
+                        <div class="card-info p-2">
+                            <div class="badges my-2">
+                                <span class="text-primary"><i class="bi bi-star"></i></span>
+                                <span class="text-primary"><i class="bi bi-open"></i></span>
+                            </div>
+                            <span class="appart-name">{{apartment.name}}</span></br>
+                            <span>{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' :
+                                '') }}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endblock %}
+
+    {# ❌ Override footer to hide it #}
+    {% block footer %}{% endblock %}
