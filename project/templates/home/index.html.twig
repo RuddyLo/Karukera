@@ -2,30 +2,38 @@
 
 {% block title %}Les Oasis de Karukera{% endblock %}
 {% block header %}
-  <header id="header" class="header " data-scrollto-offset="0">
-      {% include "components/navbar.html.twig" %}
-      {% include "components/hero.html.twig" %}
-    </header>
-           
+<header
+  id="header"
+  class="header "
+  data-scrollto-offset="0"
+>
+  {% include "components/navbar.html.twig" %}
+  {% include "components/hero.html.twig" %}
+</header>
+
 {% endblock header %}
-{% block content %}  
-  <body>
-    <!-- ======= On Top Section ======= -->
-    {% if apartments_on_top %}
-    {% include "components/onTop.html.twig" %}
-    {% endif %}
-    
-    <!-- ======= Services Section ======= -->
-    {% include "components/services.html.twig" %}
-    <!-- ======= Testimonials Section ======= -->
-    {% include "components/testimonials.html.twig" %}
-    <!-- ======= Recent Blog Posts Section ======= -->
-    {% include "components/blogPosts.html.twig" %}
+{% block content %}
 
-    <!-- ======= Contact Section ======= -->
-    {% include "components/contact.html.twig" %}
+<body>
+  <!-- ======= On Top Section ======= -->
+  {% if apartments_on_top %}
+  {% include "components/onTop.html.twig" %}
+  {% endif %}
 
-    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  </body>
+  <!-- ======= Services Section ======= -->
+  {% include "components/services.html.twig" %}
+  <!-- ======= Testimonials Section ======= -->
+  {% include "components/testimonials.html.twig" %}
+  <!-- ======= Recent Blog Posts Section ======= -->
+  {% include "components/blogPosts.html.twig" %}
+
+  <!-- ======= Contact Section ======= -->
+  {% include "components/contact.html.twig" %}
+
+  <a
+    href="#"
+    class="scroll-top d-flex align-items-center justify-content-center"
+  ><i class="bi bi-arrow-up-short"></i></a>
+</body>
 
 {% endblock %}

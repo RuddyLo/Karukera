@@ -184,6 +184,21 @@ new Swiper('.testimonials-slider', {
     
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  const header = document.querySelector('.header');
+  const body = document.body;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 50) {
+      header.classList.add('sticked');
+      body.classList.add('navbar-sticked');
+    } else {
+      header.classList.remove('sticked');
+      body.classList.remove('navbar-sticked');
+    }
+  });
+});
+
 
 
 
