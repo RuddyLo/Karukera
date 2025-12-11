@@ -21,7 +21,12 @@
   {% endif %}
 
   <!-- ======= Services Section ======= -->
+  {% if apartments %}
+  {% include "components/appartements.html.twig" %}
+  {% endif %}
+
   {% include "components/services.html.twig" %}
+
   <!-- ======= Testimonials Section ======= -->
   {% include "components/testimonials.html.twig" %}
   <!-- ======= Recent Blog Posts Section ======= -->

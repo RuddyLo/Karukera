@@ -1,7 +1,5 @@
-version: '3'
-
 services:
-   #PHP-APACHE
+  #PHP-APACHE
   www:
     build: docker
     container_name: www_karukera
@@ -12,7 +10,7 @@ services:
       - ./:/var/www
     networks:
       - dev
-    
+
   db:
     image: mysql
     container_name: mysql_karukera
@@ -20,7 +18,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:
       - dev
 
@@ -35,8 +33,6 @@ services:
       PMA_HOST: db
     networks:
       - dev
-
- 
 
 networks:
   dev:

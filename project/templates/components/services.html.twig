@@ -1,4 +1,4 @@
-<section id="services" class="services">
+{# <section id="services" class="services">
     <div class="container" >
       <div class="section-header">
         <h2>Découvrez d'autres Services</h2>
@@ -103,4 +103,66 @@
       </div>
 
     </div>
-  </section><!-- End Services Section -->
+  </section><!-- End Services Section --> #}
+
+  <section class="services-section py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="font-size: 40px;">Nos Services</h2>
+            <p class="text-muted" style="font-size: 17px;">
+                Découvrez les services que nous offrons pour rendre votre séjour plus agréable.
+            </p>
+        </div>
+
+        <div class="row text-center gy-5">
+
+            <!-- SERVICE 1 -->
+            <div class="col-md-3 col-6">
+                <div class="service-item">
+                    <div class="icon mb-3">
+                        <img src="{{ asset('images/icons/bed.svg') }}" alt="" class="service-icon">
+                    </div>
+                    <h5 class="fw-bold">Location</h5>
+                    <p class="text-muted small">Apartement</p>
+                </div>
+                
+            </div>
+
+            <!-- SERVICE 2 -->
+            <div class="col-md-3 col-6">
+                <div class="service-item">
+                    <div class="icon mb-3">
+                        <img src="{{ asset('images/icons/cleaning.svg') }}" alt="" class="service-icon">
+                    </div>
+                    <h5 class="fw-bold">Restauration</h5>
+                    <p class="text-muted small">Professionnel</p>
+                </div>
+            </div>
+
+            <!-- SERVICE 3 -->
+            <div class="col-md-3 col-6">
+                <div class="service-item">
+                    <div class="icon mb-3">
+                        <img src="{{ asset('images/icons/clock.svg') }}" alt="" class="service-icon">
+                    </div>
+                    <h5 class="fw-bold">Transport</h5>
+                    <p class="text-muted small">Récupération à l'aeroport</p>
+                </div>
+            </div>
+
+            <!-- SERVICE 4 -->
+            <div class="col-md-3 col-6">
+                <div class="service-item">
+                    <div class="icon mb-3">
+                        <img src="{{ asset('images/icons/support.svg') }}" alt="" class="service-icon">
+                    </div>
+                    <h5 class="fw-bold">Services Annexes</h5>
+                    <p class="text-muted small">Disponible 7/7</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>

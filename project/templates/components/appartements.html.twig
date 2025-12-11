@@ -1,0 +1,19 @@
+<section class="container py-5">
+    <h2 class="text-center mb-5" style="font-size: 40px; font-weight: 700;">
+        Appartements
+    </h2>
+
+    <div class="row justify-content-center">
+
+        {% for apartment in apartments %}
+            <div class="col-md-4 mb-4">
+                <div class="destination-card">
+                    <img src="{{asset(apartment.imageUrl)}}"
+                        class="img-fluid rounded" alt="Lyon">
+                    <h4 class="mt-3 fw-bold">{{apartment.name}}</h4>
+                    <p class="text-muted">{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' : '') }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>

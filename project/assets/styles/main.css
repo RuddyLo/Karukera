@@ -905,9 +905,9 @@ section {
 }
 
 .separator {
-  width: 1px;
+  width: 1.5px;
   height: 70%;
-  background: #ccc;
+  background: #b3b3b3;
 }
 
 /* SEARCH BUTTON */
@@ -986,7 +986,22 @@ section {
 /*--------------------------------------------------------------
 # Services Section
 --------------------------------------------------------------*/
-.services .img {
+.services-section .service-item {
+    transition: 0.3s ease;
+}
+
+.services-section .service-item:hover {
+    transform: translateY(-5px);
+}
+
+.service-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+/* old service css */
+/* .services .img {
   border-radius: 8px;
   max-height: 250px;
   overflow: hidden;
@@ -1046,7 +1061,6 @@ section {
 }
 
 .services .service-item:hover .details .icon {
-  /* background: var(--color-white); */
   border: 2px solid var(--color-primary);
 }
 
@@ -1056,7 +1070,7 @@ section {
 
 .services .service-item:hover .img img {
   transform: scale(1.2);
-}
+} */
 
 /*--------------------------------------------------------------
 # Testimonials Section
