@@ -25,10 +25,16 @@ class HomeController extends AbstractController
         $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
         $apartments_on_top = $this->apartmentRepository->findBy(['on_top' => true, 'is_active' => true]);
         $display_more = count($apartments) > count($apartments_on_top);
+        $last_apartments = $this->apartmentRepository->findBy(
+            ['is_active' => true],
+            ['id' => 'DESC'],
+            2
+        );
 
         return $this->render('home/index.html.twig', [
             'apartments_on_top' => $apartments_on_top,
             'apartments' => $apartments,
+            'last_apartments' => $last_apartments,
             'display_more' => $display_more,
             'controller_name' => 'HomeController',
 
