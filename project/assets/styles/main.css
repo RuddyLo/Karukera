@@ -282,7 +282,7 @@ section {
   /* Position au milieu vertical */
   transform: translateY(-50%);
   /* Centre le bouton verticalement */
-  z-index: 100;
+  z-index: 9999;
   /* Assurez-vous que le bouton WhatsApp est au-dessus des autres éléments */
 }
 
@@ -1198,6 +1198,43 @@ section {
     width: 80%;
   }
 } */
+
+
+/*--------------------------------------------------------------
+# Search Result Section
+--------------------------------------------------------------*/
+/* Style des cartes pour ressembler à l'image */
+.card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    border-radius: 12px 12px 0 0;
+}
+
+.results-container h2 {
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* Suppression du soulignement des liens */
+a.text-decoration-none:hover {
+    color: inherit;
+}
+
+.text-truncate {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 /*--------------------------------------------------------------
 # Pricing Section

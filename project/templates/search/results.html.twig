@@ -4,45 +4,295 @@
 
 {% block content %}
 
-<h2>Résultats pour votre recherche</h2>
+<div class="container-fluid px-4 mt-4">
+    <div class="row gx-5">
 
-<div class="results-container">
-    {% if results is empty %}
-    <p>Aucun appartement ne correspond à votre recherche.</p>
-    {% endif %}
+        <!-- LEFT COLUMN: RESULTS -->
+        <div class="col-lg-7">
+            <div class="results-container">
 
-    <div class="container  ">
-        <div class="row ">
-            {% for apartment in results %}
+                <form
+                    class="hero-search gap-y-5 mb-5"
+                    method="GET"
+                    action="{{ path('app.search_apartment') }}"
+                >
 
-            <div class="card-container d-flex col-md-4 mb-2">
-                <a href="{{path('app.apartment.details', {id: apartment.id})}}">
-                    <div class="card appart-card border-0">
-                        <div class="rounded">
-                            <img
-                                src="{{asset(apartment.image_url)}}"
-                                class="on-top-img rounded"
-                                alt=""
+                    {# Your UI stays completely unchanged #}
+
+                    <!-- Appartement -->
+                    <div class="form-floating"> <select
+                            class="form-select custom-select-height"
+                            id="apartmentSelect"
+                            name="apartmentUI"
+                            required
+                        >
+                            <option
+                                value=""
+                                disabled
+                                selected
+                                hidden
+                            >Selectionnez un appartement</option>
+                            {% for apartment in apartments %}
+                            <option value="{{ apartment.name }}">{{ apartment.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="apartmentSelect">Appartement</label>
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="field date-range">
+                        <div class="form-floating">
+                            <input
+                                type="text"
+                                class="form-control border-0"
+                                id="startDateInput"
+                                placeholder="Départ"
+                                readonly
                             >
+                            <label
+                                for="startDateInput"
+                                style="color: var(--color-secondary-light)"
+                            >Départ</label>
                         </div>
-                        <div class="card-info p-2">
-                            <div class="badges my-2">
-                                <span class="text-primary"><i class="bi bi-star"></i></span>
-                                <span class="text-primary"><i class="bi bi-open"></i></span>
-                            </div>
-                            <span class="appart-name">{{apartment.name}}</span></br>
-                            <span>{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' :
-                                '') }}</span>
+
+                        <span class="separator"></span>
+
+                        <div
+                            class="form-floating mb-0 date-trigger"
+                            data-type="end"
+                        >
+                            <input
+                                type="text"
+                                class="form-control border-0"
+                                id="endDateInput"
+                                placeholder="Arrivée"
+                                readonly
+                            >
+                            <label
+                                for="endDateInput"
+                                style="color: var(--color-secondary-light)"
+                            >Arrivée</label>
+                        </div>
+
+                        <div
+                            id="calendar-tooltip"
+                            class="calendar-tooltip hidden"
+                        >
+                            <div id="calendar"></div>
                         </div>
                     </div>
-                </a>
+
+                    <!-- Guests -->
+                    <div class="form-floating">
+                        <select
+                            class="form-select custom-select-height"
+                            id="guestsInput"
+                            required
+                        >
+                            <option
+                                value=""
+                                disabled
+                                selected
+                                hidden
+                            >Nombre de personnes</option>
+                            {% for i in 1..10 %}
+                            <option value="{{ i }}">{{ i }}
+                                personne{{ i > 1 ? 's' : '' }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="guestsInput">Nombre</label>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn-getstarted search-btn"
+                    >
+                        <i class="bi bi-search"></i>
+                        Rechercher
+                    </button>
+
+                    <input
+                        type="hidden"
+                        name="search_form[name]"
+                        id="sf_name"
+                    >
+                    <input
+                        type="hidden"
+                        name="search_form[startDate]"
+                        id="sf_start"
+                    >
+                    <input
+                        type="hidden"
+                        name="search_form[endDate]"
+                        id="sf_end"
+                    >
+                    <input
+                        type="hidden"
+                        name="search_form[guests]"
+                        id="sf_guests"
+                    >
+
+                </form>
+
+                {% if results is empty %}
+                    <p>Aucun appartement ne correspond à votre recherche.</p>
+                {% endif %}
+
+                <div class="row">
+                    {% for apartment in results %}
+                    <div class="col-md-6 mb-4">
+                        <a href="{{ path('app.apartment.details', {id: apartment.id}) }}" class="text-decoration-none text-dark">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="position-relative">
+                                    <img src="{{ asset(apartment.image_url) }}" class="card-img-top rounded" style="height: 180px; object-fit: cover;" alt="{{ apartment.name }}">
+                                </div>
+                                
+                                <div class="card-body p-3">
+                                    <h5 class="fw-bold mb-1 text-truncate" style="font-size: 1.1rem;">{{ apartment.name }}</h5>
+
+                                    <div class="text-muted small mb-2">
+                                        Cuisine • Wifi • Machine à laver
+                                    </div>
+                                    
+                                    <div>
+                                        <span class="fw-bold fs-5">Ar{{ apartment.price }}</span>
+                                        <span class="text-muted">par nuit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+
             </div>
-
-            {% endfor %}
         </div>
+
+        <!-- RIGHT COLUMN: LEAFLET MAP -->
+        <div class="col-lg-5">
+            <div id="map" style="height: 600px; border-radius: 12px;"></div>
+        </div>
+
     </div>
+</div>
 
-    {% endblock %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    {# ❌ Override footer to hide it #}
-    {% block footer %}{% endblock %}
+<link
+    href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css'
+    rel='stylesheet'
+/>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<script>
+    // Initialize map centered on the first apartment or fallback coordinates
+    const defaultLat = {{ results[0].latitude ?? -18.8792 }};
+    const defaultLng = {{ results[0].longitude ?? 47.5079 }};
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Add markers for each apartment
+    {% for apartment in results %}
+        {% if apartment.latitude is defined and apartment.longitude is defined %}
+            L.marker([{{ apartment.latitude }}, {{ apartment.longitude }}])
+                .addTo(map)
+                .bindPopup("<b>{{ apartment.name|e('js') }}</b><br>Ar{{ apartment.price }} / nuit");
+        {% endif %}
+    {% endfor %}
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ================================
+        // SYMFONY HIDDEN FORM FIELDS
+        // ================================
+        const sfApartment = document.getElementById('sf_name');
+        const sfStart = document.getElementById('sf_start');
+        const sfEnd = document.getElementById('sf_end');
+        const sfGuests = document.getElementById('sf_guests');
+
+
+        // ================================
+        // VISIBLE UI FIELDS
+        // ================================
+        const uiApartment = document.getElementById('apartmentSelect');
+        const startUI = document.getElementById('startDateInput');
+        const endUI = document.getElementById('endDateInput');
+        const guestsUI = document.getElementById('guestsInput');
+
+        // Sync apartment
+        uiApartment.addEventListener('change', () => {
+            sfApartment.value = uiApartment.value;
+            console.log('Apartment selected:', uiApartment.value);
+        });
+
+        // Sync guests
+        guestsUI.addEventListener('change', () => {
+            sfGuests.value = guestsUI.value;
+            console.log('Guests selected:', guestsUI.value);
+        });
+
+        // Calendar setup
+        const tooltip = document.getElementById('calendar-tooltip');
+
+        let currentSelection = null;
+        // "start" or "end"
+
+        // ================================
+        // SHOW TOOLTIP WHEN CLICKING LABEL
+        // ================================
+        document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
+            el.addEventListener('click', function (event) {
+                event.stopPropagation(); // prevent auto-close
+                currentSelection = this.dataset.type;
+
+                tooltip.classList.remove('hidden');
+
+                // VERY IMPORTANT: fix the tiny calendar problem
+                setTimeout(() => {
+                    calendar.updateSize();
+                }, 10);
+            });
+        });
+
+        // ================================
+        // HIDE TOOLTIP WHEN CLICKING OUTSIDE
+        // ================================
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
+                tooltip.classList.add('hidden');
+            }
+        });
+
+        var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            locale: 'fr',
+
+            select: function (info) {
+                const start = info.startStr;
+                const end = info.endStr;
+
+                startUI.value = start;
+                endUI.value = end;
+
+                sfStart.value = start;
+                sfEnd.value = end;
+
+                tooltip.classList.add('hidden');
+            }
+        });
+
+        calendar.render();
+    });
+</script>
+
+
+{% endblock %}
+
+{# ❌ Override footer to hide it #}
+{% block footer %}{% endblock %}

@@ -57,9 +57,12 @@ class HomeController extends AbstractController
             $data['endDate'] ?? null,
         );
 
+        $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
+
         return $this->render('search/results.html.twig', [
             'results' => $results,
             'filters' => $data,
+            'apartments' => $apartments,
         ]);
     }
 }
