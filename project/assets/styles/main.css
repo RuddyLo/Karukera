@@ -1236,6 +1236,12 @@ a.text-decoration-none:hover {
     text-overflow: ellipsis;
 }
 
+#left-scroll {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 /*--------------------------------------------------------------
 # Pricing Section
 --------------------------------------------------------------*/
