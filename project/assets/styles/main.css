@@ -984,6 +984,15 @@ section {
 }
 
 /*--------------------------------------------------------------
+# New Section
+--------------------------------------------------------------*/
+.nouveautes-section img {
+    height: 400px;
+    object-fit: cover;
+}
+
+
+/*--------------------------------------------------------------
 # Services Section
 --------------------------------------------------------------*/
 .services-section .service-item {
@@ -1075,8 +1084,21 @@ section {
 /*--------------------------------------------------------------
 # Testimonials Section
 --------------------------------------------------------------*/
+.testimonial-card {
+    background: white;
+    border: 1px solid #e6e6e6;
+}
 
-.testimonials > .container {
+.testimonial-card h5 {
+    font-size: 18px;
+}
+
+.testimonial-card p {
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* .testimonials > .container {
   width: 80%;
   border-radius: 15px;
   background-color: #d3d3d3;
@@ -1174,7 +1196,7 @@ section {
   .testimonials .testimonial-item p {
     width: 80%;
   }
-}
+} */
 
 /*--------------------------------------------------------------
 # Pricing Section
