@@ -6,11 +6,16 @@ import Swal from 'sweetalert2';
      * @param {*} imageInputSelector 
      * @param {*} imageElementSelector 
      * @param {*} imageSizeLimit 
-     * @param {*} allowedFileType 
+     * @param {*} allowedFileTypes 
      */
-function initializeImageUploader(imageInputSelector, imageElementSelector, imageSizeLimit = 2, allowedFileType = '.png') {
+function initializeImageUploader(imageInputSelector, imageElementSelector, imageSizeLimit = 2, allowedFileTypes = ['image/png', 'image/jpeg']) {
     let imageUrl = $(imageInputSelector);
     let image = $(imageElementSelector);
+
+    // Ensure allowedFileTypes is an array
+    if (!Array.isArray(allowedFileTypes)) {
+        allowedFileTypes = [allowedFileTypes];
+    }
 
     $(document).on('click', '.image-toggler', function () {
         imageUrl.click();
@@ -28,11 +33,11 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
             toastr.error('La taille du fichier ne doit pas dépasser ' + (imageSizeLimit) + ' Mo.');
             return;
         }
-        if (!file.type.match(allowedFileType + '*')) {
-            toastr.error('Le fichier doit être au format ' + allowedFileType.toUpperCase() + '.');
+        if (!allowedFileTypes.includes(file.type)) {
+            toastr.error('Le fichier doit être au format PNG, JPG ou JPEG.');
             return;
         }
-        if (file && file.type.match(allowedFileType + '*')) {
+        if (file && allowedFileTypes.includes(file.type)) {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const img = new Image();
@@ -48,8 +53,8 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
     });
 }
 
-initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2, '.png');
-initializeImageUploader('#equipment_form_iconUrl', '.rr-equipment-icon', 1, '.png');
+initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2);
+initializeImageUploader('#equipment_form_iconUrl', '.rr-equipment-icon', 1);
 
 document.addEventListener("DOMContentLoaded", function () {
     const imageInput = document.getElementById("apartment_form_images");
