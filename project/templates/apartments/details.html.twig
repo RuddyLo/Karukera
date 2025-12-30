@@ -1,297 +1,261 @@
 {% extends "base.html.twig" %}
+
 {% block content %}
 <div class="container w-100 p-4 rounded">
-    <div class="col">
-        <div class="apartment-info row d-flex align-items-center justify-content-between  p-4">
-        {% for label, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ label }} mt-2">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endfor %}
-            <!-- Colonne de gauche -->
-            <div class="col-sm-6">
-                
-                <h2 class="fw-bold">{{ apartment.name }}</h2>
-                <hr class="w-75">
-                
-            </div>
 
-            <!-- Colonne de droite -->
-            <div class="col-sm-6 d-flex flex-column align-items-end text-gray rounded">
-                <h4>{{ apartment.price }} €</h4>
-                <span>La nuitée</span>
-            </div>
+    {# ================= APARTMENT HEADER ================= #}
+    <div class="row d-flex justify-content-between align-items-center p-4">
+        <div class="col-md-6">
+            <h2 class="fw-bold">{{ apartment.name }}</h2>
+            <hr class="w-75">
         </div>
-        
-        <div class="row mt-4 rounded p-4" id="existing-images">
-            <div class="col-md-6 image-container" style="height: 400px;"> 
-                <img src="{{ asset(apartment.imageUrl) }}" 
-                    alt="Image de l'appartement" 
-                    class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
-                    data-bs-toggle="modal" 
-                    data-bs-target="#imageModal"
-                    data-image-url="{{ asset(apartment.imageUrl) }}" />
-            </div>
-
-            <div class="col-md-6">
-                <div class="row">
-                    {% set totalImages = apartment.images|length %}
-                    {% set imagesToShow = 4 %} {# Afficher 4 images initialement #}
-
-                    {% for image in apartment.images[:imagesToShow] %}
-                        <div class="col-md-6 image-container mb-2" style="height: 200px;"> 
-                            <img src="{{ asset(image.url) }}" 
-                                alt="Image de l'appartement" 
-                                class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#imageModal"
-                                data-image-url="{{ asset(image.url) }}" />
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
+        <div class="col-md-6 text-end">
+            <h4>{{ apartment.price }} €</h4>
+            <span class="text-muted">par nuit</span>
         </div>
+    </div>
 
-        <div id="more-images" class="row mt-2 p-4 d-none">
-            {% for image in apartment.images[imagesToShow:] %}
-                <div class="col-md-4 image-container" style="height: 200px;">
-                    <img src="{{ asset(image.url) }}" 
-                        alt="Image de l'appartement" 
-                        class="img-fluid rounded shadow-md preview-image w-100 h-100 object-cover"
-                        data-bs-toggle="modal" 
+    {# ================= IMAGES ================= #}
+    <div class="row mt-4 p-4">
+        <div class="col-md-6">
+            <img
+                src="{{ asset(apartment.imageUrl) }}"
+                class="img-fluid rounded w-100 h-100 object-cover preview-image"
+                data-bs-toggle="modal"
+                data-bs-target="#imageModal"
+            >
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                {% for image in apartment.images|slice(0,4) %}
+                <div class="col-md-6 mb-2">
+                    <img
+                        src="{{ asset(image.url) }}"
+                        class="img-fluid rounded preview-image"
+                        data-bs-toggle="modal"
                         data-bs-target="#imageModal"
-                        data-image-url="{{ asset(image.url) }}" />
+                    >
                 </div>
-            {% endfor %}
-        </div>
-
-        {% if totalImages > imagesToShow %}
-            <div class="text-center mt-3">
-                <button id="load-more-btn" class="btn border border-orange text-orange">Afficher plus...</button>
-            </div>
-        {% endif %}
-        
-
-        <div class="p-4 m-4">
-            <span>{{ apartment.description }}</span>
-        </div>
-        
-        <!-- Fenêtre modale Bootstrap -->
-        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-            <div class="modal-dialog  modal-xl modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img id="modalImage" src="" class="img-fluid rounded shadow-lg" alt="Aperçu de l'image">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-3 rounded p-4 shadow">
-            <div class="card col-md-6">
-                <div class="row p-4">
-                    <h5>Ce que propose cet appartement</h5>
-                    
-                    <div class="row g-3"> {# Ajoute un gap pour espacer les équipements #}
-                        {% for equipment in apartment.equipments %}
-                            <div class="col-12 col-md-6 d-flex align-items-center">
-                                <img src="{{ asset(equipment.iconUrl) }}" 
-                                     alt="Équipement"
-                                     class="equipment-icon mx-2"
-                                     />
-                                <span class="text-md p-2">{{ equipment.name }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            
-            
-            <div class="col-md-6">
-                <div class="bg-white rounded p-3">
-                    
-                {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
-                
-                    <div class="row border border-radius-4 border-info p-4">
-                        <span class="p-2 mb-4 text-muted  fw-bold h3">Réservez votre séjour dès maintenant !</span>
-                        <span class="p-2 mb-4 text-muted text-sm">Séléctionez une date sur le calendrier, glissez pour choisir plusieurs dates</span>
-                        {# --- Calendrier --- #}
-                        <div id="calendar"></div>
-
-                        <div class="col-md-6 form-group mt-4">
-                            <span class="text-xs p-2">Date de début</span>
-                            {{ form_widget(form.startDate) }}
-                        </div>
-                        <div class="col-md-6 form-group mt-4">
-                            <span class="text-xs p-2 mb-2">Date de fin</span>
-                            {{ form_widget(form.endDate) }}
-                        </div>
-                    </div>
-                    {% for label, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ label }} mt-2">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endfor %}
-                    <div class="alert-no-date mt-2 d-none">
-                        <span class="text-xs p-2 text-danger font-semibold">Selectionnez les dates</span>
-                    </div>
-
-                    {% if app.user %}
-                        <button class="btn btn-info text-white font-semibold py-2 px-4 rounded mt-4" type="button" id="preview-reservation-btn" >
-                            Faire ma réservation
-                        </button>
-                    {% endif %}
-                    
-                {{ form_end(form) }}
-                </div>
-            </div>
-            <div id="checkout">
-                <!-- Checkout will insert the payment form here -->
-            </div>
-        </div>
-
-    </div>
-    {# Modal Reservation preview #}
-    <div class="modal fade" id="reservation-modal" tabindex="-1" aria-labelledby="recapModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="recapModalLabel">Récapitulatif de votre réservation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Colonne gauche : infos logement -->
-                        <div class="col-md-6 pe-md-4 border-end">
-                            <h5 class="fw-bold mb-2">{{ apartment.name }}</h5>
-                            <span class="text-muted">{{ apartment.price }} par nuit, un total de </span>
-                        </div>
-
-                        <!-- Colonne droite : récapitulatif des dates -->
-                        <div class="col-md-6 ps-md-4">
-                            <p><strong>Date de début :</strong> <span id="recap-start"></span></p>
-                            <p><strong>Date de fin :</strong> <span id="recap-end"></span></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button id="checkout-button" class="btn btn-success">Confirmer</button>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-    
+
+    {# ================= DESCRIPTION ================= #}
+    <div class="p-4">
+        {{ apartment.description }}
+    </div>
+
+    {# ================= RESERVATION + PAYMENT ================= #}
+    <div class="row mt-4 shadow rounded p-4">
+
+        <div class="col-md-6">
+            <h5>Réservez votre séjour</h5>
+
+            {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
+
+            <div
+                id="calendar"
+                class="mb-3"
+            ></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_widget(form.startDate) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_widget(form.endDate) }}
+                </div>
+            </div>
+
+            {% if app.user %}
+            <button
+                type="button"
+                id="preview-reservation-btn"
+                class="btn btn-info text-white mt-3"
+            >
+                Faire ma réservation
+            </button>
+            {% else %}
+            <p class="text-danger mt-3">Veuillez vous connecter pour réserver</p>
+            {% endif %}
+
+            {{ form_end(form) }}
+        </div>
+
+        {# ================= STRIPE PAYMENT SECTION ================= #}
+        <div class="col-md-6">
+
+            <div
+                id="payment-section"
+                class="d-none"
+            >
+                <h5 class="fw-bold mb-3">Paiement de l’acompte (30%)</h5>
+
+                <form id="payment-form">
+                    <div
+                        id="payment-element"
+                        class="mb-3"
+                    ></div>
+
+                    <button
+                        class="btn btn-success w-100"
+                        type="submit"
+                    >
+                        Payer l’acompte
+                    </button>
+
+                    <div
+                        id="payment-message"
+                        class="text-danger mt-3 d-none"
+                    ></div>
+                </form>
+            </div>
+
+        </div>
+    </div>
 
 </div>
 
+{# ================= MODAL RECAP ================= #}
+<div
+    class="modal fade"
+    id="reservation-modal"
+    tabindex="-1"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Récapitulatif</h5>
+                <button
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Appartement :</strong> {{ apartment.name }}</p>
+                <p><strong>Début :</strong> <span id="recap-start"></span></p>
+                <p><strong>Fin :</strong> <span id="recap-end"></span></p>
+                <p class="text-muted">Acompte de 30% requis</p>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >Annuler</button>
+                <button
+                    id="checkout-button"
+                    class="btn btn-success"
+                >
+                    Confirmer & payer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+{# ================= IMAGE MODAL ================= #}
+<div
+    class="modal fade"
+    id="imageModal"
+>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img
+                    id="modalImage"
+                    class="img-fluid rounded"
+                >
+            </div>
+        </div>
+    </div>
+</div>
 
-{# --- FullCalendar --- #}
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+{# ================= FULLCALENDAR ================= #}
+<link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+    rel="stylesheet"
+>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'fr',
-        events: '{{ path("reservations_json", { id: apartment.id }) }}', 
-        selectable: true,
-        selectAllow: function(selectInfo) {
-            var events = calendar.getEvents();
-            for (let event of events) {
-                if ((selectInfo.start < event.end) && (selectInfo.end > event.start)) {
-                    return false;
-                }
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            selectable: true,
+            events: '{{ path("reservations_json", {id: apartment.id}) }}',
+            select: function (info) {
+                document.getElementById('reservation_form_startDate').value = info.startStr;
+                document.getElementById('reservation_form_endDate').value = info.endStr;
+                document.getElementById('recap-start').textContent = info.startStr;
+                document.getElementById('recap-end').textContent = info.endStr;
             }
-            return true;
-        },
-        select: function(info) {
-            document.getElementById('reservation_form_startDate').value = info.startStr;
-            document.getElementById('reservation_form_endDate').value = info.endStr;
-        }
+        });
+        calendar.render();
     });
-    calendar.render();
-});
 </script>
 
-{# --- Stripe --- #}
+{# ================= STRIPE ================= #}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     const stripe = Stripe("{{ stripe_public_key }}");
+    let elements;
 
-    const apartmentId = {{ apartment.id }};
-    const apartmentPrice = {{ apartment.price }};
-    {# const apartmenetStripePriceId = {{ apartment.getStripePriceId() }}; #}
-    const startDate = document.getElementById('reservation_form_startDate').value;
-    const endDate = document.getElementById('reservation_form_endDate').value;
+    document.getElementById("preview-reservation-btn").addEventListener("click", () => {
+        new bootstrap.Modal(document.getElementById("reservation-modal")).show();
+    });
 
-    document.getElementById('reservation_form_startDate').value ='';
-    document.getElementById('reservation_form_endDate').value='';
+    document.getElementById("checkout-button").addEventListener("click", async () => {
 
-    document.getElementById("checkout-button").addEventListener("click", () => {
-        fetch("{{ path('app_stripe_checkout') }}", {
+        const startDate = document.getElementById('reservation_form_startDate').value;
+        const endDate = document.getElementById('reservation_form_endDate').value;
+
+        const response = await fetch("{{ path('stripe_create_payment_intent') }}", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                price: apartmentPrice,
-                apartment_id: apartmentId,
-                start_date: startDate,
-                end_date: endDate
-            })
+                apartment_id: {{ apartment.id }},
+            start_date: startDate,
+            end_date: endDate
         })
-        .then(response => response.json())
-        .then(data => {
-            return stripe.redirectToCheckout({ sessionId: data.id });
-        })
-        .catch(error => console.error("Stripe error:", error));
     });
 
-    
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".preview-image").forEach(image => {
-            image.addEventListener("click", function () {
-                const imageUrl = this.getAttribute("src");
-                document.getElementById("modalImage").setAttribute("src", imageUrl);
-            });
-        });
-    });
+    const data = await response.json();
 
-    document.addEventListener("DOMContentLoaded", function () {
-    const loadMoreBtn = document.getElementById("load-more-btn");
-    const moreImagesContainer = document.getElementById("more-images");
+    elements = stripe.elements({ clientSecret: data.clientSecret });
+    const paymentElement = elements.create("payment");
+    paymentElement.mount("#payment-element");
 
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener("click", function () {
-            // Affiche le bloc des images cachées
-            moreImagesContainer.classList.remove("d-none");
+    document.getElementById("payment-section").classList.remove("d-none");
 
-            let hiddenImages = moreImagesContainer.querySelectorAll(".image-container.d-none");
-            if (hiddenImages.length > 0) {
-                hiddenImages.forEach((image, index) => {
-                    if (index < 5) {
-                        image.classList.remove("d-none");
-                    }
-                });
-                if (moreImagesContainer.querySelectorAll(".image-container.d-none").length === 0) {
-                    loadMoreBtn.style.display = "none";
-                }
-            } else {             
-                loadMoreBtn.style.display = "none";
-            }
-        });
-    }
+    bootstrap.Modal.getInstance(document.getElementById("reservation-modal")).hide();
 });
 
-   
+    document.getElementById("payment-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: "{{ path('payment_success', {}, constant('Symfony\\\\Component\\\\Routing\\\\Generator\\\\UrlGeneratorInterface::ABSOLUTE_URL')) }}"
+            }
+        });
+
+        if (error) {
+            const message = document.getElementById("payment-message");
+            message.textContent = error.message;
+            message.classList.remove("d-none");
+        }
+    });
 </script>
 
-{% endblock content %}
+<script>
+    document.querySelectorAll(".preview-image").forEach(img => {
+        img.addEventListener("click", () => {
+            document.getElementById("modalImage").src = img.src;
+        });
+    });
+</script>
+
+{% endblock %}
