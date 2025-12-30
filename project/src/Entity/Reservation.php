@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ReservationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +33,29 @@ class Reservation
     #[ORM\Column(nullable: true)]
     private ?bool $confirmed = null;
 
+    // 🔹 NEW — payments linked to this reservation
+    #[ORM\OneToMany(mappedBy: 'reservation', targetEntity: Payment::class, cascade: ['remove'])]
+    private Collection $payments;
+
+    // 🔹 OPTIONAL — reservation lifecycle
+    #[ORM\Column(length: 20)]
+    private string $status = 'pending';
+    // pending | confirmed | canceled | completed
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->payments  = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->confirmed = false;
+    }
+
+    // --------------------
+    // Getters & setters
+    // --------------------
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,7 +69,6 @@ class Reservation
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -56,7 +80,6 @@ class Reservation
     public function setApartment(?Apartment $apartment): static
     {
         $this->apartment = $apartment;
-
         return $this;
     }
 
@@ -68,7 +91,6 @@ class Reservation
     public function setStartDate(\DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
-
         return $this;
     }
 
@@ -80,7 +102,6 @@ class Reservation
     public function setEndDate(\DateTimeInterface $endDate): static
     {
         $this->endDate = $endDate;
-
         return $this;
     }
 
@@ -92,7 +113,47 @@ class Reservation
     public function setConfirmed(?bool $confirmed): static
     {
         $this->confirmed = $confirmed;
-
         return $this;
+    }
+
+    // --------------------
+    // Payments
+    // --------------------
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): static
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments->add($payment);
+            $payment->setReservation($this);
+        }
+        return $this;
+    }
+
+    // --------------------
+    // Status / lifecycle
+    // --------------------
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

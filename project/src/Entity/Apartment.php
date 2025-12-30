@@ -189,7 +189,7 @@ class Apartment
     {
         if (!$this->reservations->contains($reservation)) {
             $this->reservations->add($reservation);
-            $reservation->setAppartments($this);
+            $reservation->setApartment($this);
         }
 
         return $this;
@@ -199,8 +199,8 @@ class Apartment
     {
         if ($this->reservations->removeElement($reservation)) {
             // set the owning side to null (unless already changed)
-            if ($reservation->getAppartments() === $this) {
-                $reservation->setAppartments(null);
+            if ($reservation->getApartment() === $this) {
+                $reservation->setApartment(null);
             }
         }
 
