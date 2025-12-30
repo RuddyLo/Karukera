@@ -6,8 +6,8 @@ use App\Entity\Reservation;
 use App\Repository\ApartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
-use Stripe\Webhook;
 use Stripe\PaymentIntent;
+use Stripe\Webhook;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +16,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StripeController extends AbstractController
 {
+    private const DEPOSIT_RATE = 0.30; // 30% deposit
+
     /**
-     * Create PaymentIntent (DEPOSIT)
+     * STEP 1 — Create PaymentIntent (Deposit only)
      */
-    #[Route('/stripe/create-payment-intent', name: 'create_deposit_intent', methods: ['POST'])]
-    public function createDepositIntent(
+    #[Route('/stripe/create-payment-intent', name: 'stripe_create_payment_intent', methods: ['POST'])]
+    public function createPaymentIntent(
         Request $request,
         ApartmentRepository $apartmentRepository
     ): JsonResponse {
@@ -33,17 +35,16 @@ class StripeController extends AbstractController
             return new JsonResponse(['error' => 'Apartment not found'], 404);
         }
 
-        // 🔐 ALWAYS calculate server-side
+        // 🔐 Server-side price calculation (MANDATORY)
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
         $days      = max(1, $startDate->diff($endDate)->days);
 
-        $totalAmount = $apartment->getPrice() * $days;
-        $depositRate = 0.30; // 30% deposit
-        $depositAmount = (int) round($totalAmount * $depositRate * 100);
+        $totalAmount  = $apartment->getPrice() * $days;
+        $deposit      = round($totalAmount * self::DEPOSIT_RATE, 2);
 
         $paymentIntent = PaymentIntent::create([
-            'amount' => $depositAmount,
+            'amount' => (int) ($deposit * 100), // cents
             'currency' => 'eur',
             'automatic_payment_methods' => [
                 'enabled' => true,
@@ -54,7 +55,7 @@ class StripeController extends AbstractController
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
                 'total_amount' => $totalAmount,
-                'deposit_amount' => $depositAmount / 100,
+                'deposit_amount' => $deposit,
             ],
         ]);
 
@@ -64,7 +65,7 @@ class StripeController extends AbstractController
     }
 
     /**
-     * Stripe Webhook
+     * STEP 2 — Stripe Webhook (Payment confirmed)
      */
     #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
     public function webhook(
@@ -75,48 +76,59 @@ class StripeController extends AbstractController
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
         $payload = $request->getContent();
-        $signature = $request->headers->get('stripe-signature');
+        $sigHeader = $request->headers->get('stripe-signature');
         $endpointSecret = $this->getParameter('stripe_webhook_secret');
 
         try {
-            $event = Webhook::constructEvent($payload, $signature, $endpointSecret);
-        } catch (\Exception $e) {
+            $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+        } catch (\Exception) {
             return new Response('Invalid webhook', 400);
         }
 
-        // ✅ Payment succeeded
+        /**
+         * 🔔 Deposit paid successfully
+         */
         if ($event->type === 'payment_intent.succeeded') {
             /** @var PaymentIntent $intent */
             $intent = $event->data->object;
+            $meta = $intent->metadata;
 
-            $metadata = $intent->metadata;
-
-            $apartment = $apartmentRepository->find($metadata->apartment_id);
+            $apartment = $apartmentRepository->find($meta->apartment_id);
             if (!$apartment) {
                 return new Response('Apartment not found', 200);
             }
 
             $reservation = new Reservation();
             $reservation->setApartment($apartment);
-            $reservation->setUser(null); // attach logged user if needed
-            $reservation->setStartDate(new \DateTime($metadata->start_date));
-            $reservation->setEndDate(new \DateTime($metadata->end_date));
+            $reservation->setUser(null); // set logged user if available
+            $reservation->setStartDate(new \DateTime($meta->start_date));
+            $reservation->setEndDate(new \DateTime($meta->end_date));
             $reservation->setConfirmed(true);
 
-            // Optional fields if you added them
-            // $reservation->setDepositAmount($metadata->deposit_amount);
+            /**
+             * 🔥 STRONGLY RECOMMENDED FIELDS (add in entity)
+             */
             // $reservation->setStripePaymentIntentId($intent->id);
+            // $reservation->setTotalAmount($meta->total_amount);
+            // $reservation->setDepositAmount($meta->deposit_amount);
+            // $reservation->setPaymentStatus('deposit_paid');
 
             $em->persist($reservation);
             $em->flush();
         }
 
-        return new Response('Webhook processed', 200);
+        return new Response('Webhook handled', 200);
     }
 
-    #[Route('/payment/processing', name: 'payment_processing')]
-    public function processing(): Response
+    #[Route('/payment/success', name: 'payment_success')]
+    public function success(): Response
     {
-        return $this->render('stripe/processing.html.twig');
+        return $this->render('stripe/success.html.twig');
+    }
+
+    #[Route('/payment/cancel', name: 'payment_cancel')]
+    public function cancel(): Response
+    {
+        return $this->render('stripe/cancel.html.twig');
     }
 }
