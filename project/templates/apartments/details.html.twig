@@ -1,261 +1,218 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-<div class="container w-100 p-4 rounded">
+	<div class="container w-100 p-4 rounded">
+		<div
+			class="col">
 
-    {# ================= APARTMENT HEADER ================= #}
-    <div class="row d-flex justify-content-between align-items-center p-4">
-        <div class="col-md-6">
-            <h2 class="fw-bold">{{ apartment.name }}</h2>
-            <hr class="w-75">
-        </div>
-        <div class="col-md-6 text-end">
-            <h4>{{ apartment.price }} €</h4>
-            <span class="text-muted">par nuit</span>
-        </div>
-    </div>
+			{# Flash messages #}
+			{% for label, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="alert alert-{{ label }} mt-2">{{ message }}</div>
+				{% endfor %}
+			{% endfor %}
 
-    {# ================= IMAGES ================= #}
-    <div class="row mt-4 p-4">
-        <div class="col-md-6">
-            <img
-                src="{{ asset(apartment.imageUrl) }}"
-                class="img-fluid rounded w-100 h-100 object-cover preview-image"
-                data-bs-toggle="modal"
-                data-bs-target="#imageModal"
-            >
-        </div>
-        <div class="col-md-6">
-            <div class="row">
-                {% for image in apartment.images|slice(0,4) %}
-                <div class="col-md-6 mb-2">
-                    <img
-                        src="{{ asset(image.url) }}"
-                        class="img-fluid rounded preview-image"
-                        data-bs-toggle="modal"
-                        data-bs-target="#imageModal"
-                    >
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+			{# Apartment header #}
+			<div class="row p-4 align-items-center justify-content-between">
+				<div class="col-sm-6">
+					<h2 class="fw-bold">{{ apartment.name }}</h2>
+					<hr class="w-75">
+				</div>
+				<div class="col-sm-6 text-end">
+					<h4>{{ apartment.price }}
+						€</h4>
+					<span>La nuitée</span>
+				</div>
+			</div>
 
-    {# ================= DESCRIPTION ================= #}
-    <div class="p-4">
-        {{ apartment.description }}
-    </div>
+			{# Images #}
+			<div class="row mt-4 p-4">
+				<div class="col-md-6" style="height:400px;">
+					<img src="{{ asset(apartment.imageUrl) }}" class="img-fluid rounded preview-image w-100 h-100">
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						{% for image in apartment.images|slice(0,4) %}
+							<div class="col-md-6 mb-2" style="height:200px;">
+								<img src="{{ asset(image.url) }}" class="img-fluid rounded preview-image w-100 h-100">
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
 
-    {# ================= RESERVATION + PAYMENT ================= #}
-    <div class="row mt-4 shadow rounded p-4">
+			<div class="p-4">{{ apartment.description }}</div>
 
-        <div class="col-md-6">
-            <h5>Réservez votre séjour</h5>
+			{# Reservation & calendar #}
+			<div class="row mt-3 p-4 shadow rounded">
+				<div class="col-md-6 card p-4">
+					<h5>Ce que propose cet appartement</h5>
+					<div class="row g-3 mt-2">
+						{% for equipment in apartment.equipments %}
+							<div class="col-md-6 d-flex align-items-center">
+								<img src="{{ asset(equipment.iconUrl) }}" class="mx-2">
+								<span>{{ equipment.name }}</span>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
 
-            {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
+				<div class="col-md-6">
+					<div class="bg-white rounded p-3">
 
-            <div
-                id="calendar"
-                class="mb-3"
-            ></div>
+						{{ form_start(form, {'attr': {'id':'reservation-form'}}) }}
 
-            <div class="row">
-                <div class="col-md-6">
-                    {{ form_widget(form.startDate) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_widget(form.endDate) }}
-                </div>
-            </div>
+						<div class="border p-4 rounded">
+							<h4 class="fw-bold text-muted mb-2">Réservez votre séjour</h4>
+							<div id="calendar"></div>
 
-            {% if app.user %}
-            <button
-                type="button"
-                id="preview-reservation-btn"
-                class="btn btn-info text-white mt-3"
-            >
-                Faire ma réservation
-            </button>
-            {% else %}
-            <p class="text-danger mt-3">Veuillez vous connecter pour réserver</p>
-            {% endif %}
+							<div class="row mt-4">
+								<div class="col-md-6">
+									{{ form_widget(form.startDate) }}
+								</div>
+								<div class="col-md-6">
+									{{ form_widget(form.endDate) }}
+								</div>
+							</div>
+						</div>
 
-            {{ form_end(form) }}
-        </div>
+						{% if app.user %}
+							<button type="button" id="preview-reservation-btn" class="btn btn-info text-white mt-4" data-bs-toggle="modal" data-bs-target="#reservation-modal">
+								Faire ma réservation
+							</button>
+						{% endif %}
 
-        {# ================= STRIPE PAYMENT SECTION ================= #}
-        <div class="col-md-6">
+						{{ form_end(form) }}
 
-            <div
-                id="payment-section"
-                class="d-none"
-            >
-                <h5 class="fw-bold mb-3">Paiement de l’acompte (30%)</h5>
+					</div>
+					<div id="payment-element"></div>
+					<div id="payment-error" class="text-danger mt-2"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-                <form id="payment-form">
-                    <div
-                        id="payment-element"
-                        class="mb-3"
-                    ></div>
+	{# ================= MODAL ================= #}
+	<div class="modal fade" id="reservation-modal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
 
-                    <button
-                        class="btn btn-success w-100"
-                        type="submit"
-                    >
-                        Payer l’acompte
-                    </button>
+				<div class="modal-header">
+					<h5 class="modal-title">Récapitulatif & acompte</h5>
+					<button class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
 
-                    <div
-                        id="payment-message"
-                        class="text-danger mt-3 d-none"
-                    ></div>
-                </form>
-            </div>
+				<div class="modal-body">
+					<p>
+						<strong>{{ apartment.name }}</strong>
+					</p>
+					<p>Prix / nuit :
+						{{ apartment.price }}
+						€</p>
 
-        </div>
-    </div>
+					<p>Date début :
+						<span id="recap-start"></span>
+					</p>
+					<p>Date fin :
+						<span id="recap-end"></span>
+					</p>
 
-</div>
+					<hr>
+					<p class="fw-bold text-success">
+						Acompte à payer maintenant (30%)
+					</p>
 
-{# ================= MODAL RECAP ================= #}
-<div
-    class="modal fade"
-    id="reservation-modal"
-    tabindex="-1"
->
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5>Récapitulatif</h5>
-                <button
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Appartement :</strong> {{ apartment.name }}</p>
-                <p><strong>Début :</strong> <span id="recap-start"></span></p>
-                <p><strong>Fin :</strong> <span id="recap-end"></span></p>
-                <p class="text-muted">Acompte de 30% requis</p>
-            </div>
-            <div class="modal-footer">
-                <button
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                >Annuler</button>
-                <button
-                    id="checkout-button"
-                    class="btn btn-success"
-                >
-                    Confirmer & payer
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+					<div id="payment-element"></div>
+					<div id="payment-error" class="text-danger mt-2"></div>
+				</div>
 
-{# ================= IMAGE MODAL ================= #}
-<div
-    class="modal fade"
-    id="imageModal"
->
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <img
-                    id="modalImage"
-                    class="img-fluid rounded"
-                >
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+					<button id="checkout-button" class="btn btn-success">
+						Payer l’acompte
+					</button>
+				</div>
 
-{# ================= FULLCALENDAR ================= #}
-<link
-    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-    rel="stylesheet"
->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+			</div>
+		</div>
+	</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            initialView: 'dayGridMonth',
-            locale: 'fr',
-            selectable: true,
-            events: '{{ path("reservations_json", {id: apartment.id}) }}',
-            select: function (info) {
-                document.getElementById('reservation_form_startDate').value = info.startStr;
-                document.getElementById('reservation_form_endDate').value = info.endStr;
-                document.getElementById('recap-start').textContent = info.startStr;
-                document.getElementById('recap-end').textContent = info.endStr;
-            }
-        });
-        calendar.render();
-    });
-</script>
+	{# ================= CALENDAR ================= #}
+	<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-{# ================= STRIPE ================= #}
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-    const stripe = Stripe("{{ stripe_public_key }}");
-    let elements;
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+locale: 'fr',
+selectable: true,
+events: '{{ path("reservations_json", {id: apartment.id}) }}',
+select(info) {
+document.getElementById('reservation_form_startDate').value = info.startStr;
+document.getElementById('reservation_form_endDate').value = info.endStr;
+}
+});
+calendar.render();
+});
+	</script>
 
-    document.getElementById("preview-reservation-btn").addEventListener("click", () => {
-        new bootstrap.Modal(document.getElementById("reservation-modal")).show();
-    });
+	{# ================= STRIPE ================= #}
+	<script src="https://js.stripe.com/v3/"></script>
 
-    document.getElementById("checkout-button").addEventListener("click", async () => {
+	<script>
+		const stripe = Stripe("{{ stripe_public_key }}");
+let elements;
+let clientSecret = null;
 
-        const startDate = document.getElementById('reservation_form_startDate').value;
-        const endDate = document.getElementById('reservation_form_endDate').value;
+/**
+     * 1️⃣ When modal opens → create PaymentIntent + mount Elements
+     */
+document.getElementById('reservation-modal').addEventListener('shown.bs.modal', async () => {
 
-        const response = await fetch("{{ path('stripe_create_payment_intent') }}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                apartment_id: {{ apartment.id }},
-            start_date: startDate,
-            end_date: endDate
-        })
-    });
+const startDate = document.getElementById('reservation_form_startDate').value;
+const endDate = document.getElementById('reservation_form_endDate').value;
 
-    const data = await response.json();
+if (! startDate || ! endDate) {
+alert("Veuillez sélectionner des dates");
+return;
+}
 
-    elements = stripe.elements({ clientSecret: data.clientSecret });
-    const paymentElement = elements.create("payment");
-    paymentElement.mount("#payment-element");
-
-    document.getElementById("payment-section").classList.remove("d-none");
-
-    bootstrap.Modal.getInstance(document.getElementById("reservation-modal")).hide();
+const response = await fetch("{{ path('stripe_create_payment_intent') }}", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(
+{apartment_id: {{ apartment.id }}, start_date: startDate, end_date: endDate}
+)
 });
 
-    document.getElementById("payment-form").addEventListener("submit", async (e) => {
-        e.preventDefault();
+const data = await response.json();
+clientSecret = data.clientSecret;
 
-        const { error } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                return_url: "{{ path('payment_success', {}, constant('Symfony\\\\Component\\\\Routing\\\\Generator\\\\UrlGeneratorInterface::ABSOLUTE_URL')) }}"
-            }
-        });
+elements = stripe.elements({clientSecret});
 
-        if (error) {
-            const message = document.getElementById("payment-message");
-            message.textContent = error.message;
-            message.classList.remove("d-none");
-        }
-    });
-</script>
+const paymentElement = elements.create("payment");
+paymentElement.mount("#payment-element");
+});
 
-<script>
-    document.querySelectorAll(".preview-image").forEach(img => {
-        img.addEventListener("click", () => {
-            document.getElementById("modalImage").src = img.src;
-        });
-    });
-</script>
+/**
+     * 2️⃣ When clicking "Payer l’acompte"
+     */
+document.getElementById("checkout-button").addEventListener("click", async () => {
+
+if (! elements) {
+alert("Le formulaire de paiement n’est pas prêt.");
+return;
+}
+
+const {error} = await stripe.confirmPayment({elements, confirmParams: {}});
+
+if (error) {
+document.getElementById("payment-error").innerText = error.message;
+}
+});
+	</script>
+
 
 {% endblock %}

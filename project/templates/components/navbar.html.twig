@@ -1,11 +1,12 @@
-<div class="navbar-container w-2 container-fluid d-flex align-items-center justify-content-between " style="background-color: {{ bgColor|default('transparent') }};">
+<div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between " style="background-color: {{ bgColor|default('transparent') }};">
+
 	<a href="{{ path('app.home') }}" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
 		<!-- Uncomment the line below if you also wish to use an image logo -->
 		{# <img
-															src="{{asset('images/icons/karukera-logo.png')}}"
-															style="height: 250px; width: 350px;"
-															alt=""
-														> #}
+																																	src="{{asset('images/icons/karukera-logo.png')}}"
+																																	style="height: 250px; width: 350px;"
+																																	alt=""
+																																> #}
 			<h1 class=""> Les Oasis
 			<span>de KaruKera</span>.
 		</h1>
@@ -14,29 +15,35 @@
 	<nav id="navbar" class="navbar">
 		<ul>
 			<li class="nav-link scrollto">
-				<a href="#">
+				<a href="{{ path('app.home') }}">
 					<span>Acceuil</span>
 				</a>
 			</li>
-			<li class="dropdown">
-				<a href="#">
-					<span>Services</span>
-					<i class="bi bi-chevron-down dropdown-indicator"></i>
-				</a>
-				<ul>
-					<li><a href="" class="">Location d'appartement</a></li>
-					<li><a href="">Restauration</a></li>
-					<li><a href="">Récupération à l'aeroport</a></li>
-					<li><a href="">Services annexes</a></li>
-				</ul>
-			</li>
+			{# <li class="dropdown">
+																																																	<a href="#">
+																																																		<span>Services</span>
+																																																		<i class="bi bi-chevron-down dropdown-indicator"></i>
+																																																	</a>
+																																																	<ul>
+																																																		<li><a
+																																																				href=""
+																																																				class=""
+																																																			>Location d'appartement</a></li>
+																																																		<li><a href="">Restauration</a></li>
+																																																		<li><a href="">Récupération à l'aeroport</a></li>
+																																																		<li><a href="">Services annexes</a></li>
+																																																	</ul>
+																																																</li> #}
 
 			<li>
-				<a class="nav-link scrollto" href="#contact">Contact</a>
+				<a class="nav-link scrollto" href="">Contact</a>
 			</li>
-			<li>
-				<a class=" nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">S'inscrire</a>
-			</li>
+			{% if not app.user %}
+				<li>
+					<a class=" nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">S'inscrire</a>
+				</li>
+
+			{% endif %}
 
 			{% if not app.user %}
 				<li>
@@ -49,49 +56,30 @@
 			{% endif %}
 
 
-			<li>
-				<a class="nav-link scrollto color-orange border-primary fw-bold" href="{{path("app.login")}}">Administration</a>
+			{% if 'ROLE_ADMIN' in app.user.roles %}
+				<li>
+					<a class="nav-link scrollto color-orange border-primary fw-bold" href="{{path("app.login")}}">Administration</a>
+				</li>
+			{% endif %}
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle px-2" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Langues</a>
+
+				<ul class="dropdown-menu dropdown-menu-end language-dropdown" aria-labelledby="languageDropdown">
+
+					<li>
+						<a class="dropdown-item">
+							Français
+						</a>
+					</li>
+					<li>
+						<a class="dropdown-item">
+							Anglais
+						</a>
+					</li>
+				</ul>
 			</li>
 
-			<li>
-				<span class="langage-selector">
-					<svg width="32px" height="32px" viewbox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveaspectratio="xMidYMid meet" fill="#000000">
-						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-						<g id="SVGRepo_iconCarrier">
-							<path fill="#ED2939" d="M36 27a4 4 0 0 1-4 4h-8V5h8a4 4 0 0 1 4 4v18z"></path>
-							<path fill="#002495" d="M4 5a4 4 0 0 0-4 4v18a4 4 0 0 0 4 4h8V5H4z"></path>
-							<path fill="#EEE" d="M12 5h12v26H12z"></path>
-						</g>
-					</svg>
-
-				</span>
-
-			</li>
-
-			<li>
-				<span class="langage-selector">
-					<svg width="32px" height="32px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 496 496" xml:space="preserve" width="64px" height="64px" fill="#000000">
-						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-						<g id="SVGRepo_iconCarrier">
-							<path style="fill:#FFFFFF;" d="M496,369.6c0,27.2-21.6,46.4-48,46.4H48c-26.4,0-48-19.2-48-46.4V126.4C0,99.2,21.6,80,48,80h400 c26.4,0,48,19.2,48,46.4V369.6z"></path>
-							<path style="fill:#E9F3F4;" d="M48,80h400c26.4,0,48,19.2,48,46.4v243.2c0,27.2-22.4,46.4-48.8,46.4"></path>
-							<g>
-								<path style="fill:#D9ECED;" d="M496,368.8c0,27.2-21.6,47.2-48,47.2H48c-26.4,0-48-20.8-48-48"></path>
-								<path style="fill:#D9ECED;" d="M48,80h400c26.4,0,48,19.2,48,46.4V216"></path>
-							</g>
-							<polygon style="fill:#D32027;" points="496,216 280,216 280,80 216,80 216,216 0,216 0,280 216,280 216,416 280,416 280,280 496,280 "></polygon>
-							<g>
-								<rect x="216" y="368" style="fill:#AA0015;" width="64" height="48"></rect>
-								<polygon style="fill:#AA0015;" points="280,80 216,80 216,216 210.4,216 285.6,280 496,280 496,216 280,216 "></polygon>
-							</g>
-						</g>
-					</svg>
-
-				</span>
-
-			</li>
 		</ul>
 		<i class="bi bi-list mobile-nav-toggle d-none"></i>
 
