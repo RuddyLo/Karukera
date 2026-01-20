@@ -16,7 +16,7 @@
                 <hr class="w-75">
             </div>
             <div class="col-sm-6 text-end">
-                <h4>{{ apartment.price }} €</h4>
+                <h4>{{ price }} €</h4>
                 <span>La nuitée</span>
             </div>
         </div>
@@ -111,7 +111,7 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-6 text-muted">Prix / jour</div>
-                            <div class="col-6 text-end">{{ apartment.price }} €</div>
+                            <div class="col-6 text-end" id="apartment_price" data-price="{{ price }}">{{ price }} €</div>
                         </div>
                         <div class="row mb-3 pb-3 border-bottom">
                             <div class="col-6 text-muted">Nombre de jours</div>

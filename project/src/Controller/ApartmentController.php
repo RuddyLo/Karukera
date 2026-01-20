@@ -6,6 +6,7 @@ use App\Entity\Apartment;
 use App\Entity\Reservation;
 use App\Form\ReservationFormType;
 use App\Repository\ApartmentRepository;
+use App\Repository\PricePeriodRepository;
 use App\Repository\ReservationRepository;
 use App\Service\ReservationCheckerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +20,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class ApartmentController extends AbstractController
 {
     public function __construct(
-        private ApartmentRepository $apartmentRepository
+        private ApartmentRepository $apartmentRepository,
+        private PricePeriodRepository $repo,
     ) {
     }
 
@@ -55,11 +57,19 @@ class ApartmentController extends AbstractController
                 return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
             }
         }
-        
-        
+
+        $pricePeriod = $this->repo->findCurrentPricePeriod(null,$apartment);
+
+        $price = $pricePeriod
+            ? $pricePeriod->getPrice()
+            : $apartment->getPrice();
+
+       
+
         return $this->render('apartments/details.html.twig', [
             'form' => $form->createView(),
             'apartment' => $apartment,
+            'price' => $price,
             'stripe_public_key' => $this->getParameter('stripe_publishable_key'),
         ]);
     }

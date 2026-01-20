@@ -30,6 +30,8 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
 
     const startDate = document.getElementById('reservation_form_startDate').value;
     const endDate = document.getElementById('reservation_form_endDate').value;
+    const priceElement = document.getElementById('apartment_price');
+    const price = parseFloat(priceElement.dataset.price);
 
     if (!startDate || !endDate) {
         toastr.error("Veuillez choisir une date d'arrivée et une date de départ.");
@@ -45,7 +47,8 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
         body: JSON.stringify({
             apartment_id: window.apartmentId,
             start_date: startDate,
-            end_date: endDate
+            end_date: endDate,
+            price: price
         })
     });
 
