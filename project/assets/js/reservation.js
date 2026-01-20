@@ -2,9 +2,9 @@ import toastr from 'toastr';
 import bootstrap from '../externals/bootstrap/js/bootstrap.bundle.min.js';
 
 let stripe;
-let elements;
-let clientSecret = null;
-let reservationData = null;
+let elementsRent;
+let clientSecretRent = null;
+let clientSecretCaution = null;
 
 function initStripe() {
     if (!window.stripePublicKey) {
@@ -17,7 +17,6 @@ function initStripe() {
 
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.getElementById('preview-reservation-btn')) return;
-    
     initStripe();
 });
 
@@ -33,7 +32,7 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
     const endDate = document.getElementById('reservation_form_endDate').value;
 
     if (!startDate || !endDate) {
-        toastr.error('Veuillez choisir une date de début et une date de fin.');
+        toastr.error("Veuillez choisir une date d'arrivée et une date de départ.");
         return;
     }
 
@@ -57,41 +56,45 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
         return;
     }
 
-    clientSecret = data.clientSecret;
-    reservationData = data;
+    clientSecretRent = data.clientSecretRent;
+    clientSecretCaution = data.clientSecretCaution;
 
     document.getElementById('recap-days').textContent = data.days;
     document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
     document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
-    document.getElementById('recap-total').textContent = data.totalAmount.toFixed(2);
+    document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
+    document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
 
-    elements = stripe.elements({ clientSecret });
-    const paymentElement = elements.create('payment');
-    paymentElement.mount('#payment-element');
+    const paymentElementContainer = document.getElementById('payment-element-rent');
+    if (paymentElementContainer && !paymentElementContainer.hasChildNodes()) {
+        elementsRent = stripe.elements({ clientSecret: clientSecretRent });
+        const paymentElement = elementsRent.create('payment');
+        paymentElement.mount('#payment-element-rent');
+    }
 
     const modal = new bootstrap.Modal(document.getElementById('reservation-modal'));
     modal.show();
 });
 
 document.getElementById('checkout-button')?.addEventListener('click', async function() {
-    if (!elements) {
+    if (!elementsRent) {
         toastr.error('Le formulaire de paiement n\'est pas prêt.');
         return;
     }
 
     this.disabled = true;
-    this.textContent = 'Traitement...';
+    this.textContent = 'Paiement de la location...';
 
     const { error } = await stripe.confirmPayment({
-        elements,
+        elements: elementsRent,
         confirmParams: {
-            return_url: window.location.origin + '/payment/success',
+            return_url: window.location.origin + '/payment/processing?caution_secret=' + clientSecretCaution,
         }
     });
 
     if (error) {
         document.getElementById('payment-error').textContent = error.message;
         this.disabled = false;
-        this.textContent = 'Payer maintenant';
+        this.textContent = 'Payer la location';
     }
 });

@@ -21,7 +21,11 @@ global.$ = global.jQuery = $;
 
 import 'datatables.net-bs5';
 import 'select2';
-import 'toastr';
+
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
+
+
 // import 'datatables.net-dt/css/jquery.dataTables.min.css'; 
 import './js/main.js';
 import './js/table.js';

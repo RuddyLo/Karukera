@@ -44,8 +44,8 @@
                 <div class="row g-3 mt-2">
                     {% for equipment in apartment.equipments %}
                         <div class="col-md-6 d-flex align-items-center">
-                            <img src="{{ asset(equipment.iconUrl) }}" class="mx-2">
-                            <span>{{ equipment.name }}</span>
+                            <img src="{{ asset(equipment.iconUrl) }}" class="mx-2" style="width:60px; height:60px;">
+                            <span class='p-auto'>{{ equipment.name }}</span>
                         </div>
                     {% endfor %}
                 </div>
@@ -68,16 +68,20 @@
                             </div>
                         </div>
                     </div>
-
-                    {% if app.user %}
-                        <button type="button" id="preview-reservation-btn" class="btn btn-info text-white mt-4 w-100">
-                            Faire ma réservation
-                        </button>
-                    {% else %}
-                        <a class="btn btn-primary mt-4 w-100" href="{{ path('app.login') }}">
-                            Se connecter pour réserver
-                        </a>
-                    {% endif %}
+                    <div class="p-4">
+                        {% if app.user %}
+                            <button type="button" id="preview-reservation-btn" class="btn p-4 bg-success text-white mt-4 w-100">
+                                Faire ma réservation
+                            </button>
+                        {% else %}
+                            <a class="btn border mt-4 w-100" href="{{ path('app.login') }}">
+                                Se connecter pour réserver
+                            </a>
+                        {% endif %}
+                         <a class="btn border border-radius mt-4 w-100" href="{{ path('app.login') }}">
+                                Retour à la liste des appartements
+                         </a>
+                    </div>
 
                     {{ form_end(form) }}
                 </div>
@@ -87,54 +91,80 @@
 </div>
 
 <div class="modal fade" id="reservation-modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg bg-white">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Récapitulatif & paiement</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">Résumé de la réservation</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
-                <h6 class="fw-bold">{{ apartment.name }}</h6>
-                
-                <div class="mt-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Période</span>
-                        <span><span id="recap-start"></span> → <span id="recap-end"></span></span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Prix / nuit</span>
-                        <span>{{ apartment.price }} €</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Nombre de nuits</span>
-                        <span id="recap-days"></span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Montant location</span>
-                        <span><span id="recap-rent"></span> €</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Caution (30%)</span>
-                        <span><span id="recap-caution"></span> €</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fw-bold fs-5">Total à payer</span>
-                        <span class="fw-bold fs-5 text-primary"><span id="recap-total"></span> €</span>
-                    </div>
-                    <div class="alert alert-info mb-3">
-                        <small>La caution vous sera rendue à la fin du séjour</small>
+            <div class="modal-body p-4">
+                <h6 class="fw-bold mb-3">{{ apartment.name }}</h6>
+                <img src="{{ asset(apartment.imageUrl) }}" class="img-fluid rounded mb-2" style="max-height: 60px; width: auto;">
+                <div class="card mb-4 bg-light">
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-6 text-muted">Période</div>
+                            <div class="col-6 text-end">
+                                <span id="recap-start"></span> → <span id="recap-end"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6 text-muted">Prix / jour</div>
+                            <div class="col-6 text-end">{{ apartment.price }} €</div>
+                        </div>
+                        <div class="row mb-3 pb-3 border-bottom">
+                            <div class="col-6 text-muted">Nombre de jours</div>
+                            <div class="col-6 text-end"><span id="recap-days"></span></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6 fw-bold fs-5">Montant du séjours</div>
+                            <div class="col-6 text-end fw-bold fs-5 text-success">
+                                <span id="recap-rent"></span> €
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div id="payment-element"></div>
-                <div id="payment-error" class="text-danger mt-2"></div>
+                <div class="card mb-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-info mb-3">Information sur la caution</h6>
+                        <div class="row mb-2">
+                            <div class="col-8">Caution (remboursable)</div>
+                            <div class="col-4 text-end"><span id="recap-caution"></span> €</div>
+                        </div>
+                        <div class="row mb-2 text-muted small">
+                            <div class="col-8">+ Frais de transaction</div>
+                            <div class="col-4 text-end"><span id="recap-fees"></span> €</div>
+                        </div>
+                        <div class="row mb-0 pt-2 border-top">
+                            <div class="col-8 fw-bold">Total caution</div>
+                            <div class="col-4 text-end fw-bold">
+                                <span id="recap-caution-total"></span> €
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <small>
+                                💡 La caution sera remboursée intégralement (<span id="recap-caution"></span>€) après votre séjour si aucun dégât n'est constaté.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3">Informations de paiement</h6>
+                <div id="payment-element-rent"></div>
+                <div id="payment-error" class="text-danger mt-3"></div>
+
+                <div class="alert alert-warning mt-4 mb-0">
+                    <small><strong>Étape suivante :</strong> Après validation, vous devrez confirmer le paiement de la caution</small>
+                </div>
             </div>
 
-            <div class="modal-footer">
+            <div class="modal-footer bg-light">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button id="checkout-button" class="btn btn-success">Payer maintenant</button>
+                <button id="checkout-button" class="btn btn-success btn-lg px-5">
+                    Payer le séjours →
+                </button>
             </div>
         </div>
     </div>

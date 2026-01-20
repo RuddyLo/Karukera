@@ -1,39 +1,70 @@
-2. Utilisateur sélectionne les dates
+Workflow complet:
+1. Réservation (côté client):
 
-Clique sur le calendrier FullCalendar
-Les dates remplissent les champs startDate et endDate
+Client sélectionne dates sur calendrier
+Clique "Faire ma réservation"
+Modal s'ouvre avec récap:
 
-3. Utilisateur clique "Faire ma réservation"
+Location: X€
+Caution: Y€
+Frais Stripe: ~Z€
+Total caution à payer: Y + Z€
 
-reservation.js vérifie que les dates sont remplies
-Si OK, envoie requête POST vers /stripe/create-payment-intent
-Reçoit: clientSecret, rentAmount, cautionAmount, totalAmount, days
-Affiche le modal avec le récap
-Monte le Payment Element Stripe
 
-4. Modal s'ouvre
+2 formulaires de paiement Stripe apparaissent:
 
-Affiche le récapitulatif (dates, nombre de nuits, location, caution, total)
-Le Payment Element Stripe est visible
-Utilisateur entre ses infos de carte
+Formulaire 1: Paiement location
+Formulaire 2: Paiement caution + frais
 
-5. Utilisateur clique "Payer maintenant"
 
-stripe.confirmPayment() est appelé
-Stripe traite le paiement
-Si succès → redirection automatique vers /payment/success?payment_intent=pi_xxx
-Si erreur → affiche le message d'erreur
+Client entre infos carte (ou utilise la même carte pour les 2)
+Clique "Payer maintenant"
 
-6. Page de succès (/payment/success)
+2. Traitement paiement:
 
-Récupère le payment_intent depuis l'URL
-Vérifie que le paiement est succeeded via l'API Stripe
-Crée la réservation en BDD directement (fallback car webhook ne marche pas en local)
-Affiche le message de confirmation
-Redirige vers la home
+Intent 1 (location): Capturé immédiatement → argent sur ton compte
+Redirection vers page intermédiaire
+Intent 2 (caution): Capturé automatiquement → argent sur ton compte
+Redirection vers page succès
+Réservation créée en BDD
 
-7. (En parallèle) Webhook Stripe (ne fonctionne pas en local HTTP)
+3. Pendant le séjour:
 
-Stripe essaie d'envoyer payment_intent.succeeded
-Échoue car pas d'URL publique
-Pas grave, la réservation est déjà créée à l'étape 6
+Les 2 montants sont sur ton compte Stripe
+Client profite de l'appartement
+
+4. Après le séjour (backoffice admin):
+
+Tu consultes la liste des réservations terminées
+Pour chaque réservation, tu vois:
+
+Montant location: X€ (conservé)
+Montant caution: Y€ (remboursable)
+PaymentIntent ID de la caution
+
+
+Scénario A - Aucun dégât:
+
+Clique "Rembourser caution intégralement"
+Client reçoit Y€ (pas les frais Stripe)
+
+
+Scénario B - Dégâts partiels:
+
+Entre montant des dégâts (ex: 50€)
+Clique "Rembourser partiellement"
+Client reçoit Y - 50€
+
+
+Scénario C - Gros dégâts:
+
+Ne fais rien ou clique "Conserver la caution"
+Client ne reçoit rien
+
+
+
+Résultat:
+
+Tu gardes toujours la location
+Tu contrôles le remboursement de la caution
+Les frais Stripe (~5€) sont à la charge du client
