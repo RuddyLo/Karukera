@@ -26,7 +26,7 @@ class AdminReservationController extends AbstractController
         $reservationsWithPayments = [];
         foreach ($reservations as $reservation) {
             $paymentData = $this->getPaymentData($reservation);
-            dd($paymentData);
+            
             $reservationsWithPayments[] = [
                 'reservation' => $reservation,
                 'payment' => $paymentData
@@ -61,35 +61,38 @@ class AdminReservationController extends AbstractController
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
         $cautionIntentId = $request->request->get('caution_intent_id');
-        $refundType = $request->request->get('refund_type');
-        $partialAmount = $request->request->get('partial_amount');
+        $isConserve = $request->request->get('conserve');
 
-        try {
+        if ($isConserve) {
+            $reservation->setCautionConcerved(true);
+            $reservation->setCautionRefunded(false);
+            $em->persist($reservation);
+            $em->flush();
+            $this->addFlash('success', "Caution conservée.");
+            return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
+        }
+        else{
+            try {
             $intent = PaymentIntent::retrieve($cautionIntentId);
             $cautionAmount = $intent->metadata->caution_amount;
-
-            if ($refundType === 'full') {
+            
                 Refund::create([
                     'payment_intent' => $cautionIntentId,
                     'amount' => (int)($cautionAmount * 100),
                 ]);
                 $this->addFlash('success', "Caution de {$cautionAmount}€ remboursée intégralement.");
-            } elseif ($refundType === 'partial' && $partialAmount) {
-                $amountToRefund = min((float)$partialAmount, (float)$cautionAmount);
-                Refund::create([
-                    'payment_intent' => $cautionIntentId,
-                    'amount' => (int)($amountToRefund * 100),
-                ]);
-                $this->addFlash('success', "Remboursement partiel de {$amountToRefund}€ effectué.");
-            } else {
-                $this->addFlash('warning', 'Caution conservée (aucun remboursement).');
-            }
+                $reservation->setCautionRefunded(true);
+                $em->persist($reservation);
+                $em->flush();
 
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur Stripe: ' . $e->getMessage());
         }
 
         return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
+        }
+        
+        
     }
 
     private function getPaymentData(Reservation $reservation): ?array
@@ -101,24 +104,10 @@ class AdminReservationController extends AbstractController
         try {
             $rentIntent = PaymentIntent::retrieve($reservation->getRentPaymentIntentId());
             $cautionIntent = PaymentIntent::retrieve($reservation->getCautionPaymentIntentId());
-            dd($rentIntent, $cautionIntent);
 
-            $cautionRefunds = [];
+            
             if ($cautionIntent) {
-                foreach ($cautionIntent->charges->data as $charge) {
-                    if ($charge->refunds->data) {
-                        foreach ($charge->refunds->data as $refund) {
-                            $cautionRefunds[] = [
-                                'amount' => $refund->amount / 100,
-                                'date' => date('d/m/Y H:i', $refund->created),
-                                'status' => $refund->status,
-                            ];
-                        }
-                    }
-                }
-            }
-
-            return [
+                return [
                 'rent_intent_id' => $rentIntent->id,
                 'rent_amount' => $rentIntent->amount / 100,
                 'rent_status' => $rentIntent->status,
@@ -126,9 +115,13 @@ class AdminReservationController extends AbstractController
                 'caution_amount' => $cautionIntent->metadata->caution_amount ?? 0,
                 'caution_with_fees' => $cautionIntent->amount / 100,
                 'caution_status' => $cautionIntent->status,
-                'caution_refunds' => $cautionRefunds,
-                'caution_refunded_total' => array_sum(array_column($cautionRefunds, 'amount')),
-            ];
+                ];
+            }
+            else {
+                return null;
+            }
+
+            
         } catch (\Exception $e) {
             dd($e);
             error_log('Error fetching payment data: ' . $e->getMessage());

@@ -51,6 +51,12 @@ class Reservation
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cautionPaymentIntentId = null;
 
+    #[ORM\Column]
+    private ?bool $caution_refunded = null;
+
+    #[ORM\Column]
+    private ?bool $caution_concerved = null;
+
     public function __construct()
     {
         $this->payments  = new ArrayCollection();
@@ -183,6 +189,30 @@ class Reservation
     public function setCautionPaymentIntentId(?string $cautionPaymentIntentId): static
     {
         $this->cautionPaymentIntentId = $cautionPaymentIntentId;
+
+        return $this;
+    }
+
+    public function isCautionRefunded(): ?bool
+    {
+        return $this->caution_refunded;
+    }
+
+    public function setCautionRefunded(bool $caution_refunded): static
+    {
+        $this->caution_refunded = $caution_refunded;
+
+        return $this;
+    }
+
+    public function isCautionConcerved(): ?bool
+    {
+        return $this->caution_concerved;
+    }
+
+    public function setCautionConcerved(bool $caution_concerved): static
+    {
+        $this->caution_concerved = $caution_concerved;
 
         return $this;
     }

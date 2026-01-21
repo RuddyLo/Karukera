@@ -59,18 +59,14 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if payment %}
-                                        {% if payment.caution_refunded_total > 0 %}
+                                    {% if reservation.isCautionRefunded() %}
                                             <span class="badge bg-info">
-                                                {{ payment.caution_refunded_total }}€ remboursés
+                                                {{ payment.caution_amount }}€ remboursés
                                             </span>
-                                        {% else %}
+                                       {% else %}
                                             <span class="badge bg-warning text-dark">
                                                 {{ payment.caution_amount }}€ non remboursée
                                             </span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
                                 <td>
