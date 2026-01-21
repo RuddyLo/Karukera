@@ -47,6 +47,9 @@ class Apartment
     #[ORM\OneToMany(targetEntity: PricePeriod::class, mappedBy: 'apartment')]
     private Collection $pricePeriods;
 
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'apartment')]
+    private Collection $reviews;
+
  
 
     public function __construct()
@@ -55,6 +58,7 @@ class Apartment
         $this->equipments = new ArrayCollection();
         $this->reservations = new ArrayCollection();
         $this->pricePeriods = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     
@@ -243,6 +247,36 @@ class Apartment
             // set the owning side to null (unless already changed)
             if ($pricePeriod->getApartment() === $this) {
                 $pricePeriod->setApartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setApartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getApartment() === $this) {
+                $review->setApartment(null);
             }
         }
 

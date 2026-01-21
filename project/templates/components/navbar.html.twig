@@ -1,12 +1,12 @@
-<div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between " style="background-color: {{ bgColor|default('transparent') }};">
+<div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between ">
 
 	<a href="{{ path('app.home') }}" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
 		<!-- Uncomment the line below if you also wish to use an image logo -->
 		{# <img
-																																	src="{{asset('images/icons/karukera-logo.png')}}"
-																																	style="height: 250px; width: 350px;"
-																																	alt=""
-																																> #}
+			src="{{asset('images/icons/karukera-logo.png')}}"
+			style="height: 250px; width: 350px;"
+			alt=""
+		> #}
 			<h1 class=""> Les Oasis
 			<span>de KaruKera</span>.
 		</h1>
@@ -20,20 +20,20 @@
 				</a>
 			</li>
 			{# <li class="dropdown">
-																																																	<a href="#">
-																																																		<span>Services</span>
-																																																		<i class="bi bi-chevron-down dropdown-indicator"></i>
-																																																	</a>
-																																																	<ul>
-																																																		<li><a
-																																																				href=""
-																																																				class=""
-																																																			>Location d'appartement</a></li>
-																																																		<li><a href="">Restauration</a></li>
-																																																		<li><a href="">Récupération à l'aeroport</a></li>
-																																																		<li><a href="">Services annexes</a></li>
-																																																	</ul>
-																																																</li> #}
+			<a href="#">
+			<span>Services</span>
+			<i class="bi bi-chevron-down dropdown-indicator"></i>
+			</a>
+			<ul>
+			<li><a
+					href=""
+					class=""
+				>Location d'appartement</a></li>
+			<li><a href="">Restauration</a></li>
+			<li><a href="">Récupération à l'aeroport</a></li>
+			<li><a href="">Services annexes</a></li>
+			</ul>
+			</li> #}
 
 			<li>
 				<a class="nav-link scrollto" href="">Contact</a>
@@ -51,7 +51,7 @@
 				</li>
 			{% else %}
 				<li>
-					<a class="btn btn-danger text-white scrollto" href="{{path("app.logout")}}">Se déconnecter</a>
+					<a class="nav-link text-white scrollto" href="{{path("app.logout")}}">Se déconnecter</a>
 				</li>
 			{% endif %}
 
