@@ -172,6 +172,7 @@ class StripeController extends AbstractController
         ApartmentRepository $apartmentRepository
     ): Response {
         $paymentIntentId = $request->query->get('payment_intent');
+        $meta = '';
         
         if ($paymentIntentId) {
             Stripe::setApiKey($this->getParameter('stripe_secret_key'));
@@ -215,9 +216,17 @@ class StripeController extends AbstractController
                 error_log('Payment success error: ' . $e->getMessage());
             }
         }
+        if ($meta !== '' and isset($meta->apartment_id)) {
+            $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
+            return $this->redirectToRoute('app.apartment.details', [
+                'id' => $meta->apartment_id
+            ]);
+        }
+        else {
+            $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
+            return $this->redirectToRoute('app.home');
+        }
         
-        $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
-        return $this->redirectToRoute('app.home');
     }
 
     #[Route('/payment/cancel', name: 'payment_cancel')]
