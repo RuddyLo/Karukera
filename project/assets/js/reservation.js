@@ -4,7 +4,7 @@ import bootstrap from '../externals/bootstrap/js/bootstrap.bundle.min.js';
 let stripe;
 let elementsRent;
 let clientSecretRent = null;
-let clientSecretCaution = null;
+
 
 function initStripe() {
     if (!window.stripePublicKey) {
@@ -60,7 +60,6 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
     }
 
     clientSecretRent = data.clientSecretRent;
-    clientSecretCaution = data.clientSecretCaution;
 
     document.getElementById('recap-days').textContent = data.days;
     document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
@@ -86,12 +85,12 @@ document.getElementById('checkout-button')?.addEventListener('click', async func
     }
 
     this.disabled = true;
-    this.textContent = 'Paiement de la location...';
+    this.textContent = 'Paiement en cours...';
 
     const { error } = await stripe.confirmPayment({
         elements: elementsRent,
         confirmParams: {
-            return_url: window.location.origin + '/payment/processing?caution_secret=' + clientSecretCaution,
+            return_url: window.location.origin + '/payment/success',
         }
     });
 

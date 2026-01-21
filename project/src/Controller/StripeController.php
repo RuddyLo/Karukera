@@ -46,7 +46,7 @@ class StripeController extends AbstractController
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
         $paymentIntentRent = PaymentIntent::create([
-            'amount' => (int) ($rentAmount * 100),
+            'amount' => (int) ($rentAmount * 100) + (int) ($cautionWithFees * 100),
             'currency' => 'eur',
             'automatic_payment_methods' => ['enabled' => true],
             'metadata' => [
@@ -56,27 +56,14 @@ class StripeController extends AbstractController
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
                 'rent_amount' => $rentAmount,
-                'days' => $days,
-            ],
-        ]);
-
-        $paymentIntentCaution = PaymentIntent::create([
-            'amount' => (int) ($cautionWithFees * 100),
-            'currency' => 'eur',
-            'automatic_payment_methods' => ['enabled' => true],
-            'metadata' => [
-                'type' => 'caution',
-                'user_id' => $this->getUser()->getId(),
-                'apartment_id' => $apartment->getId(),
-                'rent_payment_intent' => $paymentIntentRent->id,
                 'caution_amount' => $caution,
                 'caution_with_fees' => $cautionWithFees,
+                'days' => $days,
             ],
         ]);
 
         return new JsonResponse([
             'clientSecretRent' => $paymentIntentRent->client_secret,
-            'clientSecretCaution' => $paymentIntentCaution->client_secret,
             'rentAmount' => $rentAmount,
             'cautionAmount' => $caution,
             'cautionWithFees' => $cautionWithFees,
@@ -138,6 +125,8 @@ class StripeController extends AbstractController
                         $reservation->setConfirmed(true);
                         $reservation->setRentPaymentIntentId($rentIntentId);
                         $reservation->setCautionPaymentIntentId($intent->id);
+                        $reservation->setCautionConcerved(false);
+                        $reservation->setCautionRefunded(false);
 
                         $em->persist($reservation);
                         $em->flush();
@@ -151,21 +140,6 @@ class StripeController extends AbstractController
         return new Response('OK', 200);
     }
 
-    #[Route('/payment/processing', name: 'payment_processing')]
-    public function processing(Request $request): Response
-    {
-        $cautionSecret = $request->query->get('caution_secret');
-        
-        if (!$cautionSecret) {
-            $this->addFlash('error', 'Erreur de traitement du paiement');
-            return $this->redirectToRoute('app.home');
-        }
-        
-        return $this->render('stripe/processing.html.twig', [
-            'caution_secret' => $cautionSecret,
-            'stripe_public_key' => $this->getParameter('stripe_publishable_key')
-        ]);
-    }
 
     #[Route('/payment/success', name: 'payment_success')]
     public function success(
@@ -182,39 +156,38 @@ class StripeController extends AbstractController
             try {
                 $intent = PaymentIntent::retrieve($paymentIntentId);
                 
-                if ($intent->status === 'succeeded' && $intent->metadata->type === 'caution') {
-                    $rentIntentId = $intent->metadata->rent_payment_intent;
-                    $rentIntent = PaymentIntent::retrieve($rentIntentId);
+                if ($intent->status === 'succeeded') {
                     
-                    if ($rentIntent->status === 'succeeded') {
-                        $meta = $rentIntent->metadata;
+                    
+                    $meta = $intent->metadata;
                         
-                        $apartment = $apartmentRepository->find($meta->apartment_id);
-                        $user = $em->getRepository(\App\Entity\User::class)->find($meta->user_id);
+                    $apartment = $apartmentRepository->find($meta->apartment_id);
+                    $user = $em->getRepository(\App\Entity\User::class)->find($meta->user_id);
+                    
+                    if ($apartment && $user) {
+                        $existing = $em->getRepository(Reservation::class)
+                            ->findOneBy([
+                                'user' => $user, 
+                                'apartment' => $apartment, 
+                                'startDate' => new \DateTime($meta->start_date)
+                            ]);
                         
-                        if ($apartment && $user) {
-                            $existing = $em->getRepository(Reservation::class)
-                                ->findOneBy([
-                                    'user' => $user, 
-                                    'apartment' => $apartment, 
-                                    'startDate' => new \DateTime($meta->start_date)
-                                ]);
-                            
-                            if (!$existing) {
-                                $reservation = new Reservation();
-                                $reservation->setApartment($apartment);
-                                $reservation->setUser($user);
-                                $reservation->setStartDate(new \DateTime($meta->start_date));
-                                $reservation->setEndDate(new \DateTime($meta->end_date));
-                                $reservation->setConfirmed(true);
-                                $reservation->setRentPaymentIntentId($rentIntentId);
-                                $reservation->setCautionPaymentIntentId($paymentIntentId);
-                                
-                                $em->persist($reservation);
-                                $em->flush();
-                            }
+                        if (!$existing) {
+                            $reservation = new Reservation();
+                            $reservation->setApartment($apartment);
+                            $reservation->setUser($user);
+                            $reservation->setStartDate(new \DateTime($meta->start_date));
+                            $reservation->setEndDate(new \DateTime($meta->end_date));
+                            $reservation->setConfirmed(true);
+                            $reservation->setRentPaymentIntentId($paymentIntentId);
+                            $reservation->setCautionPaymentIntentId($paymentIntentId);
+                            $reservation->setCautionConcerved(false);
+                            $reservation->setCautionRefunded(false);
+                            $em->persist($reservation);
+                            $em->flush();
                         }
                     }
+                    
                 }
             } catch (\Exception $e) {
                 error_log('Payment success error: ' . $e->getMessage());
