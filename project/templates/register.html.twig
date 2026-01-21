@@ -4,13 +4,11 @@
     
         <div class="container h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col col-xl-10">
-                <div class="card" style="border-radius: 1rem;">
+            
+                <div class="card" style="border-radius: 1rem; max-width: 30vw;">
                 <div class="row g-0">
-                    <div class="col-md-6 col-lg-5 d-none d-md-flex my-auto ">
-                        <svg class="mx-auto" width="200px" height="200px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 18L14 18M17 15V21M4 21C4 17.134 7.13401 14 11 14C11.695 14 12.3663 14.1013 13 14.2899M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke="#0ea2bd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-                    </div>
-                    <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                    
+                    <div class="d-flex align-items-center">
                     <div class="card-body p-4 p-lg-5 text-black">
         
                         {{ form_start(registrationForm) }}
@@ -42,13 +40,12 @@
                                 </div>
                             {% endif %}
                         </div>
-
-
-                            
-                        
-        
+                         <div class="pt-1 mb-4" style="display:none;">
                         {{ form_row(registrationForm.submit) }}
-                        
+                         </div>
+                        <div class="pt-1 mb-4">
+                            <button data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-lg btn-block w-100 text-white" type="submit">Se connecter</button>
+                        </div>
                         
                         <p class="mt-3">
                             Déjà inscrit ? <a href="{{ path('app.login') }}">Connectez-vous ici</a>.
@@ -59,7 +56,7 @@
                     </div>
                 </div>
                 </div>
-            </div>
+            
             </div>
         </div>
 
