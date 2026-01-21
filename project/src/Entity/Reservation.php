@@ -45,6 +45,12 @@ class Reservation
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $rentPaymentIntentId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cautionPaymentIntentId = null;
+
     public function __construct()
     {
         $this->payments  = new ArrayCollection();
@@ -155,5 +161,29 @@ class Reservation
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getRentPaymentIntentId(): ?string
+    {
+        return $this->rentPaymentIntentId;
+    }
+
+    public function setRentPaymentIntentId(?string $rentPaymentIntentId): static
+    {
+        $this->rentPaymentIntentId = $rentPaymentIntentId;
+
+        return $this;
+    }
+
+    public function getCautionPaymentIntentId(): ?string
+    {
+        return $this->cautionPaymentIntentId;
+    }
+
+    public function setCautionPaymentIntentId(?string $cautionPaymentIntentId): static
+    {
+        $this->cautionPaymentIntentId = $cautionPaymentIntentId;
+
+        return $this;
     }
 }

@@ -136,6 +136,8 @@ class StripeController extends AbstractController
                         $reservation->setStartDate(new \DateTime($rentMeta->start_date));
                         $reservation->setEndDate(new \DateTime($rentMeta->end_date));
                         $reservation->setConfirmed(true);
+                        $reservation->setRentPaymentIntentId($rentIntentId);
+                        $reservation->setCautionPaymentIntentId($intent->id);
 
                         $em->persist($reservation);
                         $em->flush();
@@ -172,7 +174,7 @@ class StripeController extends AbstractController
         ApartmentRepository $apartmentRepository
     ): Response {
         $paymentIntentId = $request->query->get('payment_intent');
-        $meta = '';
+        $meta = null;
         
         if ($paymentIntentId) {
             Stripe::setApiKey($this->getParameter('stripe_secret_key'));
@@ -205,6 +207,8 @@ class StripeController extends AbstractController
                                 $reservation->setStartDate(new \DateTime($meta->start_date));
                                 $reservation->setEndDate(new \DateTime($meta->end_date));
                                 $reservation->setConfirmed(true);
+                                $reservation->setRentPaymentIntentId($rentIntentId);
+                                $reservation->setCautionPaymentIntentId($paymentIntentId);
                                 
                                 $em->persist($reservation);
                                 $em->flush();
@@ -216,17 +220,16 @@ class StripeController extends AbstractController
                 error_log('Payment success error: ' . $e->getMessage());
             }
         }
-        if ($meta !== '' and isset($meta->apartment_id)) {
+
+        if ($meta !== null && isset($meta->apartment_id)) {
             $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
             return $this->redirectToRoute('app.apartment.details', [
                 'id' => $meta->apartment_id
             ]);
-        }
-        else {
+        } else {
             $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
             return $this->redirectToRoute('app.home');
         }
-        
     }
 
     #[Route('/payment/cancel', name: 'payment_cancel')]

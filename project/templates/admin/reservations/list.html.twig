@@ -1,0 +1,105 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestion des réservations</h2>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Appartement</th>
+                            <th>Dates</th>
+                            <th>Location</th>
+                            <th>Caution</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reservations %}
+                            {% set reservation = item.reservation %}
+                            {% set payment = item.payment %}
+                            {% set now = date() %}
+                            {% set isFinished = reservation.endDate < now %}
+                            
+                            <tr>
+                                <td>#{{ reservation.id }}</td>
+                                <td>
+                                    {{ reservation.user.email }}
+                                    <br>
+                                    <small class="text-muted">{{ reservation.user.email }}</small>
+                                </td>
+                                <td>{{ reservation.apartment.name }}</td>
+                                <td>
+                                    {{ reservation.startDate|date('d/m/Y') }}
+                                    <br>
+                                    <small class="text-muted">→ {{ reservation.endDate|date('d/m/Y') }}</small>
+                                </td>
+                                <td>
+                                    {% if payment %}
+                                        <span class="badge bg-success">{{ payment.rent_amount }}€</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if payment %}
+                                        {% if payment.caution_refunded_total > 0 %}
+                                            <span class="badge bg-info">
+                                                {{ payment.caution_refunded_total }}€ remboursés
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">
+                                                {{ payment.caution_amount }}€ non remboursée
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if isFinished %}
+                                        <span class="badge bg-secondary">Terminée</span>
+                                    {% elseif reservation.startDate > now %}
+                                        <span class="badge bg-primary">À venir</span>
+                                    {% else %}
+                                        <span class="badge bg-success">En cours</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ path('admin_reservation_show', {id: reservation.id}) }}" 
+                                       class="btn btn-sm btn-primary">
+                                        Détails
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    Aucune réservation
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

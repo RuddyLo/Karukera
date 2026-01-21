@@ -1,0 +1,194 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{{ path('admin_reservations_list') }}" class="btn btn-secondary">
+            ← Retour à la liste
+        </a>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Réservation #{{ reservation.id }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Client</h6>
+                            <p class="fw-bold">
+                                {{ reservation.user.email }}
+                                <br>
+                                <small class="text-muted">{{ reservation.user.email }}</small>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Appartement</h6>
+                            <p class="fw-bold">{{ reservation.apartment.name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Date de début</h6>
+                            <p class="fw-bold">{{ reservation.startDate|date('d/m/Y') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Date de fin</h6>
+                            <p class="fw-bold">{{ reservation.endDate|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Statut</h6>
+                            <p>
+                                {% if reservation.confirmed %}
+                                    <span class="badge bg-success">Confirmée</span>
+                                {% else %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if payment %}
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Informations de paiement</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Location</h6>
+                            <p class="fs-4 fw-bold text-success mb-1">{{ payment.rent_amount }}€</p>
+                            <small class="text-muted">Statut: {{ payment.rent_status }}</small>
+                            <br>
+                            <small class="text-muted">ID: {{ payment.rent_intent_id }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Caution</h6>
+                            <p class="fs-4 fw-bold text-warning mb-1">{{ payment.caution_amount }}€</p>
+                            <small class="text-muted">Total payé (avec frais): {{ payment.caution_with_fees }}€</small>
+                            <br>
+                            <small class="text-muted">ID: {{ payment.caution_intent_id }}</small>
+                        </div>
+                    </div>
+
+                    {% if payment.caution_refunds %}
+                    <div class="alert alert-info mb-0">
+                        <h6 class="fw-bold">Historique des remboursements</h6>
+                        <ul class="mb-0">
+                            {% for refund in payment.caution_refunds %}
+                                <li>
+                                    {{ refund.amount }}€ - {{ refund.date }} 
+                                    <span class="badge bg-{{ refund.status == 'succeeded' ? 'success' : 'warning' }}">
+                                        {{ refund.status }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <hr>
+                        <p class="mb-0 fw-bold">
+                            Total remboursé: {{ payment.caution_refunded_total }}€ / {{ payment.caution_amount }}€
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            {% if payment and payment.caution_refunded_total == 0 %}
+            <div class="card shadow border-warning">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Remboursement caution</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('admin_refund_caution', {id: reservation.id}) }}" 
+                          onsubmit="return confirm('Confirmer le remboursement ?')">
+                        <input type="hidden" name="caution_intent_id" value="{{ payment.caution_intent_id }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Type de remboursement</label>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="refund_type" 
+                                       value="full" id="full" checked onchange="togglePartialAmount()">
+                                <label class="form-check-label" for="full">
+                                    Remboursement intégral
+                                    <br>
+                                    <small class="text-muted">{{ payment.caution_amount }}€</small>
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="refund_type" 
+                                       value="partial" id="partial" onchange="togglePartialAmount()">
+                                <label class="form-check-label" for="partial">
+                                    Remboursement partiel
+                                </label>
+                            </div>
+
+                            <div id="partial-amount-container" class="ms-4 mb-3" style="display:none;">
+                                <label class="form-label">Montant à rembourser</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="partial_amount" 
+                                           step="0.01" min="0" max="{{ payment.caution_amount }}" 
+                                           placeholder="0.00">
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                <small class="text-muted">Max: {{ payment.caution_amount }}€</small>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="refund_type" 
+                                       value="none" id="none" onchange="togglePartialAmount()">
+                                <label class="form-check-label" for="none">
+                                    Conserver la caution
+                                    <br>
+                                    <small class="text-danger">Aucun remboursement</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100">
+                            Valider le remboursement
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+            function togglePartialAmount() {
+                const partial = document.getElementById('partial').checked;
+                document.getElementById('partial-amount-container').style.display = 
+                    partial ? 'block' : 'none';
+            }
+            </script>
+            {% elseif payment %}
+            <div class="alert alert-success">
+                <h6 class="fw-bold">✓ Caution traitée</h6>
+                <p class="mb-0">
+                    {{ payment.caution_refunded_total }}€ remboursés sur {{ payment.caution_amount }}€
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
