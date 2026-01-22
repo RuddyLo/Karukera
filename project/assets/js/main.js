@@ -7,7 +7,9 @@
 */
 import Swiper from 'swiper';
 
-
+import $ from 'jquery'
+import toastr from 'toastr'
+import Swal from 'sweetalert2';
 
 
 
@@ -198,6 +200,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+
+document.addEventListener('click', function(event) {
+    // Vérifie si l'élément cliqué correspond au sélecteur
+    if (event.target.matches('#caution-refund-btn') || event.target.closest('#caution-refund-btn')) {
+        event.preventDefault(); // Empêche le comportement par défaut du bouton
+
+        Swal.fire({
+            title: "Êtes-vous sûr de vouloir poursuivre cette action ?",
+            text: "Cette action est irréversible !",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#d3d3d3",
+            confirmButtonText: "Oui, continuer",
+            cancelButtonText: "Annuler"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Sélectionne et soumet le formulaire
+                const form = document.getElementById('caution-refund-form');
+                if (form) {
+                    form.submit(); // Exécute le remboursement si confirmé
+                }
+            }
+        });
+    }
+});
+
 
 
 

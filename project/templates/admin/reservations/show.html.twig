@@ -95,14 +95,14 @@
         </div>
 
         <div class="col-md-4">
-            {% if reservation and not reservation.isCautionRefunded() %}
+            {% if reservation and not reservation.isCautionRefunded() and not reservation.isCautionConcerved() %}
             <div class="card shadow border-warning">
                 <div class="card-header bg-warning">
                     <h5 class="mb-0">Remboursement caution</h5>
                 </div>
                 <div class="card-body">
                     <form method="post" action="{{ path('admin_refund_caution', {id: reservation.id}) }}" 
-                          onsubmit="return confirm('Confirmer le remboursement ?')">
+                          id="caution-refund-form">
                         <input type="hidden" name="caution_intent_id" value="{{ payment.caution_intent_id }}">
 
                         <div class="mb-3">
@@ -129,23 +129,31 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-warning w-100">
-                            Valider le remboursement
+                        <button class="btn btn-warning w-100" id='caution-refund-btn'>
+                            Valider
                         </button>
                     </form>
                 </div>
             </div>
 
-            
-            {% elseif payment %}
+            {% elseif reservation.isCautionConcerved() %}
             <div class="alert alert-success">
-                <h6 class="fw-bold">✓ Caution traitée</h6>
+                <h6 class="fw-bold">✓ Caution conservée</h6>
                 <p class="mb-0">
-                    {{ payment.caution_amount }}€ remboursés 
+                    {{ payment.caution_amount }}€ conservés par l'hôte. 
+                </p>
+            </div>
+            {% elseif reservation.isCautionRefunded() %}
+            <div class="alert alert-success">
+                <h6 class="fw-bold">✓ Caution remboursée</h6>
+                <p class="mb-0">
+                    {{ payment.caution_amount }}€ remboursés au client.
                 </p>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+
 {% endblock %}

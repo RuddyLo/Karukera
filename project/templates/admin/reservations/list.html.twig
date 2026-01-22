@@ -63,10 +63,12 @@
                                             <span class="badge bg-info">
                                                 {{ payment.caution_amount }}€ remboursés
                                             </span>
-                                       {% else %}
+                                       {% elseif reservation.isCautionConcerved() %}
                                             <span class="badge bg-warning text-dark">
-                                                {{ payment.caution_amount }}€ non remboursée
+                                                {{ payment.caution_amount }}€ conservée
                                             </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary text-white">Caution non traitée</span>
                                     {% endif %}
                                 </td>
                                 <td>
