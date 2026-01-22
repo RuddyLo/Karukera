@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0">Réservation #{{ reservation.id }}</h5>
                 </div>
                 <div class="card-body">
@@ -154,6 +154,19 @@
         </div>
     </div>
 </div>
+<script>
+const checkbox = document.getElementById('none');
+const button = document.getElementById('caution-refund-btn');
 
+if (checkbox && button) {
+    // Initialisation
+    button.textContent = checkbox.checked ? 'Conserver la caution' : 'Rembourser la caution';
+    
+    // Écoute les changements
+    checkbox.addEventListener('change', function() {
+        button.textContent = this.checked ? 'Conserver la caution' : 'Rembourser la caution';
+    });
+}
+</script>
 
 {% endblock %}
