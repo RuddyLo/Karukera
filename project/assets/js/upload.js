@@ -49,7 +49,7 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
             };
             reader.readAsDataURL(file);
         }
-        console.log(imageUrl.val());
+        
     });
 }
 

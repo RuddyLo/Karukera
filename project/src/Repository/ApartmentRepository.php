@@ -136,35 +136,38 @@ class ApartmentRepository extends ServiceEntityRepository
         return [$em->getResult(), $this->countApartmentFiltered($search)];
     }
 
-    public function searchApartments(?string $name, ?string $start, ?string $end): array
+   public function searchApartments(?string $name, ?string $start, ?string $end): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
         // Prepare SQL query
         $sql = "
-        SELECT *
-        FROM apartment
-        WHERE apartment.is_active = true
-        AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
-    ";
+            SELECT *
+            FROM apartment
+            WHERE apartment.is_active = true
+            AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        ";
+        
+        // Paramètres à passer
+        $params = ['name' => $name];
+        
         // If dates provided, exclude unavailable apartments
         if ($start && $end) {
             $sql .= "
-            AND apartment.id NOT IN (
-                SELECT reservation.apartment_id
-                FROM reservation
-                WHERE reservation.start_date <= :endDate
-                  AND reservation.end_date >= :startDate
-            )
-        ";
+                AND apartment.id NOT IN (
+                    SELECT reservation.apartment_id
+                    FROM reservation
+                    WHERE reservation.start_date <= :endDate
+                    AND reservation.end_date >= :startDate
+                )
+            ";
+            // Ajouter les paramètres de dates uniquement si utilisés
+            $params['startDate'] = $start;
+            $params['endDate'] = $end;
         }
 
         $stmt = $conn->prepare($sql);
-        // Execute SQL
-        return $stmt->executeQuery([
-            'name' => $name ?: null,
-            'startDate' => $start ?: null,
-            'endDate' => $end ?: null,
-        ])->fetchAllAssociative();
+        // Execute SQL avec les bons paramètres
+        return $stmt->executeQuery($params)->fetchAllAssociative();
     }
 }

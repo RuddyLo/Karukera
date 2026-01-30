@@ -35,7 +35,6 @@ $(document).on('click', '#toggle-apartment-delete', function (event) {
 $(document).on('click', '.event-delete-equipment', function () {
     
     let dataUuid = $(this);
-    console.log(dataUuid.data('uuid'));
     Swal.fire({
         title: 'Suppression',
         text: "Voulez vous vraiment supprimer cet équipement?",
@@ -58,7 +57,7 @@ $(document).on('click', '.event-delete-equipment', function () {
 $(document).on('click', '.event-delete-price-period', function () {
     
     let dataUuid = $(this);
-    console.log(dataUuid.data('uuid'));
+    
     Swal.fire({
         title: 'Suppression',
         text: "Voulez vous vraiment supprimer cette Période ?",
