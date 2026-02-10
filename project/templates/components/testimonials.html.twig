@@ -1,4 +1,4 @@
-<section id="testimonials" class="py-5">
+<section id="testimonials" class="py-5 bg-light">
     <div class="container">
 
         <!-- Title -->
@@ -6,46 +6,139 @@
             <h2 class="fw-bold" style="font-size: 40px;">Avis de nos voyageurs</h2>
         </div>
 
-        <!-- Testimonials Grid -->
-        <div class="row gy-4">
-
-            <!-- Testimonial 1 -->
-            <div class="col-md-6">
-                <div class="testimonial-card p-4 shadow-sm rounded-3">
-                    <h5 class="fw-bold mb-2">Filot</h5>
-                    <p class="mb-1 fw-semibold">Week-end entre amis au top !</p>
-                    <p class="mb-0">
-                        On a super bien dormi (merci les lits), super bien profité de la ville (tout est à 5 min à pied !)
-                        et le check in et check out se fait tout seul (trop pratique)
-                    </p>
-                </div>
+        <!-- Carousel -->
+        <div id="testimonialCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+            
+            <!-- Indicators -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active btn-success"></button>
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2"></button>
             </div>
 
-            <!-- Testimonial 2 -->
-            <div class="col-md-6">
-                <div class="testimonial-card p-4 shadow-sm rounded-3">
-                    <h5 class="fw-bold mb-2">Jean-Baptiste</h5>
-                    <p class="mb-1 fw-semibold">On a adoré !</p>
-                    <p class="mb-0">
-                        Nous avons été super bien accueillis par Sabrina et la maison est magnifique !
-                        À refaire absolument !!
-                    </p>
+            <!-- Slides -->
+            <div class="carousel-inner">
+                
+                <!-- Testimonial 1 -->
+                <div class="carousel-item active">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-md-10">
+                            <div class="testimonial-card p-5 bg-white shadow rounded-3 text-center">
+                                <!-- Stars -->
+                                <div class="mb-3">
+                                    <span class="text-warning fs-4">★★★★★</span>
+                                </div>
+                                <!-- Content -->
+                                <h5 class="fw-bold mb-3">Week-end entre amis au top !</h5>
+                                <p class="lead mb-4">
+                                    On a super bien dormi (merci les lits), super bien profité de la ville (tout est à 5 min à pied !)
+                                    et le check in et check out se fait tout seul (trop pratique)
+                                </p>
+                                <!-- Author -->
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="me-2">
+                                        <strong>Filot</strong>
+                                    </div>
+                                    {# Optionnel : Badge Trustpilot si l'avis vient de là #}
+                                    {# <span class="badge bg-success ms-2">
+                                        <small>Trustpilot</small>
+                                    </span> #}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Testimonial 2 -->
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-md-10">
+                            <div class="testimonial-card p-5 bg-white shadow rounded-3 text-center">
+                                <div class="mb-3">
+                                    <span class="text-warning fs-4">★★★★★</span>
+                                </div>
+                                <h5 class="fw-bold mb-3">On a adoré !</h5>
+                                <p class="lead mb-4">
+                                    Nous avons été super bien accueillis par Sabrina et la maison est magnifique !
+                                    À refaire absolument !!
+                                </p>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="me-2">
+                                        <strong>Jean-Baptiste</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-md-10">
+                            <div class="testimonial-card p-5 bg-white shadow rounded-3 text-center">
+                                <div class="mb-3">
+                                    <span class="text-warning fs-4">★★★★★</span>
+                                </div>
+                                <h5 class="fw-bold mb-3">Parfait pour un week-end entre amis</h5>
+                                <p class="lead mb-4">
+                                    Emplacement idéal, déco avec goût et maison super grande !
+                                    Idéal pour un week-end entre amis. Je mets 5/5
+                                </p>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="me-2">
+                                        <strong>Dominique</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Testimonial 3 -->
-            <div class="col-12">
-                <div class="testimonial-card p-4 shadow-sm rounded-3">
-                    <h5 class="fw-bold mb-2">Dominique</h5>
-                    <p class="mb-1 fw-semibold">Parfait pour un week-end entre amis</p>
-                    <p class="mb-0">
-                        Emplacement idéal, déco avec goût et maison super grande !
-                        Idéal pour un week-end entre amis. Je mets 5/5
-                    </p>
-                </div>
-            </div>
+            <!-- Controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
+        </div>
 
+        <!-- Trustpilot Button -->
+        <div class="text-center">
+            <a href="https://fr.trustpilot.com/review/votre-entreprise.com" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="btn btn-outline-success"
+               style="border-width: 2px; font-weight: 600;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="me-2" style="vertical-align: middle;">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+                Voir tous nos avis Trustpilot
+            </a>
         </div>
 
     </div>
 </section>
+
+<style>
+    /* Style personnalisé pour les contrôles du carousel */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        filter: invert(1);
+    }
+    
+    /* Animation douce */
+    .carousel-item {
+        transition: transform 0.6s ease-in-out;
+    }
+    
+    /* Hauteur minimale pour éviter les sauts */
+    .carousel-inner {
+        min-height: 350px;
+    }
+</style>

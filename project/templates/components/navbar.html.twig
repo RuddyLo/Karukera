@@ -1,6 +1,6 @@
 <div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between ">
 
-	<a href="{{ path('app.home') }}" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
+	<a href="{{ path('app.home') }}" class="logo d-flex align-items-center me-auto me-lg-0">
 		<!-- Uncomment the line below if you also wish to use an image logo -->
 		{# <img
 			src="{{asset('images/icons/karukera-logo.png')}}"
@@ -14,7 +14,7 @@
 
 	<nav id="navbar" class="navbar">
 		<ul>
-			<li class="nav-link scrollto">
+			<li class="nav-link ">
 				<a href="{{ path('app.home') }}">
 					<span>Acceuil</span>
 				</a>
@@ -36,7 +36,7 @@
 			</li> #}
 
 			<li>
-				<a class="nav-link scrollto" href="">Contact</a>
+				<a class="nav-link" href="{{ path('app.contact') }}">Contact</a>
 			</li>
 			{% if not app.user %}
 				<li>
