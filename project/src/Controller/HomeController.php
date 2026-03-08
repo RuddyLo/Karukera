@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\ContactFormType;
 use App\Repository\ApartmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,6 +10,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\SearchFormType;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 class HomeController extends AbstractController
 {
@@ -71,8 +74,37 @@ class HomeController extends AbstractController
     }
 
     #[Route('/{_locale}/contact', name: 'app.contact', requirements: ['_locale' => 'fr|en'])]
-    public function contact(): Response
+    public function contact(Request $request, MailerInterface $mailer): Response
     {
-        return $this->render('home/contact.html.twig');
+        $form = $this->createForm(ContactFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+              error_log('FORM SUBMITTED - sending email');
+
+            $email = (new Email())
+                ->from('ratianarivoruddy@gmail.com')
+                ->to('boumrakoto@gmail.com')
+                ->replyTo($data['email'])   
+                ->subject('[Contact] ' . $data['subject'])
+                ->html(
+                    '<p><strong>Nom :</strong> ' . $data['name'] . '</p>' .
+                    '<p><strong>Email :</strong> ' . $data['email'] . '</p>' .
+                    '<p><strong>Message :</strong><br>' . nl2br($data['message']) . '</p>' .
+                    ($data['start_date'] ? '<p><strong>Arrivée :</strong> ' . $data['start_date']->format('d/m/Y') . '</p>' : '') .
+                    ($data['end_date'] ? '<p><strong>Départ :</strong> ' . $data['end_date']->format('d/m/Y') . '</p>' : '')
+                );
+
+            $mailer->send($email);
+
+            $this->addFlash('success', 'contact.flash.success');
+
+            return $this->redirectToRoute('app.contact', ['_locale' => $request->getLocale()]);
+        }
+
+        return $this->render('components/contact.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

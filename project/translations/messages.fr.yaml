@@ -24,3 +24,19 @@ hero:
     plural: "s"
 
   search: "Rechercher"
+
+contact:
+    title: Nous Contacter
+    subtitle: Envoyez-nous un message, nous vous répondrons rapidement.
+    form:
+        name: Votre nom
+        email: Votre adresse Email
+        subject: Sujet du message
+        message: Message
+        start_date: Date de début
+        end_date: Date de fin
+        submit: Envoyer le Message
+        stay: Durée du séjour envisagée
+        stay_optional: (facultatif)
+    flash:
+        success: Votre message a bien été envoyé. Merci !

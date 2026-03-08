@@ -1,86 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
 <section id="contact" class="contact">
     <div class="container">
-
-      <div class="section-header">
-        <h2>Nous Contacter</h2>
-        <p>Ea vitae aspernatur deserunt voluptatem impedit deserunt magnam occaecati dssumenda quas ut ad dolores adipisci aliquam.</p>
-      </div>
-
+        <div class="section-header">
+            <h2>{{ 'contact.title'|trans }}</h2>
+            <p>{{ 'contact.subtitle'|trans }}</p>
+        </div>
     </div>
 
     <div class="container">
+        <div class="row gy-5 gx-lg-5">
 
-      <div class="row gy-5 gx-lg-5">
+            <div class="col-lg-8">
 
-        <div class="col-lg-8">
-          <form action="forms/contact.php" method="post" role="form" class="php-email-form">
-          
-            <div class="row">
-              <div class="col-md-6 form-group">
-                <input type="text" name="name" class="form-control" id="name" placeholder="Votre nom" required>
-              </div>
-              <div class="col-md-6 form-group mt-3 mt-md-0">
-                <input type="email" class="form-control" name="email" id="email" placeholder="Votre adresse Email" required>
-              </div>
+                {% for flash in app.flashes('success') %}
+                    <div class="alert alert-success">{{ flash|trans }}</div>
+                {% endfor %}
+
+                {{ form_start(form) }}
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        {{ form_widget(form.name) }}
+                    </div>
+                    <div class="col-md-6 form-group mt-3 mt-md-0">
+                        {{ form_widget(form.email) }}
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    {{ form_widget(form.subject) }}
+                </div>
+
+                <div class="form-group mt-3">
+                    {{ form_widget(form.message) }}
+                </div>
+
+                <div class="row border border-radius-2 p-2 mt-3">
+                    <span class="p-2 text-muted text-sm">
+                        {{ 'contact.form.stay'|trans }}
+                        <span class="text-xs">{{ 'contact.form.stay_optional'|trans }}</span>
+                    </span>
+                    <div class="col-md-6 form-group">
+                        <span class="text-xs p-2">{{ 'contact.form.start_date'|trans }}</span>
+                        {{ form_widget(form.start_date) }}
+                    </div>
+                    <div class="col-md-6 form-group mt-3 mt-md-0">
+                        <span class="text-xs p-2">{{ 'contact.form.end_date'|trans }}</span>
+                        {{ form_widget(form.end_date) }}
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        {{ 'contact.form.submit'|trans }}
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+
             </div>
-            <div class="form-group mt-3">
-              <input type="text" class="form-control" name="subject" id="subject" placeholder="Sujet du message" required>
-            </div>
-           
-            <div class="form-group mt-3">
-              <textarea class="form-control" name="message" placeholder="Message" required></textarea>
-            </div>
-             <div class="row border border-radius-2 p-2">
-              <span class="p-2 text-muted text-sm">Durée du séjour envisagée <span class="text-xs">(facultatif)</span></span>
-              <div class="col-md-6 form-group">
-                <span class="text-xs p-2">Date du début</span>
-                <input type="date" name="name" class="form-control" id="name" placeholder="Date de début" required>
-              </div>
-              <div class="col-md-6 form-group mt-3 mt-md-0">
-                <span class="text-xs p-2">Date de fin</span>
-                <input type="date" class="form-control" name="email" id="email" placeholder="Date de fin" required>
-              </div>
-            </div>
-            <div class="my-3">
-              <div class="loading">Loading</div>
-              <div class="error-message"></div>
-              <div class="sent-message">Your message has been sent. Thank you!</div>
-            </div>
-            <div class="text-center"><button type="submit">Envoyer le Message</button></div>
-          </form>
-        </div><!-- End Contact Form -->
-        <div class="col-lg-4">
 
-          <div class="info">
-            <div class="info-item d-flex">
-              <i class="bi bi-geo-alt flex-shrink-0"></i>
-              <div>
-                <h4>Adresse:</h4>
-                <p>oasis de karukera, 12 rue morne tricolore 97180 Sainte Anne</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex">
-              <i class="bi bi-envelope flex-shrink-0"></i>
-              <div>
-                <h4>Email:</h4>
-                <p>maurice.b@oasisdekarukera.com</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex">
-              <i class="bi bi-phone flex-shrink-0"></i>
-              <div>
-                <h4>Whatsapp:</h4>
-                <p>+33 755503086</p>
-              </div>
-            </div><!-- End Info Item -->
-
-          </div>
+            <div class="col-lg-4">
+                <div class="info">
+                    <div class="info-item d-flex">
+                        <i class="bi bi-geo-alt flex-shrink-0"></i>
+                        <div>
+                            <h4>Adresse:</h4>
+                            <p>oasis de karurio, 12 rue morne tricolore 97180 Sainte Anne</p>
+                        </div>
+                    </div>
+                    <div class="info-item d-flex">
+                        <i class="bi bi-envelope flex-shrink-0"></i>
+                        <div>
+                            <h4>Email:</h4>
+                            <p>contact@karurio.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item d-flex">
+                        <i class="bi bi-phone flex-shrink-0"></i>
+                        <div>
+                            <h4>Whatsapp:</h4>
+                            <p>+33 755503086</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
-
-      </div>
-
     </div>
-  </section><!-- End Contact Section -->
+</section>
+{% endblock %}

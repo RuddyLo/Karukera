@@ -24,3 +24,19 @@ hero:
     plural: "s"
 
   search: "Search"
+
+contact:
+    title: Contact Us
+    subtitle: Send us a message, we will get back to you quickly.
+    form:
+        name: Your name
+        email: Your email address
+        subject: Subject
+        message: Message
+        start_date: Start date
+        end_date: End date
+        submit: Send Message
+        stay: Estimated stay duration
+        stay_optional: (optional)
+    flash:
+        success: Your message has been sent. Thank you!
