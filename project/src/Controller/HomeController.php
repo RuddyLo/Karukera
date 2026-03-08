@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ApartmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\SearchFormType;
@@ -15,10 +16,15 @@ class HomeController extends AbstractController
         private ApartmentRepository $apartmentRepository,
     ) {}
 
-    #[Route('/', name: 'app.home')]
+    #[Route('/', name: 'root_redirect')]
+    public function rootRedirect(): RedirectResponse
+    {
+        return $this->redirectToRoute('app.home', ['_locale' => 'fr']);
+    }
+
+    #[Route('/{_locale}/', name: 'app.home', requirements: ['_locale' => 'fr|en'])]
     public function index(Request $request): Response
     {
-        // Create the search form for the hero section
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
 
@@ -37,13 +43,11 @@ class HomeController extends AbstractController
             'last_apartments' => $last_apartments,
             'display_more' => $display_more,
             'controller_name' => 'HomeController',
-
-            // IMPORTANT: make the form available
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/search', name: 'app.search_apartment')]
+    #[Route('/{_locale}/search', name: 'app.search_apartment', requirements: ['_locale' => 'fr|en'])]
     public function search(Request $request, ApartmentRepository $repo): Response
     {
         $form = $this->createForm(SearchFormType::class);
@@ -66,10 +70,9 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/contact', name: 'app.contact')]
+    #[Route('/{_locale}/contact', name: 'app.contact', requirements: ['_locale' => 'fr|en'])]
     public function contact(): Response
     {
-        return $this->render('home/contact.html.twig', [
-        ]);
+        return $this->render('home/contact.html.twig');
     }
 }

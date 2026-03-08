@@ -1,0 +1,26 @@
+nav:
+    home: Accueil
+    contact: Contact
+    register: S'inscrire
+    login: Se connecter
+    logout: Se déconnecter
+    admin: Administration
+
+hero:
+  title: "Louez votre appartement au meilleur prix !"
+
+  apartment:
+    placeholder: "Sélectionnez un appartement"
+    label: "Appartement"
+
+  date:
+    arrival: "Arrivée"
+    departure: "Départ"
+
+  guests:
+    placeholder: "Nombre de personnes"
+    label: "Nombre"
+    person: "personne"
+    plural: "s"
+
+  search: "Rechercher"

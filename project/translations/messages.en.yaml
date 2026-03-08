@@ -1,0 +1,26 @@
+nav:
+    home: Home
+    contact: Contact
+    register: Register
+    login: Log in
+    logout: Log out
+    admin: Administration
+
+hero:
+  title: "Rent your apartment at the best price!"
+
+  apartment:
+    placeholder: "Select an apartment"
+    label: "Apartment"
+
+  date:
+    arrival: "Check-in"
+    departure: "Check-out"
+
+  guests:
+    placeholder: "Number of guests"
+    label: "Guests"
+    person: "guest"
+    plural: "s"
+
+  search: "Search"

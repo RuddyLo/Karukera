@@ -1,88 +1,69 @@
-<div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between ">
+<div class="navbar-container fixed-top w-2 container-fluid d-flex align-items-center justify-content-between">
 
-	<a href="{{ path('app.home') }}" class="logo d-flex align-items-center me-auto me-lg-0">
-		<!-- Uncomment the line below if you also wish to use an image logo -->
-		{# <img
-			src="{{asset('images/icons/karukera-logo.png')}}"
-			style="height: 250px; width: 350px;"
-			alt=""
-		> #}
-			<h1 class=""> Les Oasis
-			<span>de Karurio</span>.
-		</h1>
-	</a>
+    <a href="{{ path('app.home', {'_locale': app.request.locale}) }}" class="logo d-flex align-items-center me-auto me-lg-0">
+        <h1 class=""> Les Oasis
+            <span>de Karurio</span>.
+        </h1>
+    </a>
 
-	<nav id="navbar" class="navbar">
-		<ul>
-			<li class="nav-link ">
-				<a href="{{ path('app.home') }}">
-					<span>Acceuil</span>
-				</a>
-			</li>
-			{# <li class="dropdown">
-			<a href="#">
-			<span>Services</span>
-			<i class="bi bi-chevron-down dropdown-indicator"></i>
-			</a>
-			<ul>
-			<li><a
-					href=""
-					class=""
-				>Location d'appartement</a></li>
-			<li><a href="">Restauration</a></li>
-			<li><a href="">Récupération à l'aeroport</a></li>
-			<li><a href="">Services annexes</a></li>
-			</ul>
-			</li> #}
+    <nav id="navbar" class="navbar">
+        <ul>
+            <li class="nav-link">
+                <a href="{{ path('app.home', {'_locale': app.request.locale}) }}">
+                    <span>{{ 'nav.home'|trans }}</span>
+                </a>
+            </li>
 
-			<li>
-				<a class="nav-link" href="{{ path('app.contact') }}">Contact</a>
-			</li>
-			{% if not app.user %}
-				<li>
-					<a class=" nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">S'inscrire</a>
-				</li>
+            <li>
+                <a class="nav-link" href="{{ path('app.contact', {'_locale': app.request.locale}) }}">
+                    {{ 'nav.contact'|trans }}
+                </a>
+            </li>
 
-			{% endif %}
+            {% if not app.user %}
+                <li>
+                    <a class="nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">
+                        {{ 'nav.register'|trans }}
+                    </a>
+                </li>
+            {% endif %}
 
-			{% if not app.user %}
-				<li>
-					<a class="btn-getstarted scrollto" href="{{path("app.login")}}">Se connecter</a>
-				</li>
-			{% else %}
-				<li>
-					<a class="nav-link text-white scrollto" href="{{path("app.logout")}}">Se déconnecter</a>
-				</li>
-			{% endif %}
+            {% if not app.user %}
+                <li>
+                    <a class="btn-getstarted scrollto" href="{{ path('app.login') }}">
+                        {{ 'nav.login'|trans }}
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a class="nav-link text-white scrollto" href="{{ path('app.logout') }}">
+                        {{ 'nav.logout'|trans }}
+                    </a>
+                </li>
+            {% endif %}
 
+            {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                <li>
+                    <a class="nav-link scrollto color-orange border-primary fw-bold" href="{{ path('app.admin') }}">
+                        {{ 'nav.admin'|trans }}
+                    </a>
+                </li>
+            {% endif %}
 
-			{% if app.user and 'ROLE_ADMIN' in app.user.roles %}
-				<li>
-					<a class="nav-link scrollto color-orange border-primary fw-bold" href="{{path("app.login")}}">Administration</a>
-				</li>
-			{% endif %}
+            <li class="nav-item">
+                <div class="language-switcher d-flex ">
+                    <a href="{{ path(app.request.attributes.get('_route'),
+                        app.request.attributes.get('_route_params')|merge({'_locale': 'fr'})) }}">
+                        FR
+                    </a>
+                    <a href="{{ path(app.request.attributes.get('_route'),
+                        app.request.attributes.get('_route_params')|merge({'_locale': 'en'})) }}">
+                        EN
+                    </a>
+                </div>
+            </li>
 
-			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle px-2" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Langues</a>
-
-				<ul class="dropdown-menu dropdown-menu-end language-dropdown" aria-labelledby="languageDropdown">
-
-					<li>
-						<a class="dropdown-item">
-							Français
-						</a>
-					</li>
-					<li>
-						<a class="dropdown-item">
-							Anglais
-						</a>
-					</li>
-				</ul>
-			</li>
-
-		</ul>
-		<i class="bi bi-list mobile-nav-toggle d-none"></i>
-
-	</nav>
-	<!-- .navbar -->
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle d-none"></i>
+    </nav>
 </div>

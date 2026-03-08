@@ -3,7 +3,7 @@
     <div class="hero-overlay"></div>
 
     <div class="hero-content">
-        <h1>Louez votre appartement au meilleur prix!</h1>
+        <h1>{{ 'hero.title'|trans }}</h1>
 
         <!-- Searchbar -->
         <form
@@ -12,10 +12,9 @@
             action="{{ path('app.search_apartment') }}"
         >
 
-            {# Your UI stays completely unchanged #}
-
             <!-- Appartement -->
-            <div class="form-floating"> <select
+            <div class="form-floating">
+                <select
                     class="form-select custom-select-height"
                     id="apartmentSelect"
                     name="apartmentUI"
@@ -26,28 +25,39 @@
                         disabled
                         selected
                         hidden
-                    >Selectionnez un appartement</option>
+                    >
+                        {{ 'hero.apartment.placeholder'|trans }}
+                    </option>
+
                     {% for apartment in apartments %}
-                    <option value="{{ apartment.name }}">{{ apartment.name }}</option>
+                        <option value="{{ apartment.name }}">
+                            {{ apartment.name }}
+                        </option>
                     {% endfor %}
                 </select>
-                <label for="apartmentSelect">Appartement</label>
+
+                <label for="apartmentSelect">
+                    {{ 'hero.apartment.label'|trans }}
+                </label>
             </div>
 
             <!-- Date Range -->
             <div class="field date-range">
+
                 <div class="form-floating">
                     <input
                         type="text"
                         class="form-control border-0"
                         id="startDateInput"
-                        placeholder="Départ"
+                        placeholder="{{ 'hero.date.arrival'|trans }}"
                         readonly
                     >
                     <label
                         for="startDateInput"
                         style="color: var(--color-secondary-light)"
-                    >Arrivée</label>
+                    >
+                        {{ 'hero.date.arrival'|trans }}
+                    </label>
                 </div>
 
                 <span class="separator"></span>
@@ -60,13 +70,15 @@
                         type="text"
                         class="form-control border-0"
                         id="endDateInput"
-                        placeholder="Arrivée"
+                        placeholder="{{ 'hero.date.departure'|trans }}"
                         readonly
                     >
                     <label
                         for="endDateInput"
                         style="color: var(--color-secondary-light)"
-                    >Départ</label>
+                    >
+                        {{ 'hero.date.departure'|trans }}
+                    </label>
                 </div>
 
                 <div
@@ -89,13 +101,23 @@
                         disabled
                         selected
                         hidden
-                    >Nombre de personnes</option>
+                    >
+                        {{ 'hero.guests.placeholder'|trans }}
+                    </option>
+
                     {% for i in 1..10 %}
-                    <option value="{{ i }}">{{ i }}
-                        personne{{ i > 1 ? 's' : '' }}</option>
+                        <option value="{{ i }}">
+                            {{ i }} {{ 'hero.guests.person'|trans }}
+                            {% if i > 1 %}
+                                {{ 'hero.guests.plural'|trans }}
+                            {% endif %}
+                        </option>
                     {% endfor %}
                 </select>
-                <label for="guestsInput">Nombre</label>
+
+                <label for="guestsInput">
+                    {{ 'hero.guests.label'|trans }}
+                </label>
             </div>
 
             <button
@@ -103,7 +125,7 @@
                 class="btn-getstarted search-btn rounded-pill"
             >
                 <i class="bi bi-search"></i>
-                Rechercher
+                {{ 'hero.search'|trans }}
             </button>
 
             <input
@@ -111,16 +133,19 @@
                 name="search_form[name]"
                 id="sf_name"
             >
+
             <input
                 type="hidden"
                 name="search_form[startDate]"
                 id="sf_start"
             >
+
             <input
                 type="hidden"
                 name="search_form[endDate]"
                 id="sf_end"
             >
+
             <input
                 type="hidden"
                 name="search_form[guests]"
@@ -132,95 +157,87 @@
 </section>
 
 <link
-    href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css'
-    rel='stylesheet'
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+    rel="stylesheet"
 />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-        // ================================
-        // SYMFONY HIDDEN FORM FIELDS
-        // ================================
-        const sfApartment = document.getElementById('sf_name');
-        const sfStart = document.getElementById('sf_start');
-        const sfEnd = document.getElementById('sf_end');
-        const sfGuests = document.getElementById('sf_guests');
+    // ================================
+    // SYMFONY HIDDEN FORM FIELDS
+    // ================================
+    const sfApartment = document.getElementById('sf_name');
+    const sfStart = document.getElementById('sf_start');
+    const sfEnd = document.getElementById('sf_end');
+    const sfGuests = document.getElementById('sf_guests');
 
+    // ================================
+    // VISIBLE UI FIELDS
+    // ================================
+    const uiApartment = document.getElementById('apartmentSelect');
+    const startUI = document.getElementById('startDateInput');
+    const endUI = document.getElementById('endDateInput');
+    const guestsUI = document.getElementById('guestsInput');
 
-        // ================================
-        // VISIBLE UI FIELDS
-        // ================================
-        const uiApartment = document.getElementById('apartmentSelect');
-        const startUI = document.getElementById('startDateInput');
-        const endUI = document.getElementById('endDateInput');
-        const guestsUI = document.getElementById('guestsInput');
-
-        // Sync apartment
-        uiApartment.addEventListener('change', () => {
-            sfApartment.value = uiApartment.value;
-           
-        });
-
-        // Sync guests
-        guestsUI.addEventListener('change', () => {
-            sfGuests.value = guestsUI.value;
-           
-        });
-
-        // Calendar setup
-        const tooltip = document.getElementById('calendar-tooltip');
-
-        let currentSelection = null;
-        // "start" or "end"
-
-        // ================================
-        // SHOW TOOLTIP WHEN CLICKING LABEL
-        // ================================
-        document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
-            el.addEventListener('click', function (event) {
-                event.stopPropagation(); // prevent auto-close
-                currentSelection = this.dataset.type;
-
-                tooltip.classList.remove('hidden');
-
-                // VERY IMPORTANT: fix the tiny calendar problem
-                setTimeout(() => {
-                    calendar.updateSize();
-                }, 10);
-            });
-        });
-
-        // ================================
-        // HIDE TOOLTIP WHEN CLICKING OUTSIDE
-        // ================================
-        document.addEventListener('click', function (event) {
-            if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
-                tooltip.classList.add('hidden');
-            }
-        });
-
-        var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            initialView: 'dayGridMonth',
-            selectable: true,
-            locale: 'fr',
-
-            select: function (info) {
-                const start = info.startStr;
-                const end = info.endStr;
-
-                startUI.value = start;
-                endUI.value = end;
-
-                sfStart.value = start;
-                sfEnd.value = end;
-
-                tooltip.classList.add('hidden');
-            }
-        });
-
-        calendar.render();
+    // Sync apartment
+    uiApartment.addEventListener('change', () => {
+        sfApartment.value = uiApartment.value;
     });
+
+    // Sync guests
+    guestsUI.addEventListener('change', () => {
+        sfGuests.value = guestsUI.value;
+    });
+
+    // Calendar setup
+    const tooltip = document.getElementById('calendar-tooltip');
+
+    let currentSelection = null;
+
+    document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
+        el.addEventListener('click', function (event) {
+            event.stopPropagation();
+            currentSelection = this.dataset.type;
+
+            tooltip.classList.remove('hidden');
+
+            setTimeout(() => {
+                calendar.updateSize();
+            }, 10);
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
+            tooltip.classList.add('hidden');
+        }
+    });
+
+    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        initialView: 'dayGridMonth',
+        selectable: true,
+
+       
+        locale: '{{ app.request.locale }}',
+
+        select: function (info) {
+
+            const start = info.startStr;
+            const end = info.endStr;
+
+            startUI.value = start;
+            endUI.value = end;
+
+            sfStart.value = start;
+            sfEnd.value = end;
+
+            tooltip.classList.add('hidden');
+        }
+    });
+
+    calendar.render();
+});
 </script>
