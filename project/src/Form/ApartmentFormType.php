@@ -117,6 +117,16 @@ class ApartmentFormType extends AbstractType
                 'row_attr' => ['class' => 'form-group'],
                 'attr' => ['class' => 'dropdown-checkbox-select form-select'],
                 'label' => 'Équipements',
+            ])
+            ->add('locale', ChoiceType::class, [
+                'mapped' => false,
+                'label' => 'Langue de saisie',
+                'choices' => [
+                    'Français' => 'fr',
+                    'English' => 'en',
+                ],
+                'attr' => ['class' => 'form-control'],
+                'row_attr' => ['class' => 'form-group col-sm-6 my-2'],
             ]);
     }
 

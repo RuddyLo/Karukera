@@ -105,7 +105,8 @@ class AdminApartmentController extends AbstractController
                 $pricePeriod = $form->get('pricePeriod')->getData();
 
                 // $apartment->addPricePeriod($pricePeriod);
-
+                $locale = $form->get('locale')->getData();
+                $apartment->setTranslatableLocale($locale);
                 $entityManager->persist($apartment);
                 $pricePeriod->setApartment($apartment);
                 $entityManager->persist($pricePeriod);
@@ -198,7 +199,9 @@ class AdminApartmentController extends AbstractController
                 $entityManager->persist($pricePeriod);
             }
            
-
+            $locale = $form->get('locale')->getData();
+            $apartment->setTranslatableLocale($locale);
+            $entityManager->persist($apartment);
             $entityManager->flush();
 
             return $this->redirectToRoute('admin.apartment', [], Response::HTTP_SEE_OTHER);

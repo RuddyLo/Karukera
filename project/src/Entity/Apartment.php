@@ -8,18 +8,23 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
+
 
 #[ORM\Entity(repositoryClass: ApartmentRepository::class)]
-class Apartment
+class Apartment  implements Translatable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Gedmo\Translatable]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Gedmo\Translatable]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
@@ -49,6 +54,14 @@ class Apartment
 
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'apartment')]
     private Collection $reviews;
+
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+    public function setTranslatableLocale(string $locale): void
+    {
+        $this->locale = $locale;
+    }
 
  
 

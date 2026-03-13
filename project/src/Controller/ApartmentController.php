@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/apartments')]
+#[Route('/{_locale}/apartments', requirements: ['_locale' => 'fr|en'])]
 class ApartmentController extends AbstractController
 {
     public function __construct(

@@ -29,3 +29,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
+            
+    Gedmo\Translatable\TranslatableListener:
+        alias: stof_doctrine_extensions.listener.translatable
