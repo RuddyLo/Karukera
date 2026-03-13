@@ -56,9 +56,12 @@ $(document).ready(() => {
                                 <a title="Visualisation" href='${ajaxLink.apartment.show.replace('123456789', row[0])}' id='${data}' class='btn btn-primary'>
                                    <i class="bi bi-eye-fill"></i>
                                 </a>
-                                <a title="Modification" href='${ajaxLink.apartment.edit.replace('123456789', row[0])}' id='${data}' class='btn btn-secondary'>
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
+                                <a title="Modifier FR" href='${ajaxLink.apartment.edit.replace('123456789', row[0])}?locale=fr' class='btn btn-secondary'>
+    🇫🇷
+</a>
+<a title="Modifier EN" href='${ajaxLink.apartment.edit.replace('123456789', row[0])}?locale=en' class='btn btn-secondary'>
+    🇺🇸
+</a>
                                 <button title="Suppression" id='delete-apartment' class='btn btn-danger event-delete-apartment' data-uuid=${data}>
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>

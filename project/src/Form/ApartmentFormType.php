@@ -123,8 +123,9 @@ class ApartmentFormType extends AbstractType
                 'label' => 'Langue de saisie',
                 'choices' => [
                     'Français' => 'fr',
-                    'English' => 'en',
+                    'English'  => 'en',
                 ],
+                'data' => $options['locale'], // présélectionne la locale courante
                 'attr' => ['class' => 'form-control'],
                 'row_attr' => ['class' => 'form-group col-sm-6 my-2'],
             ]);
@@ -134,6 +135,7 @@ class ApartmentFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Apartment::class,
+            'locale'     => 'fr',
         ]);
     }
 }
