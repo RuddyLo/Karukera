@@ -1,64 +1,70 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    
-        <div class="container py-5 h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-            
-                <div class="card" style="border-radius: 1rem; max-width: 30vw;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="card" style="border-radius: 1rem; max-width: 30vw;">
                 <div class="row g-0">
-                    
                     <div class="d-flex align-items-center">
-                    <div class="card-body p-4 p-lg-5 text-black">
-        
-                        {{ form_start(registrationForm) }}
-        
-                       
-        
-                        <h5 class="h3 fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Inscrivez-vous et profitez de nos services</h5>
-        
-                        <div data-mdb-input-init class="form-outline mb-4">
-                            {{ form_row(registrationForm.email) }}
-                        </div>
-        
-                        <div data-mdb-input-init class="form-outline mb-4">
-                            {{ form_label(registrationForm.plainPassword.first) }}
-                            {{ form_widget(registrationForm.plainPassword.first) }}
-                            {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
-                                <div class="text-danger">
-                                    {{ form_errors(registrationForm.plainPassword.first) }}
-                                </div>
-                            {% endif %}
-                        </div>
+                        <div class="card-body p-4 p-lg-5 text-black">
 
-                        <div data-mdb-input-init class="form-outline mb-4">
-                            {{ form_label(registrationForm.plainPassword.second) }}
-                            {{ form_widget(registrationForm.plainPassword.second) }}
-                            {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
-                                <div class="text-danger">
-                                    {{ form_errors(registrationForm.plainPassword.second) }}
-                                </div>
-                            {% endif %}
+                            {% for type, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                                        {{ message|trans }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+
+                            {{ form_start(registrationForm) }}
+
+                            <h5 class="h3 fw-bold mb-3 pb-3" style="letter-spacing: 1px;">{{ 'register.title'|trans }}</h5>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                {{ form_row(registrationForm.email) }}
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                {{ form_label(registrationForm.plainPassword.first) }}
+                                {{ form_widget(registrationForm.plainPassword.first) }}
+                                {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
+                                    <div class="text-danger">
+                                        {{ form_errors(registrationForm.plainPassword.first) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                {{ form_label(registrationForm.plainPassword.second) }}
+                                {{ form_widget(registrationForm.plainPassword.second) }}
+                                {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
+                                    <div class="text-danger">
+                                        {{ form_errors(registrationForm.plainPassword.second) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="pt-1 mb-4" style="display:none;">
+                                {{ form_row(registrationForm.submit) }}
+                            </div>
+
+                            <div class="pt-1 mb-4">
+                                <button class="btn btn-info btn-lg btn-block w-100 text-white" type="submit">
+                                    {{ 'register.submit'|trans }}
+                                </button>
+                            </div>
+
+                            <p class="mt-3">
+                                {{ 'register.already_registered'|trans }}
+                                <a href="{{ path('app.login') }}">{{ 'register.login_link'|trans }}</a>
+                            </p>
+
+                            {{ form_end(registrationForm) }}
                         </div>
-                         <div class="pt-1 mb-4" style="display:none;">
-                        {{ form_row(registrationForm.submit) }}
-                         </div>
-                        <div class="pt-1 mb-4">
-                            <button data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-lg btn-block w-100 text-white" type="submit">Se connecter</button>
-                        </div>
-                        
-                        <p class="mt-3">
-                            Déjà inscrit ? <a href="{{ path('app.login') }}">Connectez-vous ici</a>.
-                        </p>
-                        {{ form_end(registrationForm) }}
-        
-                    </div>
                     </div>
                 </div>
-                </div>
-            
             </div>
         </div>
-
-
+    </div>
 {% endblock %}

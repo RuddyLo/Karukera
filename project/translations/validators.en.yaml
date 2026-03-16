@@ -1,0 +1,8 @@
+register:
+    validation:
+        password_required: "Password is required."
+        password_min: "Password must be at least {{ limit }} characters."
+        password_uppercase: "Password must contain at least one uppercase letter."
+        password_lowercase: "Password must contain at least one lowercase letter."
+        password_digit: "Password must contain at least one digit."
+        password_special: "Password must contain at least one special character (!@#$%^&*)."

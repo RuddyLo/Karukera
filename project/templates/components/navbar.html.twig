@@ -22,7 +22,8 @@
 
             {% if not app.user %}
                 <li>
-                    <a class="nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register') }}">
+                <a class="nav-link scrollto color-primary border-primary fw-bold" href="{{ path('app.register', {_locale: app.request.locale}) }}">
+                   
                         {{ 'nav.register'|trans }}
                     </a>
                 </li>

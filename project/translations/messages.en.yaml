@@ -85,3 +85,17 @@ footer:
         contact: "Contact"
         register: "Sign up"
         login: "Log in"
+
+register:
+    title: "Sign up and enjoy our services"
+    submit: "Sign up"
+    already_registered: "Already registered?"
+    login_link: "Log in here"
+    flash:
+        success: "Registration successful, please log in!"
+        duplicate_email: "This email address is already in use."
+    register:
+    form:
+        email: "Email address"
+        password: "Password"
+        password_confirm: "Confirm password"

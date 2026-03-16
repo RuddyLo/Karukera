@@ -16,44 +16,41 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [
-                'label' => 'Adresse e-mail',
+           ->add('email', EmailType::class, [
+                'label' => 'register.form.email',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
                 'constraints' => [
-                new Assert\NotBlank(['message' => 'Le mot de passe est obligatoire.']),
-                new Assert\Length([
-                    'min' => 8,
-                    'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
-                ]),
-                new Assert\Regex([
-                    'pattern' => '/[A-Z]/',
-                    'message' => 'Le mot de passe doit contenir au moins une lettre majuscule.',
-                ]),
-                new Assert\Regex([
-                    'pattern' => '/[a-z]/',
-                    'message' => 'Le mot de passe doit contenir au moins une lettre minuscule.',
-                ]),
-                new Assert\Regex([
-                    'pattern' => '/\d/',
-                    'message' => 'Le mot de passe doit contenir au moins un chiffre.',
-                ]),
-                new Assert\Regex([
-                    'pattern' => '/[\W]/',
-                    'message' => 'Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*).',
-                ]),
-            ],
-                'first_options' => ['label' => 'Mot de passe', 'attr' => ['class' => 'form-control']],
-                'second_options' => ['label' => 'Confirmer le mot de passe', 'attr' => ['class' => 'form-control']],
+                    new Assert\NotBlank(['message' => 'register.validation.password_required']),
+                    new Assert\Length([
+                        'min' => 8,
+                        'minMessage' => 'register.validation.password_min',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[A-Z]/',
+                        'message' => 'register.validation.password_uppercase',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[a-z]/',
+                        'message' => 'register.validation.password_lowercase',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/\d/',
+                        'message' => 'register.validation.password_digit',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[\W]/',
+                        'message' => 'register.validation.password_special',
+                    ]),
+                ],
+                'first_options' => ['label' => 'register.form.password', 'attr' => ['class' => 'form-control']],
+                'second_options' => ['label' => 'register.form.password_confirm', 'attr' => ['class' => 'form-control']],
             ])
-
-            
-            
             ->add('submit', SubmitType::class, [
-                'label' => "S'inscrire",
+                'label' => 'register.submit',
                 'attr' => ['class' => 'btn btn-primary mt-3 px-4']
             ]);
     }

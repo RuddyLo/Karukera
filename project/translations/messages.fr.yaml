@@ -85,3 +85,17 @@ footer:
         contact: "Contact"
         register: "S'inscrire"
         login: "Se connecter"
+
+register:
+    title: "Inscrivez-vous et profitez de nos services"
+    submit: "S'inscrire"
+    already_registered: "Déjà inscrit ?"
+    login_link: "Connectez-vous ici"
+    flash:
+        success: "Inscription réussie, connectez-vous !"
+        duplicate_email: "Cette adresse email est déjà utilisée."
+    register:
+    form:
+        email: "Adresse e-mail"
+        password: "Mot de passe"
+        password_confirm: "Confirmer le mot de passe"

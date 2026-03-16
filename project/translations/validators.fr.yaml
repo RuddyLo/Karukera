@@ -1,0 +1,8 @@
+register:
+    validation:
+        password_required: "Le mot de passe est obligatoire."
+        password_min: "Le mot de passe doit contenir au moins {{ limit }} caractères."
+        password_uppercase: "Le mot de passe doit contenir au moins une lettre majuscule."
+        password_lowercase: "Le mot de passe doit contenir au moins une lettre minuscule."
+        password_digit: "Le mot de passe doit contenir au moins un chiffre."
+        password_special: "Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*)."
