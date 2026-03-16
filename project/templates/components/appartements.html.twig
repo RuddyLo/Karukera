@@ -1,34 +1,25 @@
 <section class="container">
-    <h2
-        class="text-center mb-5"
-        style="font-size: 40px; font-weight: 700;"
-    >
+    <h2 class="text-center mb-5" style="font-size: 40px; font-weight: 700;">
         Appartements
     </h2>
 
     <div class="row justify-content-center">
-
-        {% for apartment in apartments %}<a
-            href="{{ path('app.apartment.details', { id: apartment.id }) }}"
-            class="text-decoration-none text-dark"
-        >
-            <div class="col-lg-4 mb-4 d-flex justify-content-center">
-                <div
-                    class="destination-card"
-                    style="width: 100%; max-width: 500px;"
-                >
+        {% for apartment in apartments %}
+        <div class="col-lg-4 mb-4 d-flex justify-content-center">
+            <a href="{{ path('app.apartment.details', { id: apartment.id, _locale: app.request.locale }) }}"
+               class="text-decoration-none text-dark w-100">
+                <div class="destination-card" style="width: 100%; max-width: 500px;">
                     <img
-                        src="{{asset(apartment.imageUrl)}}"
+                        src="{{ asset(apartment.imageUrl) }}"
                         class="img-fluid mx-auto d-block"
                         alt="image appartement"
                         style="object-fit: cover; width: 100%; height: 250px;"
                     >
-                    <h4 class="mt-3 fw-bold">{{apartment.name}}</h4>
-                    <p class="text-muted">{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ?
-                        '...' : '') }}</p>
+                    <h4 class="mt-3 fw-bold">{{ apartment.name }}</h4>
+                    <p class="text-muted">{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' : '') }}</p>
                 </div>
-            </div>
-        </a>
+            </a>
+        </div>
         {% endfor %}
     </div>
 </section>

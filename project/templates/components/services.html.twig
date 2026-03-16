@@ -2,60 +2,54 @@
     <div class="container">
 
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="font-size: 40px;">Nos Services</h2>
+            <h2 class="fw-bold" style="font-size: 40px;">{{ 'services.title'|trans }}</h2>
             <p class="text-muted" style="font-size: 17px;">
-                Découvrez les services que nous offrons pour rendre votre séjour plus agréable.
+                {{ 'services.subtitle'|trans }}
             </p>
         </div>
 
         <div class="row text-center gy-5">
 
-            <!-- SERVICE 1 -->
             <div class="col-md-3 col-6">
                 <div class="service-item">
                     <div class="icon mb-3">
                         <img src="{{ asset('images/icons/bed.svg') }}" alt="" class="service-icon">
                     </div>
-                    <h5 class="fw-bold">Location</h5>
-                    <p class="text-muted small">Apartement</p>
+                    <h5 class="fw-bold">{{ 'services.rental.title'|trans }}</h5>
+                    <p class="text-muted small">{{ 'services.rental.subtitle'|trans }}</p>
                 </div>
-                
             </div>
 
-            <!-- SERVICE 2 -->
             <div class="col-md-3 col-6">
                 <div class="service-item">
                     <div class="icon mb-3">
                         <img src="{{ asset('images/icons/resto.svg') }}" alt="" class="service-icon">
                     </div>
-                    <h5 class="fw-bold">Restauration</h5>
-                    <p class="text-muted small">Professionnel</p>
+                    <h5 class="fw-bold">{{ 'services.catering.title'|trans }}</h5>
+                    <p class="text-muted small">{{ 'services.catering.subtitle'|trans }}</p>
                 </div>
             </div>
 
-            <!-- SERVICE 3 -->
             <div class="col-md-3 col-6">
                 <div class="service-item">
                     <div class="icon mb-3">
                         <img src="{{ asset('images/icons/transport.svg') }}" alt="" class="service-icon">
                     </div>
-                    <h5 class="fw-bold">Transport</h5>
-                    <p class="text-muted small">Récupération à l'aeroport</p>
+                    <h5 class="fw-bold">{{ 'services.transport.title'|trans }}</h5>
+                    <p class="text-muted small">{{ 'services.transport.subtitle'|trans }}</p>
                 </div>
             </div>
 
-            <!-- SERVICE 4 -->
             <div class="col-md-3 col-6">
                 <div class="service-item">
                     <div class="icon mb-3">
                         <img src="{{ asset('images/icons/service.svg') }}" alt="" class="service-icon">
                     </div>
-                    <h5 class="fw-bold">Services Annexes</h5>
-                    <p class="text-muted small"></p>
+                    <h5 class="fw-bold">{{ 'services.extra.title'|trans }}</h5>
+                    <p class="text-muted small">{{ 'services.extra.subtitle'|trans }}</p>
                 </div>
             </div>
 
         </div>
-
     </div>
 </section>

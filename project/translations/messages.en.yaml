@@ -40,3 +40,48 @@ contact:
         stay_optional: (optional)
     flash:
         success: Your message has been sent. Thank you!
+
+services:
+    title: "Our Services"
+    subtitle: "Discover the services we offer to make your stay more enjoyable."
+    rental:
+        title: "Rental"
+        subtitle: "Apartment"
+    catering:
+        title: "Catering"
+        subtitle: "Professional"
+    transport:
+        title: "Transport"
+        subtitle: "Airport pickup"
+    extra:
+        title: "Additional Services"
+        subtitle: ""
+
+testimonials:
+    title: "What our travelers say"
+    prev: "Previous"
+    next: "Next"
+    trustpilot: "See all our Trustpilot reviews"
+    1:
+        title: "Amazing weekend with friends!"
+        content: "We slept incredibly well (thanks to the beds), enjoyed the city to the fullest (everything is 5 min away on foot!) and check in and check out is fully automated (so convenient)"
+        author: "Filot"
+    2:
+        title: "We loved it!"
+        content: "We were warmly welcomed by Sabrina and the place is absolutely beautiful! Would definitely come back!!"
+        author: "Jean-Baptiste"
+    3:
+        title: "Perfect for a weekend with friends"
+        content: "Ideal location, tasteful decoration and a very spacious place! Perfect for a weekend with friends. 5/5"
+        author: "Dominique"
+
+footer:
+    phone: "Phone"
+    email: "Email"
+    rights: "All Rights Reserved"
+    links:
+        title: "Useful links"
+        home: "Home"
+        contact: "Contact"
+        register: "Sign up"
+        login: "Log in"

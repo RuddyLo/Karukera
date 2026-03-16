@@ -20,16 +20,14 @@
         <div class="row justify-content-center gy-4 mt-4">
 
             {% for apartment in last_apartments %}
-
-            <div class="col-lg-6 col-lg-6 d-flex justify-content-center">
-                <img
-                    src="{{ asset(apartment.imageUrl) }}"
-                    alt="Nouveauté 1"
-                    class="img-fluid shadow-sm"
-                >
-            </div>
-
-            {% endfor %}
+<div class="col-lg-6 d-flex justify-content-center">
+    {% if apartment.images|length > 0 %}
+        <img src="{{ asset(random(apartment.images.toArray()).url) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
+    {% else %}
+        <img src="{{ asset(apartment.imageUrl) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
+    {% endif %}
+</div>
+{% endfor %}
         </div>
     </div>
 </section>

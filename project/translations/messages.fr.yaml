@@ -40,3 +40,48 @@ contact:
         stay_optional: (facultatif)
     flash:
         success: Votre message a bien été envoyé. Merci !
+
+services:
+    title: "Nos Services"
+    subtitle: "Découvrez les services que nous offrons pour rendre votre séjour plus agréable."
+    rental:
+        title: "Location"
+        subtitle: "Appartement"
+    catering:
+        title: "Restauration"
+        subtitle: "Professionnel"
+    transport:
+        title: "Transport"
+        subtitle: "Récupération à l'aéroport"
+    extra:
+        title: "Services Annexes"
+        subtitle: ""
+
+testimonials:
+    title: "Avis de nos voyageurs"
+    prev: "Précédent"
+    next: "Suivant"
+    trustpilot: "Voir tous nos avis Trustpilot"
+    1:
+        title: "Week-end entre amis au top !"
+        content: "On a super bien dormi (merci les lits), super bien profité de la ville (tout est à 5 min à pied !) et le check in et check out se fait tout seul (trop pratique)"
+        author: "Filot"
+    2:
+        title: "On a adoré !"
+        content: "Nous avons été super bien accueillis par Sabrina et la maison est magnifique ! À refaire absolument !!"
+        author: "Jean-Baptiste"
+    3:
+        title: "Parfait pour un week-end entre amis"
+        content: "Emplacement idéal, déco avec goût et maison super grande ! Idéal pour un week-end entre amis. Je mets 5/5"
+        author: "Dominique"
+
+footer:
+    phone: "Téléphone"
+    email: "Email"
+    rights: "Tous droits réservés"
+    links:
+        title: "Liens utiles"
+        home: "Accueil"
+        contact: "Contact"
+        register: "S'inscrire"
+        login: "Se connecter"

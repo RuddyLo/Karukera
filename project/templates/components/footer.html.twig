@@ -8,32 +8,29 @@
             <div class="footer-info">
               <h1 class="">Les Oasis <span>de KaruKera</span>.</h1>
               <p>
-                 oasis de karurio, 12 rue morne tricolore 97180 Sainte Anne<br>
-                <strong>Téléphone:</strong>+33 755503086<br>
-                <strong>Email:</strong> contact@oasisdekarukera.com<br>
+                oasis de karurio, 12 rue morne tricolore 97180 Sainte Anne<br>
+                <strong>{{ 'footer.phone'|trans }}:</strong> +33 755503086<br>
+                <strong>{{ 'footer.email'|trans }}:</strong> contact@oasisdekarukera.com<br>
               </p>
             </div>
           </div>
 
           <div class="col-lg-2 col-md-6 footer-links">
-            <h4>Liens utiles</h4>
+            <h4>{{ 'footer.links.title'|trans }}</h4>
             <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.home') }}">Acceuil</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.contact') }}">Contact</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.register') }}">S'inscrire</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.login') }}">Se connecter</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.home', {_locale: app.request.locale}) }}">{{ 'footer.links.home'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.contact', {_locale: app.request.locale}) }}">{{ 'footer.links.contact'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.register') }}">{{ 'footer.links.register'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.login') }}">{{ 'footer.links.login'|trans }}</a></li>
             </ul>
           </div>
 
-          
-        <div class="social-links col-lg-3">
-        <a href="#" class="tiktok btn  "><i class="text-white bi bi-tiktok"></i></a>
-          <a href="#" class="twitter btn  "><i class="text-white bi bi-twitter"></i></a>
-          <a href="#" class="facebook btn "><i class="text-white bi bi-facebook"></i></a>
-          <a href="#" class="instagram btn"><i class="text-white bi bi-instagram"></i></a>
-          
-        </div>
-         
+          <div class="social-links col-lg-3">
+            <a href="#" class="tiktok btn"><i class="text-white bi bi-tiktok"></i></a>
+            <a href="#" class="twitter btn"><i class="text-white bi bi-twitter"></i></a>
+            <a href="#" class="facebook btn"><i class="text-white bi bi-facebook"></i></a>
+            <a href="#" class="instagram btn"><i class="text-white bi bi-instagram"></i></a>
+          </div>
 
         </div>
       </div>
@@ -41,17 +38,12 @@
 
     <div class="footer-legal text-center">
       <div class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center">
-
         <div class="d-flex flex-column align-items-center align-items-lg-start">
           <div class="copyright">
-            &copy; Copyright <strong><span>lesoasisdekarukera</span></strong>. All Rights Reserved
+            &copy; Copyright <strong><span>lesoasisdekarukera</span></strong>. {{ 'footer.rights'|trans }}
           </div>
-          
         </div>
-
-        
-
       </div>
     </div>
 
-  </footer><!-- End Footer -->
+</footer>
