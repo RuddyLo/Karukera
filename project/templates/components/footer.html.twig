@@ -21,7 +21,7 @@
               <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.home', {_locale: app.request.locale}) }}">{{ 'footer.links.home'|trans }}</a></li>
               <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.contact', {_locale: app.request.locale}) }}">{{ 'footer.links.contact'|trans }}</a></li>
               <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.register', {_locale: app.request.locale}) }}">{{ 'footer.links.register'|trans }}</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.login') }}">{{ 'footer.links.login'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.login', {'_locale': app.request.locale}) }}">{{ 'footer.links.login'|trans }}</a></li>
             </ul>
           </div>
 

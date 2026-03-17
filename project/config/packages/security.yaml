@@ -19,6 +19,7 @@ security:
             form_login:
                 login_path: app.login
                 check_path: app.login
+                
                 enable_csrf: true
             logout:
                 path: app.logout

@@ -99,3 +99,17 @@ register:
         email: "Email address"
         password: "Password"
         password_confirm: "Confirm password"
+
+nouveautes:
+    title: "Latest additions"
+    subtitle: "Ideally located in the heart of the city, all our properties are furnished and decorated by our interior designers for exceptional comfort."
+
+
+login:
+    title: "Login"
+    subtitle: "Sign in to your account"
+    email: "Email address"
+    password: "Password"
+    submit: "Log in"
+    no_account: "No account yet?"
+    register_link: "Sign up here"

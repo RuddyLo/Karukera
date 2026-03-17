@@ -57,7 +57,7 @@
 
                             <p class="mt-3">
                                 {{ 'register.already_registered'|trans }}
-                                <a href="{{ path('app.login') }}">{{ 'register.login_link'|trans }}</a>
+                                <a href="{{ path('app.login',{'_locale': app.request.locale}) }}">{{ 'register.login_link'|trans }}</a>
                             </p>
 
                             {{ form_end(registrationForm) }}

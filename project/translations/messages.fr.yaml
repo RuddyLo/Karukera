@@ -99,3 +99,16 @@ register:
         email: "Adresse e-mail"
         password: "Mot de passe"
         password_confirm: "Confirmer le mot de passe"
+
+nouveautes:
+    title: "Nouveautés"
+    subtitle: "Idéalement situés en hyper-centre, tous nos biens sont meublés et décorés par nos décoratrices d'intérieur pour un confort exceptionnel."
+
+login:
+    title: "Connexion"
+    subtitle: "Connectez-vous à votre compte"
+    email: "Adresse email"
+    password: "Mot de passe"
+    submit: "Se connecter"
+    no_account: "Pas encore de compte ?"
+    register_link: "Inscrivez-vous ici"

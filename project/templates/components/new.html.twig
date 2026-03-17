@@ -1,33 +1,23 @@
 <section class="py-5 nouveautes-section">
     <div class="container">
 
-        <!-- TITLE -->
         <div class="text-center mb-4">
-            <h2
-                class="fw-bold"
-                style="font-size: 40px;"
-            >Nouveautés</h2>
-            <p
-                class="text-muted mt-3"
-                style="font-size: 17px;"
-            >
-                Idéalement situés en hyper-centre, tous nos biens sont meublés et décorés par nos décoratrices
-                d'intérieur pour un confort exceptionnel.
+            <h2 class="fw-bold" style="font-size: 40px;">{{ 'nouveautes.title'|trans }}</h2>
+            <p class="text-muted mt-3" style="font-size: 17px;">
+                {{ 'nouveautes.subtitle'|trans }}
             </p>
         </div>
 
-        <!-- IMAGES -->
         <div class="row justify-content-center gy-4 mt-4">
-
             {% for apartment in last_apartments %}
-<div class="col-lg-6 d-flex justify-content-center">
-    {% if apartment.images|length > 0 %}
-        <img src="{{ asset(random(apartment.images.toArray()).url) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
-    {% else %}
-        <img src="{{ asset(apartment.imageUrl) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
-    {% endif %}
-</div>
-{% endfor %}
+            <div class="col-lg-6 d-flex justify-content-center">
+                {% if apartment.images|length > 0 %}
+                    <img src="{{ asset(random(apartment.images.toArray()).url) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
+                {% else %}
+                    <img src="{{ asset(apartment.imageUrl) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
