@@ -137,37 +137,31 @@ class ApartmentRepository extends ServiceEntityRepository
     }
 
    public function searchApartments(?string $name, ?string $start, ?string $end): array
-    {
-        $conn = $this->getEntityManager()->getConnection();
+{
+    $conn = $this->getEntityManager()->getConnection();
 
-        // Prepare SQL query
-        $sql = "
-            SELECT *
-            FROM apartment
-            WHERE apartment.is_active = true
-            AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
+    $sql = "
+        SELECT *
+        FROM apartment
+        WHERE apartment.is_active = true
+        AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
+    ";
+
+    $params = ['name' => $name];
+
+    if ($start && $end) {
+        $sql .= "
+            AND apartment.id NOT IN (
+                SELECT reservation.apartment_id
+                FROM reservation
+                WHERE reservation.start_date < :endDate
+                AND reservation.end_date > :startDate
+            )
         ";
-        
-        // Paramètres à passer
-        $params = ['name' => $name];
-        
-        // If dates provided, exclude unavailable apartments
-        if ($start && $end) {
-            $sql .= "
-                AND apartment.id NOT IN (
-                    SELECT reservation.apartment_id
-                    FROM reservation
-                    WHERE reservation.start_date <= :endDate
-                    AND reservation.end_date >= :startDate
-                )
-            ";
-            // Ajouter les paramètres de dates uniquement si utilisés
-            $params['startDate'] = $start;
-            $params['endDate'] = $end;
-        }
-
-        $stmt = $conn->prepare($sql);
-        // Execute SQL avec les bons paramètres
-        return $stmt->executeQuery($params)->fetchAllAssociative();
+        $params['startDate'] = $start;
+        $params['endDate']   = $end;
     }
+
+    return $conn->prepare($sql)->executeQuery($params)->fetchAllAssociative();
+}
 }

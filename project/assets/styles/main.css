@@ -1262,8 +1262,8 @@ a.text-decoration-none:hover {
 
 /* Image */
 .appart-image-wrapper {
-    width: 300px;
-    height: 220px;
+    width: auto;
+    height: auto;
     overflow: hidden;
 }
 

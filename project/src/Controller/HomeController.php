@@ -49,29 +49,32 @@ class HomeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
     #[Route('/{_locale}/search', name: 'app.search_apartment', requirements: ['_locale' => 'fr|en'])]
-    public function search(Request $request, ApartmentRepository $repo): Response
-    {
-        $form = $this->createForm(SearchFormType::class);
-        $form->handleRequest($request);
+public function search(Request $request, ApartmentRepository $repo): Response
+{
+    $form = $this->createForm(SearchFormType::class);
+    $form->handleRequest($request);
 
-        $data = $form->getData();
+    $name      = null;
+    $startDate = null;
+    $endDate   = null;
 
-        $results = $repo->searchApartments(
-            $data['name'] ?? null,
-            $data['startDate'] ?? null,
-            $data['endDate'] ?? null,
-        );
-
-        $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
-
-        return $this->render('search/results.html.twig', [
-            'results' => $results,
-            'filters' => $data,
-            'apartments' => $apartments,
-        ]);
+    if ($form->isSubmitted()) {
+        $data      = $form->getData();
+        $name      = $data['name'] ?? null;
+        $startDate = $data['startDate'] ?? null;
+        $endDate   = $data['endDate'] ?? null;
     }
+
+    $results    = $repo->searchApartments($name, $startDate, $endDate);
+    $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
+
+    return $this->render('search/results.html.twig', [
+        'results'    => $results,
+        'filters'    => compact('name', 'startDate', 'endDate'),
+        'apartments' => $apartments,
+    ]);
+}
 
     
     #[Route('/{_locale}/contact', name: 'app.contact', requirements: ['_locale' => 'fr|en'])]

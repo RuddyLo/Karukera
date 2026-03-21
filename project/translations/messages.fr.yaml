@@ -133,3 +133,10 @@ reset:
         email_sent: "Si cet email existe, un lien de réinitialisation vous a été envoyé."
         token_invalid: "Ce lien est invalide ou a expiré."
         success: "Mot de passe modifié avec succès, connectez-vous !"
+
+search:
+    title: "Résultats de recherche"
+    availability_for: "Disponibilités du"
+    available: "Disponible"
+    no_results_dates: "Aucun appartement disponible pour ces dates."
+    no_results: "Aucun appartement trouvé."

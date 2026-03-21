@@ -134,3 +134,10 @@ reset:
         email_sent: "If this email exists, a reset link has been sent."
         token_invalid: "This link is invalid or has expired."
         success: "Password changed successfully, please log in!"
+
+search:
+    title: "Search results"
+    availability_for: "Availability from"
+    available: "Available"
+    no_results_dates: "No apartments available for these dates."
+    no_results: "No apartments found."
