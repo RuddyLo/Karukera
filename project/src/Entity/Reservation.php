@@ -57,6 +57,30 @@ class Reservation
     #[ORM\Column]
     private ?bool $caution_concerved = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $reference = null;
+
+    public function getReference(): ?string
+    {
+        return $this->reference;
+    }
+
+    public function setReference(string $reference): static
+    {
+        $this->reference = $reference;
+        return $this;
+    }
+
+    public function generateReference(): string
+    {
+        $userPart  = strtoupper(substr($this->user->getEmail(), 0, 3));
+        $apartPart = strtoupper(substr($this->apartment->getName(), 0, 3));
+        $datePart  = $this->createdAt->format('Ymd');
+        $randPart  = strtoupper(substr(uniqid(), -4));
+
+        return $userPart . '-' . $apartPart . '-' . $datePart . '-' . $randPart;
+    }
+
     public function __construct()
     {
         $this->payments  = new ArrayCollection();

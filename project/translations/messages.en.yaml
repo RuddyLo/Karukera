@@ -5,6 +5,7 @@ nav:
     login: Log in
     logout: Log out
     admin: Administration
+    my_reservations: "My reservations"
 
 hero:
   title: "Rent your apartment at the best price!"
@@ -141,3 +142,22 @@ search:
     available: "Available"
     no_results_dates: "No apartments available for these dates."
     no_results: "No apartments found."
+
+
+reservations:
+    title: "My reservations"
+    empty: "You have no reservations yet."
+    nights: "night(s)"
+    see_apartment: "View apartment"
+    status:
+        pending: "Pending"
+        confirmed: "Confirmed"
+        canceled: "Canceled"
+        completed: "Completed"
+    caution:
+        refunded: "Deposit refunded"
+        conserved: "Deposit kept"
+        pending: "Deposit pending"
+    rent_paid: "Rent paid"
+    caution_amount: "Deposit"
+    total: "Total paid"

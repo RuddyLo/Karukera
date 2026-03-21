@@ -127,7 +127,7 @@ class StripeController extends AbstractController
                         $reservation->setCautionPaymentIntentId($intent->id);
                         $reservation->setCautionConcerved(false);
                         $reservation->setCautionRefunded(false);
-
+                        $reservation->setReference($reservation->generateReference());
                         $em->persist($reservation);
                         $em->flush();
 
@@ -183,6 +183,7 @@ class StripeController extends AbstractController
                             $reservation->setCautionPaymentIntentId($paymentIntentId);
                             $reservation->setCautionConcerved(false);
                             $reservation->setCautionRefunded(false);
+                            $reservation->setReference($reservation->generateReference());
                             $em->persist($reservation);
                             $em->flush();
                         }

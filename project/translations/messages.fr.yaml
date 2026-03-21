@@ -5,6 +5,7 @@ nav:
     login: Se connecter
     logout: Se déconnecter
     admin: Administration
+    my_reservations: "Mes réservations"
 
 hero:
   title: "Louez votre appartement au meilleur prix !"
@@ -140,3 +141,22 @@ search:
     available: "Disponible"
     no_results_dates: "Aucun appartement disponible pour ces dates."
     no_results: "Aucun appartement trouvé."
+    
+
+reservations:
+    title: "Mes réservations"
+    empty: "Vous n'avez pas encore de réservation."
+    nights: "nuit(s)"
+    see_apartment: "Voir l'appartement"
+    status:
+        pending: "En attente"
+        confirmed: "Confirmée"
+        canceled: "Annulée"
+        completed: "Terminée"
+    caution:
+        refunded: "Caution remboursée"
+        conserved: "Caution conservée"
+        pending: "Caution en attente"
+    rent_paid: "Loyer payé"
+    caution_amount: "Caution"
+    total: "Total payé"
