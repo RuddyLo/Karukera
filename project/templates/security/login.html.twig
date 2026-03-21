@@ -47,6 +47,9 @@
                                     {{ 'login.no_account'|trans }}
                                     <a href="{{ path('app.register', {_locale: app.request.locale}) }}">{{ 'login.register_link'|trans }}</a>
                                 </p>
+                                <p class="mt-2">
+    <a href="{{ path('app.forgot_password', {_locale: app.request.locale}) }}">{{ 'login.forgot_password'|trans }}</a>
+</p>
                             </form>
 
                         </div>

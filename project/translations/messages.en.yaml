@@ -113,3 +113,24 @@ login:
     submit: "Log in"
     no_account: "No account yet?"
     register_link: "Sign up here"
+    forgot_password: "Forgot your password?"
+
+reset:
+    request:
+        title: "Forgot password"
+        subtitle: "Reset your password"
+        description: "Enter your email address and we'll send you a reset link."
+        back_to_login: "Back to login"
+    new:
+        title: "New password"
+        subtitle: "Choose a new password"
+    form:
+        email: "Email address"
+        submit_request: "Send reset link"
+        new_password: "New password"
+        confirm_password: "Confirm password"
+        submit_new: "Save password"
+    flash:
+        email_sent: "If this email exists, a reset link has been sent."
+        token_invalid: "This link is invalid or has expired."
+        success: "Password changed successfully, please log in!"

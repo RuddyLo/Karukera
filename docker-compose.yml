@@ -1,5 +1,5 @@
 services:
-  #PHP-APACHE
+  # PHP-APACHE
   www:
     build: docker
     container_name: www_karukera
@@ -10,6 +10,10 @@ services:
       - ./:/var/www
     networks:
       - dev
+    environment:
+      MAILER_DSN: smtp://9d58de415e8c9e:efc1dc4d7b5bb6@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login
+      ADMIN_EMAIL: "ratianarivoruddy@gmail.com"
+      MAILER_FROM_ADDRESS: "ratianarivoruddy@gmail.com"
 
   db:
     image: mysql

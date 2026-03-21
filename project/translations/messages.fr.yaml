@@ -112,3 +112,24 @@ login:
     submit: "Se connecter"
     no_account: "Pas encore de compte ?"
     register_link: "Inscrivez-vous ici"
+    forgot_password: "Mot de passe oublié ?"
+
+reset:
+    request:
+        title: "Mot de passe oublié"
+        subtitle: "Réinitialiser votre mot de passe"
+        description: "Entrez votre adresse email, nous vous enverrons un lien de réinitialisation."
+        back_to_login: "Retour à la connexion"
+    new:
+        title: "Nouveau mot de passe"
+        subtitle: "Choisissez un nouveau mot de passe"
+    form:
+        email: "Adresse email"
+        submit_request: "Envoyer le lien"
+        new_password: "Nouveau mot de passe"
+        confirm_password: "Confirmer le mot de passe"
+        submit_new: "Enregistrer le mot de passe"
+    flash:
+        email_sent: "Si cet email existe, un lien de réinitialisation vous a été envoyé."
+        token_invalid: "Ce lien est invalide ou a expiré."
+        success: "Mot de passe modifié avec succès, connectez-vous !"

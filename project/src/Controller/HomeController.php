@@ -73,6 +73,7 @@ class HomeController extends AbstractController
         ]);
     }
 
+    
     #[Route('/{_locale}/contact', name: 'app.contact', requirements: ['_locale' => 'fr|en'])]
     public function contact(Request $request, MailerInterface $mailer): Response
     {
@@ -81,12 +82,11 @@ class HomeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-              error_log('FORM SUBMITTED - sending email');
 
             $email = (new Email())
                 ->from('ratianarivoruddy@gmail.com')
-                ->to('boumrakoto@gmail.com')
-                ->replyTo($data['email'])   
+                ->to('ratianarivoruddy@gmail.com')
+                ->replyTo($data['email'])
                 ->subject('[Contact] ' . $data['subject'])
                 ->html(
                     '<p><strong>Nom :</strong> ' . $data['name'] . '</p>' .
@@ -96,9 +96,12 @@ class HomeController extends AbstractController
                     ($data['end_date'] ? '<p><strong>Départ :</strong> ' . $data['end_date']->format('d/m/Y') . '</p>' : '')
                 );
 
-            $mailer->send($email);
-
-            $this->addFlash('success', 'contact.flash.success');
+            try {
+                $mailer->send($email);
+                $this->addFlash('success', 'contact.flash.success');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', $e->getMessage());
+            }
 
             return $this->redirectToRoute('app.contact', ['_locale' => $request->getLocale()]);
         }
@@ -107,4 +110,21 @@ class HomeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+#[Route('/test-mail', name: 'app.test_mail')]
+public function testMail(MailerInterface $mailer): Response
+{
+    $email = (new Email())
+        ->from('d5f74dfdb4-12c54f+user1@inbox.mailtrap.io')
+        ->to('d5f74dfdb4-12c54f+user1@inbox.mailtrap.io') // ton email Mailtrap autorisé
+        ->subject('Test Mailtrap Symfony')
+        ->text('Ceci est un test depuis Symfony avec Mailtrap.');
+
+    try {
+        $mailer->send($email);
+        return new Response('Mail envoyé avec succès.');
+    } catch (\Throwable $e) {
+        return new Response('Erreur : ' . $e->getMessage());
+    }
+}
 }
