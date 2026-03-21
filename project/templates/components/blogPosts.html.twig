@@ -1,53 +1,58 @@
-<section id="recent-blog-posts" class="recent-blog-posts">
+<section class="py-5 blog-section">
     <div class="container">
-      <div class="section-header">
-        <h2>Blog</h2>
-        <p>Recent posts form our Blog</p>
-      </div>
 
-      <div class="row">
-
-        <div class="col-lg-4">
-          <div class="post-box">
-            <div class="post-img"><img src="{{asset('images/img/blog/blog-1.jpg')}}" class="img-fluid" alt=""></div>
-            <div class="meta">
-              <span class="post-date">Tue, December 12</span>
-              <span class="post-author"> / Julia Parker</span>
-            </div>
-            <h3 class="post-title">Eum ad dolor et. Autem aut fugiat debitis voluptatem consequuntur sit</h3>
-            <p>Illum voluptas ab enim placeat. Adipisci enim velit nulla. Vel omnis laudantium. Asperiores eum ipsa est officiis. Modi cupiditate exercitationem qui magni est...</p>
-            <a href="blog-details.html" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-          </div>
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="font-size: 40px;">{{ 'blog.title'|trans }}</h2>
+            <p class="text-muted mt-3" style="font-size: 17px;">{{ 'blog.subtitle'|trans }}</p>
         </div>
 
-        <div class="col-lg-4">
-          <div class="post-box">
-            <div class="post-img"><img src="{{asset('images/img/blog/blog-2.jpg')}}" class="img-fluid" alt=""></div>
-            <div class="meta">
-              <span class="post-date">Fri, September 05</span>
-              <span class="post-author"> / Mario Douglas</span>
+        <div class="row justify-content-center">
+            {% for article in last_articles %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    {% if article.featuredImage %}
+                        <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}"
+                             class="card-img-top"
+                             alt="{{ article.title }}"
+                             style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="{{ asset('images/img/placeholder-image.png') }}"
+                             class="card-img-top"
+                             alt="{{ article.title }}"
+                             style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-primary mb-2 align-self-start">
+                            {{ article.category.name }}
+                        </span>
+                        <h5 class="card-title fw-bold">{{ article.title }}</h5>
+                        {% if article.excerpt %}
+                            <p class="card-text text-muted small">
+                                {{ article.excerpt|slice(0, 100) ~ (article.excerpt|length > 100 ? '...' : '') }}
+                            </p>
+                        {% endif %}
+                        <div class="mt-auto">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3"></i>
+                                {{ article.publishedAt|date('d/m/Y') }}
+                            </small>
+                            <a href="{{ path('blog_article', {slug: article.slug, _locale: app.request.locale}) }}"
+                               class="btn btn-outline-primary btn-sm w-100 mt-2">
+                                {{ 'blog.read_more'|trans }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="post-title">Et repellendus molestiae qui est sed omnis voluptates magnam</h3>
-            <p>Voluptatem nesciunt omnis libero autem tempora enim ut ipsam id. Odit quia ab eum assumenda. Quisquam omnis aliquid necessitatibus tempora consectetur doloribus...</p>
-            <a href="blog-details.html" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-          </div>
+            {% endfor %}
         </div>
 
-        <div class="col-lg-4">
-          <div class="post-box">
-            <div class="post-img"><img src="{{asset('images/img/blog/blog-3.jpg')}}" class="img-fluid" alt=""></div>
-            <div class="meta">
-              <span class="post-date">Tue, July 27</span>
-              <span class="post-author"> / Lisa Hunter</span>
-            </div>
-            <h3 class="post-title">Quia assumenda est et veritatis aut quae</h3>
-            <p>Quia nam eaque omnis explicabo similique eum quaerat similique laboriosam. Quis omnis repellat sed quae consectetur magnam veritatis dicta nihil...</p>
-            <a href="blog-details.html" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-          </div>
+        <div class="text-center mt-4">
+            <a href="{{ path('blog_index', {_locale: app.request.locale}) }}"
+               class="btn btn-primary px-5 py-2">
+                {{ 'blog.see_all'|trans }}
+            </a>
         </div>
-
-      </div>
 
     </div>
-
-  </section><!-- End Recent Blog Posts Section -->
+</section>

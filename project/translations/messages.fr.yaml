@@ -160,3 +160,9 @@ reservations:
     rent_paid: "Loyer payé"
     caution_amount: "Caution"
     total: "Total payé"
+
+blog:
+    title: "Notre Blog"
+    subtitle: "Découvrez nos derniers articles et conseils."
+    read_more: "Lire l'article"
+    see_all: "Voir tous les articles"

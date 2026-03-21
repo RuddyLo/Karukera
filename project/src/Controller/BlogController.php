@@ -19,7 +19,7 @@ class BlogController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'blog_index')]
+    #[Route('/{_locale}/blog', name: 'blog_index', requirements: ['_locale' => 'fr|en'])]
     public function index(): Response
     {
         $articles = $this->articleRepository->findPublishedArticles();
@@ -31,7 +31,7 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/article/{slug}', name: 'blog_article')]
+    #[Route('/{_locale}/blog/article/{slug}', name: 'blog_article', requirements: ['_locale' => 'fr|en'])]
     public function article(string $slug): Response
     {
         $article = $this->articleRepository->findPublishedBySlug($slug);
@@ -45,7 +45,7 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/categorie/{slug}', name: 'blog_category')]
+    #[Route('/{_locale}/blog/categorie/{slug}', name: 'blog_category', requirements: ['_locale' => 'fr|en'])]
     public function category(Category $category): Response
     {
         $articles = $this->articleRepository->findPublishedByCategory($category);

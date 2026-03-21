@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\ContactFormType;
 use App\Repository\ApartmentRepository;
+use App\Repository\Blog\ArticleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -17,6 +18,7 @@ class HomeController extends AbstractController
 {
     public function __construct(
         private ApartmentRepository $apartmentRepository,
+        private ArticleRepository $articleRepository,
     ) {}
 
     #[Route('/', name: 'root_redirect')]
@@ -40,6 +42,8 @@ class HomeController extends AbstractController
             2
         );
 
+        $lastArticles = $this->articleRepository->findPublishedArticles(3);
+
         return $this->render('home/index.html.twig', [
             'apartments_on_top' => $apartments_on_top,
             'apartments' => $apartments,
@@ -47,6 +51,7 @@ class HomeController extends AbstractController
             'display_more' => $display_more,
             'controller_name' => 'HomeController',
             'form' => $form->createView(),
+             'last_articles' => $lastArticles,
         ]);
     }
     #[Route('/{_locale}/search', name: 'app.search_apartment', requirements: ['_locale' => 'fr|en'])]

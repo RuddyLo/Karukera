@@ -28,13 +28,12 @@
 
   <!-- ======= Testimonials Section ======= -->
   {% include "components/testimonials.html.twig" %}
+
   <!-- ======= Recent Blog Posts Section ======= -->
+  {% if last_articles is defined and last_articles|length > 0 %}
+      {% include "components/blogPosts.html.twig" %}
+  {% endif %}
 
-
-  {# {% include "components/blogPosts.html.twig" %}
-
-  <!-- ======= Contact Section ======= -->
-  {% include "components/contact.html.twig" %} #}
 
   <a
     href="#"
