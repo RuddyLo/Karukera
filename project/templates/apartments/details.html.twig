@@ -43,7 +43,7 @@
         {% if apartment.images|length > 4 %}
             <div class="text-end mt-2">
                 <button class="btn btn-outline-dark" id="show-all-images-btn">
-                    🖼 Afficher toutes les images ({{ apartment.images|length }})
+                    Afficher toutes les images ({{ apartment.images|length }})
                 </button>
             </div>
         {% endif %}
@@ -220,6 +220,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     calendar.render();
+});
+</script>
+<script>
+document.getElementById('show-all-images-btn').addEventListener('click', function () {
+    const gallery = document.getElementById('all-images-gallery');
+    gallery.style.setProperty('display', 'flex', 'important');
+    gallery.style.flexWrap = 'wrap';
+    this.style.display = 'none';
 });
 </script>
 {% endblock %}
