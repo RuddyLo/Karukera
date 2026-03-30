@@ -14,7 +14,7 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app.admin');
+            return $this->redirectToRoute('app.home', ['_locale' => 'fr']);
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -26,7 +26,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app.logout')]
+    #[Route(path: '/{_locale}/logout', name: 'app.logout', requirements: ['_locale' => 'fr|en'])]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');

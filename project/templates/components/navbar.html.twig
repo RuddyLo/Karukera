@@ -51,7 +51,7 @@
                 </li>
             {% else %}
                 <li>
-                    <a class="nav-link text-danger scrollto" href="{{ path('app.logout') }}">
+                    <a class="nav-link text-danger scrollto" href="{{ path('app.logout', {'_locale': app.request.locale}) }}">
                         {{ 'nav.logout'|trans }}
                     </a>
                 </li>
