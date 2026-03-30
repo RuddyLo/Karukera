@@ -51,9 +51,10 @@
 </div>
 
 {# Galerie complète cachée, affichée au clic du bouton #}
+{# Galerie complète cachée - uniquement les images > 4 #}
 {% if apartment.images|length > 4 %}
 <div id="all-images-gallery" class="row p-4 g-2" style="display:none!important;">
-    {% for image in apartment.images %}
+    {% for image in apartment.images|slice(4) %}
         <div class="col-md-3 col-sm-6" style="height:200px;">
             <img src="{{ asset(image.url) }}" 
                  class="img-fluid rounded w-100 h-100 clickable-image"
@@ -63,6 +64,20 @@
     {% endfor %}
 </div>
 {% endif %}
+
+{# Modale preview image #}
+<div class="modal fade" id="image-preview-modal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-2">
+                <img id="preview-modal-img" src="" class="img-fluid rounded" style="max-height:80vh; object-fit:contain;">
+            </div>
+        </div>
+    </div>
+</div>
         </div>
 
         <div class="p-4">{{ apartment.description }}</div>
@@ -223,11 +238,27 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script>
-document.getElementById('show-all-images-btn').addEventListener('click', function () {
-    const gallery = document.getElementById('all-images-gallery');
-    gallery.style.setProperty('display', 'flex', 'important');
-    gallery.style.flexWrap = 'wrap';
-    this.style.display = 'none';
+// Afficher toutes les images
+const showBtn = document.getElementById('show-all-images-btn');
+if (showBtn) {
+    showBtn.addEventListener('click', function () {
+        const gallery = document.getElementById('all-images-gallery');
+        gallery.style.setProperty('display', 'flex', 'important');
+        gallery.style.flexWrap = 'wrap';
+        this.style.display = 'none';
+    });
+}
+
+// Preview au clic
+const previewModal = new bootstrap.Modal(document.getElementById('image-preview-modal'));
+const previewImg = document.getElementById('preview-modal-img');
+
+document.addEventListener('click', function (e) {
+    const img = e.target.closest('.clickable-image');
+    if (img) {
+        previewImg.src = img.dataset.src;
+        previewModal.show();
+    }
 });
 </script>
 {% endblock %}
