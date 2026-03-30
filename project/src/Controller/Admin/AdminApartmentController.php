@@ -50,65 +50,68 @@ class AdminApartmentController extends AbstractController
     }
 
     #[Route('/new', name: 'admin.apartment.new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ApartmentFormType::class);
-        $form->handleRequest($request);
+public function new(Request $request, EntityManagerInterface $entityManager): Response
+{
+    $apartment = new Apartment();
+    $form = $this->createForm(ApartmentFormType::class, $apartment);
+    $form->handleRequest($request);
 
-        $pricePeriod = new PricePeriod();
+    if ($form->isSubmitted() && $form->isValid()) {
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            if ($form->get('imageUrl')->getData()) {
-
-                $apartment = $form->getData();
-
-                if (!file_exists($this->apartmentImageDirectory)) {
-                    mkdir($this->apartmentImageDirectory, 0777, true);
-                }
-                $image = $form->all()['imageUrl']->getData();
-                $fileName = uniqid() . '.' . $this->slugify->slugify(
-                    $image->getClientOriginalName()
-                );
-
-                $image->move($this->apartmentImageDirectory, $fileName);
-                $apartment->setImageUrl($this->imageUrlDirectory . $fileName);
-
-                $images = $form->get('images')->getData();
-                foreach ($images as $imageFile) {
-                    $fileName = uniqid() . '.' . $this->slugify->slugify(
-                        $imageFile->getClientOriginalName()
-                    );
-
-                    try {
-                        $imageFile->move($this->apartmentImageDirectory, $fileName);
-                    } catch (FileException $e) {
-                    }
-
-                    $image = new Image();
-                    $image->setUrl($this->imageUrlDirectory . $fileName);
-                    $apartment->addImage($image);
-                    $entityManager->persist($image);
-                }
-
-                $pricePeriod = $form->get('pricePeriod')->getData();
-
-                $locale = $form->get('locale')->getData();
-                $apartment->setTranslatableLocale($locale);
-                $entityManager->persist($apartment);
-                $pricePeriod->setApartment($apartment);
-                $entityManager->persist($pricePeriod);
-                $entityManager->flush();
+        // Image principale
+        $imageFile = $form->get('imageUrl')->getData();
+        if ($imageFile) {
+            if (!file_exists($this->apartmentImageDirectory)) {
+                mkdir($this->apartmentImageDirectory, 0777, true);
             }
 
-            return $this->redirectToRoute('admin.apartment', []);
+            $fileName = uniqid() . '.' . $this->slugify->slugify(
+                $imageFile->getClientOriginalName()
+            );
+            $imageFile->move($this->apartmentImageDirectory, $fileName);
+            $apartment->setImageUrl($this->imageUrlDirectory . $fileName);
+        } else {
+            $apartment->setImageUrl($this->imageUrlDirectory . 'default.jpg');
         }
 
-        return $this->render('admin/apartment/new.html.twig', [
-            'form' => $form,
-            'apartmentId' => 0
-        ]);
+        // Images supplémentaires
+        foreach ($form->get('images')->getData() as $imageFile) {
+            $fileName = uniqid() . '.' . $this->slugify->slugify(
+                $imageFile->getClientOriginalName()
+            );
+            try {
+                $imageFile->move($this->apartmentImageDirectory, $fileName);
+                $image = new Image();
+                $image->setUrl($this->imageUrlDirectory . $fileName);
+                $apartment->addImage($image);
+                $entityManager->persist($image);
+            } catch (FileException $e) {
+                // log si besoin
+            }
+        }
+
+        // Locale
+        $locale = $form->get('locale')->getData();
+        $apartment->setTranslatableLocale($locale);
+        $entityManager->persist($apartment);
+
+        // PricePeriod (optionnel)
+        $pricePeriod = $form->get('pricePeriod')->getData();
+        if ($pricePeriod instanceof PricePeriod) {
+            $pricePeriod->setApartment($apartment);
+            $entityManager->persist($pricePeriod);
+        }
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute('admin.apartment');
     }
+
+    return $this->render('admin/apartment/new.html.twig', [
+        'form' => $form,
+        'apartmentId' => 0
+    ]);
+}
 
     #[Route('/{id}', name: 'admin.apartment.show', methods: ['GET'])]
     public function show(Apartment $apartment): Response
