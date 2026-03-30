@@ -238,27 +238,31 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script>
-// Afficher toutes les images
-const showBtn = document.getElementById('show-all-images-btn');
-if (showBtn) {
-    showBtn.addEventListener('click', function () {
-        const gallery = document.getElementById('all-images-gallery');
-        gallery.style.setProperty('display', 'flex', 'important');
-        gallery.style.flexWrap = 'wrap';
-        this.style.display = 'none';
-    });
-}
+document.addEventListener('DOMContentLoaded', function () {
 
-// Preview au clic
-const previewModal = new bootstrap.Modal(document.getElementById('image-preview-modal'));
-const previewImg = document.getElementById('preview-modal-img');
-
-document.addEventListener('click', function (e) {
-    const img = e.target.closest('.clickable-image');
-    if (img) {
-        previewImg.src = img.dataset.src;
-        previewModal.show();
+    // Afficher toutes les images
+    const showBtn = document.getElementById('show-all-images-btn');
+    if (showBtn) {
+        showBtn.addEventListener('click', function () {
+            const gallery = document.getElementById('all-images-gallery');
+            gallery.style.setProperty('display', 'flex', 'important');
+            gallery.style.flexWrap = 'wrap';
+            this.style.display = 'none';
+        });
     }
+
+    // Preview au clic
+    const previewModal = new bootstrap.Modal(document.getElementById('image-preview-modal'));
+    const previewImg = document.getElementById('preview-modal-img');
+
+    document.addEventListener('click', function (e) {
+        const img = e.target.closest('.clickable-image');
+        if (img) {
+            previewImg.src = img.dataset.src;
+            previewModal.show();
+        }
+    });
+
 });
 </script>
 {% endblock %}
