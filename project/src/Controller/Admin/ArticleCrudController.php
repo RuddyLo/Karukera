@@ -1,5 +1,5 @@
 <?php
-// src/Controller/Admin/ArticleCrudController.php
+
 namespace App\Controller\Admin;
 
 use App\Entity\Blog\Article;
@@ -15,6 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 
 class ArticleCrudController extends AbstractCrudController
 {
@@ -38,22 +40,33 @@ class ArticleCrudController extends AbstractCrudController
         yield SlugField::new('slug')->setTargetFieldName('title');
         yield TextareaField::new('excerpt', 'Extrait')
             ->setHelp('Résumé court de l\'article (optionnel)');
-        yield TextareaField::new('content', 'Contenu')
+
+        // Champ CKEditor pour le contenu HTML
+        yield \EasyCorp\Bundle\EasyAdminBundle\Field\Field::new('content', 'Contenu')
+            ->setFormType(CKEditorType::class)
+            ->setFormTypeOptions([
+                'config' => [
+                    'toolbar' => 'full',
+                    'extraAllowedContent' => 'iframe[*]',
+                    'allowedContent' => true,
+                ],
+            ])
             ->hideOnIndex();
+
         yield AssociationField::new('category', 'Catégorie');
         yield ImageField::new('featuredImage', 'Image mise en avant')
             ->setBasePath('uploads/blog/')
             ->setUploadDir('public/uploads/blog/')
             ->setUploadedFileNamePattern('[randomhash].[extension]')
             ->hideOnIndex();
-        
+
         yield TextField::new('metaTitle', 'Meta Titre (SEO)')
             ->hideOnIndex()
             ->setHelp('Titre pour les moteurs de recherche (60 caractères max)');
         yield TextareaField::new('metaDescription', 'Meta Description (SEO)')
             ->hideOnIndex()
             ->setHelp('Description pour les moteurs de recherche (160 caractères max)');
-        
+
         yield BooleanField::new('published', 'Publié');
         yield DateTimeField::new('publishedAt', 'Date de publication')
             ->hideOnForm();

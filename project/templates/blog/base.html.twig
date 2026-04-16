@@ -1,24 +1,34 @@
 {# templates/blog/base.html.twig #}
-{% extends 'base.html.twig' %}
 
-{% block title %}
-    {% if block('page_title') is defined %}
-        {{ block('page_title') }} - Blog
-    {% else %}
-        Blog
-    {% endif %} - {{ parent() }}
+
+
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
-{% block body %}
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ path('app.home') }}">Accueil</a></li>
-                <li class="breadcrumb-item"><a href="{{ path('blog_index') }}">Blog</a></li>
-                {% block breadcrumb %}{% endblock %}
-            </ol>
-        </nav>
 
+{% block content %}
+    {# Hero breadcrumb #}
+    <div class="blog-breadcrumb-bar py-3 mb-0" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-bottom: 3px solid var(--color-primary, #e8a045);">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app.home', {'_locale': app.request.locale}) }}" class="text-warning text-decoration-none">
+                            <i class="bi bi-house-fill me-1"></i>Accueil
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('blog_index') }}" class="text-warning text-decoration-none">Blog</a>
+                    </li>
+                    {% block breadcrumb %}{% endblock %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container py-5">
         {% block blog_content %}{% endblock %}
     </div>
 {% endblock %}

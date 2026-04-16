@@ -16,8 +16,7 @@ class BlogController extends AbstractController
     public function __construct(
         private ArticleRepository $articleRepository,
         private CategoryRepository $categoryRepository
-    ) {
-    }
+    ) {}
 
     #[Route('/{_locale}/blog', name: 'blog_index', requirements: ['_locale' => 'fr|en'])]
     public function index(): Response
@@ -40,7 +39,7 @@ class BlogController extends AbstractController
             throw $this->createNotFoundException('Article non trouvé');
         }
 
-        return $this->render('blog/article.html.twig', [
+        return $this->render('blog/articles.html.twig', [
             'article' => $article,
         ]);
     }

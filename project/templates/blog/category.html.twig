@@ -4,40 +4,135 @@
 {% block page_title %}{{ category.name }}{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item active">{{ category.name }}</li>
+    <li class="breadcrumb-item active text-light">{{ category.name }}</li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .blog-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.13);
+        }
+        .blog-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        .blog-card .card-img-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bbb;
+            font-size: 2.5rem;
+        }
+        .blog-card .card-title a {
+            color: #1a1a2e;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .blog-card .card-title a:hover { color: #e8a045; }
+        .btn-read-more {
+            background: transparent;
+            border: 2px solid #e8a045;
+            color: #e8a045;
+            border-radius: 20px;
+            padding: 5px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-read-more:hover {
+            background: #e8a045;
+            color: white;
+        }
+        .category-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            border-left: 4px solid #e8a045;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+    </style>
 {% endblock %}
 
 {% block blog_content %}
-    <h1>{{ category.name }}</h1>
-    {% if category.description %}
-        <p class="lead">{{ category.description }}</p>
-    {% endif %}
 
-    <div class="row">
-        {% for article in articles %}
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    {% if article.featuredImage %}
-                        <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" 
-                             class="card-img-top" alt="{{ article.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{{ path('blog_article', {slug: article.slug}) }}">
-                                {{ article.title }}
-                            </a>
-                        </h5>
-                        {% if article.excerpt %}
-                            <p class="card-text">{{ article.excerpt }}</p>
+    {# Header catégorie #}
+    <div class="category-header">
+        <div class="d-flex align-items-center gap-3">
+            <div style="background: #e8a045; border-radius: 50%; width: 50px; height: 50px; display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-tag-fill text-white fs-5"></i>
+            </div>
+            <div>
+                <h1 class="text-white fw-bold mb-0">{{ category.name }}</h1>
+                {% if category.description %}
+                    <p class="text-secondary mb-0 mt-1">{{ category.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Articles #}
+    {% if articles is empty %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-journal-x" style="font-size: 3rem; color: #ddd;"></i>
+            <p class="mt-3">Aucun article dans cette catégorie.</p>
+            <a href="{{ path('blog_index') }}" class="btn btn-outline-secondary rounded-pill mt-2">
+                <i class="bi bi-arrow-left me-1"></i> Voir tous les articles
+            </a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for article in articles %}
+                <div class="col-sm-6 col-lg-4">
+                    <div class="blog-card card h-100">
+                        {% if article.featuredImage %}
+                            <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}"
+                                 class="card-img-top" alt="{{ article.title }}">
+                        {% else %}
+                            <div class="card-img-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
                         {% endif %}
-                        <small class="text-muted">
-                            {{ article.publishedAt|date('d/m/Y') }}
-                        </small>
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h5 class="card-title mb-0">
+                                <a href="{{ path('blog_article', {slug: article.slug}) }}">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            {% if article.excerpt %}
+                                <p class="card-text text-muted small mb-0">
+                                    {{ article.excerpt|slice(0, 100) }}{% if article.excerpt|length > 100 %}…{% endif %}
+                                </p>
+                            {% endif %}
+                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ article.publishedAt|date('d/m/Y') }}
+                                </small>
+                                <a href="{{ path('blog_article', {slug: article.slug}) }}" class="btn-read-more btn">
+                                    Lire <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <p>Aucun article dans cette catégorie.</p>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{{ path('blog_index') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i> Tous les articles
+            </a>
+        </div>
+    {% endif %}
+
 {% endblock %}

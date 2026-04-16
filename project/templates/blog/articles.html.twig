@@ -5,59 +5,191 @@
 
 {% block breadcrumb %}
     <li class="breadcrumb-item">
-        <a href="{{ path('blog_category', {slug: article.category.slug}) }}">
+        <a href="{{ path('blog_category', {slug: article.category.slug}) }}" class="text-warning text-decoration-none">
             {{ article.category.name }}
         </a>
     </li>
-    <li class="breadcrumb-item active">{{ article.title }}</li>
+    <li class="breadcrumb-item active text-light">{{ article.title }}</li>
 {% endblock %}
 
-{% block head %}
+{% block stylesheets %}
     {{ parent() }}
-    {% if article.metaDescription %}
-        <meta name="description" content="{{ article.metaDescription }}">
-    {% endif %}
-    <meta property="og:title" content="{{ article.metaTitle ?? article.title }}">
-    <meta property="og:type" content="article">
-    {% if article.featuredImage %}
-        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog/' ~ article.featuredImage)) }}">
-    {% endif %}
+    <style>
+        .article-hero {
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+        .article-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .article-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%);
+            border-radius: 16px;
+        }
+        .article-hero-title {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            color: white;
+        }
+        .article-category-badge {
+            background: #e8a045;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+        }
+        .article-body {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #2d2d2d;
+        }
+        .article-body h2, .article-body h3 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .article-body p {
+            margin-bottom: 1.25rem;
+        }
+        .article-body img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        .article-body iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 10px;
+            border: none;
+            margin: 1.5rem 0;
+        }
+        .article-body blockquote {
+            border-left: 4px solid #e8a045;
+            padding: 1rem 1.5rem;
+            background: #fff8f0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #555;
+            margin: 1.5rem 0;
+        }
+        .article-meta-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .article-divider {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #e8a045, transparent);
+            margin: 3rem 0;
+        }
+        .btn-blog-back {
+            background: transparent;
+            border: 2px solid #1a1a2e;
+            color: #1a1a2e;
+            border-radius: 25px;
+            padding: 8px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-blog-back:hover {
+            background: #1a1a2e;
+            color: white;
+        }
+        .btn-blog-category {
+            background: #e8a045;
+            border: 2px solid #e8a045;
+            color: white;
+            border-radius: 25px;
+            padding: 8px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-blog-category:hover {
+            background: #cf8c32;
+            border-color: #cf8c32;
+            color: white;
+        }
+    </style>
 {% endblock %}
 
 {% block blog_content %}
-    <article>
-        <header class="mb-4">
-            <h1>{{ article.title }}</h1>
-            <div class="text-muted mb-3">
-                Publié le {{ article.publishedAt|date('d/m/Y à H:i') }}
-                dans <a href="{{ path('blog_category', {slug: article.category.slug}) }}">
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+
+        {# Hero image ou header simple #}
+        {% if article.featuredImage %}
+            <div class="article-hero shadow-sm">
+                <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" alt="{{ article.title }}">
+                <div class="article-hero-overlay"></div>
+                <div class="article-hero-title">
+                    <a href="{{ path('blog_category', {slug: article.category.slug}) }}" class="article-category-badge mb-2 d-inline-block">
+                        {{ article.category.name }}
+                    </a>
+                    <h1 class="h2 fw-bold mb-0 mt-2">{{ article.title }}</h1>
+                </div>
+            </div>
+        {% else %}
+            <div class="mb-4">
+                <a href="{{ path('blog_category', {slug: article.category.slug}) }}" class="article-category-badge mb-3 d-inline-block">
                     {{ article.category.name }}
                 </a>
+                <h1 class="fw-bold mt-2" style="color: #1a1a2e;">{{ article.title }}</h1>
             </div>
-            {% if article.featuredImage %}
-                <img src="{{ asset('uploads/blog/' ~ article.featuredImage) }}" 
-                     class="img-fluid mb-4" alt="{{ article.title }}">
-            {% endif %}
-        </header>
-        
-        <div class="content">
-            {{ article.content|nl2br }}
-        </div>
-    </article>
+        {% endif %}
 
-    <hr class="my-5">
-    
-    <div class="row">
-        <div class="col-md-6">
-            <a href="{{ path('blog_index') }}" class="btn btn-outline-primary">
-                ← Retour au blog
+        {# Meta infos #}
+        <div class="article-meta-card mb-4 d-flex align-items-center gap-3 flex-wrap">
+            <span><i class="bi bi-calendar3 me-1"></i>{{ article.publishedAt|date('d/m/Y') }}</span>
+            <span><i class="bi bi-clock me-1"></i>{{ article.publishedAt|date('H:i') }}</span>
+            <span><i class="bi bi-folder me-1"></i>
+                <a href="{{ path('blog_category', {slug: article.category.slug}) }}" class="text-decoration-none" style="color: #e8a045;">
+                    {{ article.category.name }}
+                </a>
+            </span>
+        </div>
+
+        {# Extrait #}
+        {% if article.excerpt %}
+            <div class="lead text-muted mb-4 fst-italic border-start border-warning border-3 ps-3">
+                {{ article.excerpt }}
+            </div>
+        {% endif %}
+
+        {# Contenu principal #}
+        <div class="article-body">
+            {{ article.content|raw }}
+        </div>
+
+        <hr class="article-divider">
+
+        {# Navigation bas de page #}
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <a href="{{ path('blog_index') }}" class="btn-blog-back btn">
+                <i class="bi bi-arrow-left me-1"></i> Retour au blog
+            </a>
+            <a href="{{ path('blog_category', {slug: article.category.slug}) }}" class="btn-blog-category btn">
+                Plus dans {{ article.category.name }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
-        <div class="col-md-6 text-end">
-            <a href="{{ path('blog_category', {slug: article.category.slug}) }}" 
-               class="btn btn-outline-secondary">
-                Plus d'articles dans {{ article.category.name }}
-            </a>
-        </div>
+
     </div>
+</div>
 {% endblock %}
