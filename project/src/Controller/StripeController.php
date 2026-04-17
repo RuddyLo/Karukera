@@ -38,7 +38,7 @@ class StripeController extends AbstractController
 
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
-        $days      = max(1, $startDate->diff($endDate)->days);
+        $days      = max(1, $startDate->diff($endDate)->days + 1);
         $price = $data['price'] ?? $apartment->getPrice();
 
         $rentAmount  = $price * $days;
