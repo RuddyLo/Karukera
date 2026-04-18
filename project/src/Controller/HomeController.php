@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\News;
 use App\Form\ContactFormType;
 use App\Repository\ApartmentRepository;
 use App\Repository\Blog\ArticleRepository;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\SearchFormType;
+use App\Repository\NewsRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -19,6 +21,7 @@ class HomeController extends AbstractController
     public function __construct(
         private ApartmentRepository $apartmentRepository,
         private ArticleRepository $articleRepository,
+        private NewsRepository $newsRepository,
     ) {}
 
     #[Route('/', name: 'root_redirect')]
@@ -43,9 +46,11 @@ class HomeController extends AbstractController
         );
 
         $lastArticles = $this->articleRepository->findPublishedArticles(3);
+        $news = $this->newsRepository->findOneBy(['active' => true]);
 
         return $this->render('home/index.html.twig', [
             'apartments_on_top' => $apartments_on_top,
+            'news' => $news,
             'apartments' => $apartments,
             'last_apartments' => $last_apartments,
             'display_more' => $display_more,

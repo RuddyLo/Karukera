@@ -1,0 +1,58 @@
+{% extends "admin/admin.base.html.twig" %}
+
+{% block content %}
+<div class="container p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Nouveautés</h2>
+        <a href="{{ path('admin.news.new') }}" class="btn btn-primary">+ Ajouter une nouveauté</a>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Description</th>
+                <th>Images</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for news in newsList %}
+            <tr>
+                <td>{{ news.description|slice(0, 80) }}...</td>
+                <td>{{ news.newsImages|length }}</td>
+                <td>
+                    {% if news.active %}
+                        <span class="badge bg-success">Oui</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Non</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('admin.news.edit', {id: news.id, locale: 'fr'}) }}" 
+                        class="btn btn-sm btn-outline-secondary" title="Éditer en français">🇫🇷</a>
+                        <a href="{{ path('admin.news.edit', {id: news.id, locale: 'en'}) }}" 
+                        class="btn btn-sm btn-outline-secondary" title="Edit in English">🇺🇸</a>
+                    <form method="post" action="{{ path('admin.news.delete', {id: news.id}) }}" 
+                          style="display:inline"
+                          onsubmit="return confirm('Supprimer cette nouveauté ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ news.id) }}">
+                        <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">Aucune nouveauté</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

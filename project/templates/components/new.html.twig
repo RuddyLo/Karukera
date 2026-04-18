@@ -1,23 +1,24 @@
 <section class="py-5 nouveautes-section">
     <div class="container">
+        
 
+        {% if news %}
         <div class="text-center mb-4">
             <h2 class="fw-bold" style="font-size: 40px;">{{ 'nouveautes.title'|trans }}</h2>
             <p class="text-muted mt-3" style="font-size: 17px;">
-                {{ 'nouveautes.subtitle'|trans }}
+                {{ news.description|nl2br }}
             </p>
         </div>
 
         <div class="row justify-content-center gy-4 mt-4">
-            {% for apartment in last_apartments %}
+            {% for image in news.newsImages %}
             <div class="col-lg-6 d-flex justify-content-center">
-                {% if apartment.images|length > 0 %}
-                    <img src="{{ asset(random(apartment.images.toArray()).url) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
-                {% else %}
-                    <img src="{{ asset(apartment.imageUrl) }}" alt="{{ apartment.name }}" class="img-fluid shadow-sm">
-                {% endif %}
+                <img src="{{ asset(image.url) }}" class="img-fluid shadow-sm rounded p-2" style="max-height: 400px; object-fit: cover;">
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <p class="text-center text-muted">Aucune nouveauté disponible.</p>
+        {% endif %}
     </div>
 </section>

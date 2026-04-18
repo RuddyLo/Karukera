@@ -32,3 +32,9 @@ services:
             
     Gedmo\Translatable\TranslatableListener:
         alias: stof_doctrine_extensions.listener.translatable
+    
+    App\Controller\Admin\AdminNewsController:
+        arguments:
+            $newsImageDirectory: '%kernel.project_dir%/public/uploads/news'
+            $newsImageUrlDirectory: 'uploads/news/'
+        tags: ['controller.service_arguments']
