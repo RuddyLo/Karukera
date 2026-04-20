@@ -14,6 +14,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Mime\Address;
 
 class ResetPasswordController extends AbstractController
 {
@@ -42,7 +43,7 @@ class ResetPasswordController extends AbstractController
                 ], UrlGeneratorInterface::ABSOLUTE_URL);
 
                 $mail = (new Email())
-                    ->from('ratianarivoruddy@gmail.com')
+                    ->from(new Address($_ENV['MAILER_FROM_ADDRESS'], 'Oasis Karurio'))
                     ->to($user->getEmail())
                     ->subject('Réinitialisation de votre mot de passe')
                     ->html(

@@ -15,6 +15,7 @@ use App\Form\SearchFormType;
 use App\Repository\NewsRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 
 class HomeController extends AbstractController
 {
@@ -97,8 +98,8 @@ public function search(Request $request, ApartmentRepository $repo): Response
             $data = $form->getData();
 
             $email = (new Email())
-                ->from('ratianarivoruddy@gmail.com')
-                ->to('ratianarivoruddy@gmail.com')
+                ->from(new Address($_ENV['MAILER_FROM_ADDRESS'], 'Oasis Karurio'))
+                ->to($_ENV['ADMIN_EMAIL'])
                 ->replyTo($data['email'])
                 ->subject('[Contact] ' . $data['subject'])
                 ->html(

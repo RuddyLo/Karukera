@@ -11,9 +11,9 @@ services:
     networks:
       - dev
     environment:
-      MAILER_DSN: smtp://9d58de415e8c9e:efc1dc4d7b5bb6@sandbox.smtp.mailtrap.io:2525?encryption=tls&auth_mode=login
-      ADMIN_EMAIL: "ratianarivoruddy@gmail.com"
-      MAILER_FROM_ADDRESS: "ratianarivoruddy@gmail.com"
+      MAILER_DSN: 'smtp://contact%40oasiskarurio.com:oasiskarurio2026%21%24@ssl0.ovh.net:465?encryption=ssl&auth_mode=login'
+      ADMIN_EMAIL: "contact@oasiskarurio.com"
+      MAILER_FROM_ADDRESS: "contact@oasiskarurio.com"
 
   db:
     image: mysql
