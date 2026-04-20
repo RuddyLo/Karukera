@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'users')]
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'users', cascade: ['remove'])]
     private Collection $reservations;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -46,6 +46,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setResetToken(?string $resetToken): static { $this->resetToken = $resetToken; return $this; }
     public function getResetTokenExpiresAt(): ?\DateTimeImmutable { return $this->resetTokenExpiresAt; }
     public function setResetTokenExpiresAt(?\DateTimeImmutable $resetTokenExpiresAt): static { $this->resetTokenExpiresAt = $resetTokenExpiresAt; return $this; }
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isVerified = false;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $verificationToken = null;
+
+    public function isVerified(): bool { return $this->isVerified; }
+    public function setIsVerified(bool $isVerified): static { $this->isVerified = $isVerified; return $this; }
+    public function getVerificationToken(): ?string { return $this->verificationToken; }
+    public function setVerificationToken(?string $verificationToken): static { $this->verificationToken = $verificationToken; return $this; }
 
     public function __construct()
     {
