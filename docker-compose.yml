@@ -11,7 +11,7 @@ services:
     networks:
       - dev
     environment:
-      MAILER_DSN: 'smtp://contact%40oasiskarurio.com:oasiskarurio2026%21%24@ssl0.ovh.net:465?encryption=ssl&auth_mode=login'
+      MAILER_DSN: 'smtp://contact%40oasiskarurio.com:oasiskarurio@ssl0.ovh.net:465'
       ADMIN_EMAIL: "contact@oasiskarurio.com"
       MAILER_FROM_ADDRESS: "contact@oasiskarurio.com"
 
