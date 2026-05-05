@@ -939,7 +939,81 @@ section {
   background: #005fcc;
 }
 
-/* Tooltip */
+/* Date input wrapper with calendar icon */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-input-wrapper .calendar-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.date-input-wrapper .calendar-icon:hover {
+  color: var(--color-secondary);
+}
+
+#startDateInput::placeholder,
+#endDateInput::placeholder {
+  color: transparent;
+}
+
+/* Flatpickr calendar styling */
+.flatpickr-calendar {
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+.flatpickr-day:hover {
+  background-color: var(--color-primary-light) !important;
+}
+
+.flatpickr-day.inRange {
+  background-color: rgba(0, 123, 255, 0.1) !important;
+  color: var(--color-primary) !important;
+}
+
+.flatpickr-months {
+  padding: 0 !important;
+}
+
+.flatpickr-month {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+}
+
+.flatpickr-month .flatpickr-prev-month,
+.flatpickr-month .flatpickr-next-month {
+  color: white !important;
+}
+
+.flatpickr-weekdays {
+  background-color: #f8f9fa !important;
+  font-weight: 600;
+  color: var(--color-primary) !important;
+}
+
+.flatpickr-calendar.open {
+  z-index: 9999 !important;
+}
+
+/* Calendar tooltip styling (kept for compatibility) */
 .calendar-tooltip {
   position: absolute;
   top: 60px;

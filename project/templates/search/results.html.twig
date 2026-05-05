@@ -11,65 +11,6 @@
         <div class="col-lg-7" id="left-scroll">
             <div class="results-container">
 
-                <!-- SEARCH FORM -->
-                <form class="hero-search gap-y-3 mb-3" method="GET" action="{{ path('app.search_apartment', {_locale: app.request.locale}) }}">
-
-                    <!-- Appartement -->
-                    <div class="form-floating">
-                        <select class="form-select custom-select-height" id="apartmentSelect" name="apartmentUI">
-                            <option value="" disabled selected hidden>{{ 'hero.apartment.placeholder'|trans }}</option>
-                            {% for apartment in apartments %}
-                                <option value="{{ apartment.name }}" {{ filters.name == apartment.name ? 'selected' : '' }}>
-                                    {{ apartment.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <label for="apartmentSelect">{{ 'hero.apartment.label'|trans }}</label>
-                    </div>
-
-                    <!-- Date Range -->
-                    <div class="field date-range">
-                        <div class="form-floating">
-                            <input type="text" class="form-control border-0" id="startDateInput"
-                                   value="{{ filters.startDate ?? '' }}" placeholder="{{ 'hero.date.arrival'|trans }}" readonly>
-                            <label for="startDateInput" style="color: var(--color-secondary-light)">{{ 'hero.date.arrival'|trans }}</label>
-                        </div>
-
-                        <span class="separator"></span>
-
-                        <div class="form-floating mb-0 date-trigger" data-type="end">
-                            <input type="text" class="form-control border-0" id="endDateInput"
-                                   value="{{ filters.endDate ?? '' }}" placeholder="{{ 'hero.date.departure'|trans }}" readonly>
-                            <label for="endDateInput" style="color: var(--color-secondary-light)">{{ 'hero.date.departure'|trans }}</label>
-                        </div>
-
-                        <div id="calendar-tooltip" class="calendar-tooltip hidden">
-                            <div id="calendar"></div>
-                        </div>
-                    </div>
-
-                    <!-- Guests -->
-                    <div class="form-floating">
-                        <select class="form-select custom-select-height" id="guestsInput">
-                            <option value="" disabled selected hidden>{{ 'hero.guests.placeholder'|trans }}</option>
-                            {% for i in 1..10 %}
-                                <option value="{{ i }}">{{ i }} {{ 'hero.guests.person'|trans }}{{ i > 1 ? ('hero.guests.plural'|trans) : '' }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="guestsInput">{{ 'hero.guests.label'|trans }}</label>
-                    </div>
-
-                    <button type="submit" class="btn-getstarted search-btn rounded-pill">
-                        <i class="bi bi-search"></i> {{ 'hero.search'|trans }}
-                    </button>
-
-                    <input type="hidden" name="search_form[name]" id="sf_name" value="{{ filters.name ?? '' }}">
-                    <input type="hidden" name="search_form[startDate]" id="sf_start" value="{{ filters.startDate ?? '' }}">
-                    <input type="hidden" name="search_form[endDate]" id="sf_end" value="{{ filters.endDate ?? '' }}">
-                    <input type="hidden" name="search_form[guests]" id="sf_guests">
-
-                </form>
-
                 <!-- RESULTS -->
                 {% if filters.startDate and filters.endDate %}
                     <p class="text-muted mb-3">
@@ -81,7 +22,7 @@
                 <div class="row">
                     {% for apartment_result in results %}
                         <div class="card-container d-flex col-md-4 mb-3">
-                            <a href="{{ path('app.apartment.details', { id: apartment_result.id, _locale: app.request.locale }) }}"
+                            <a href="{{ path('app.apartment.details', { id: apartment_result.id, _locale: app.request.locale, startDate: filters.startDate, endDate: filters.endDate }) }}"
                                class="text-decoration-none text-dark w-100 shadow">
                                 <div class="card appart-card border-0">
                                     <div class="appart-image-wrapper">

@@ -44,7 +44,7 @@
             <!-- Date Range -->
             <div class="field date-range">
 
-                <div class="form-floating">
+                <div class="form-floating date-input-wrapper">
                     <input
                         type="text"
                         class="form-control border-0"
@@ -58,13 +58,13 @@
                     >
                         {{ 'hero.date.arrival'|trans }}
                     </label>
+                    <i class="bi bi-calendar3 calendar-icon"></i>
                 </div>
 
                 <span class="separator"></span>
 
                 <div
-                    class="form-floating mb-0 date-trigger"
-                    data-type="end"
+                    class="form-floating mb-0 date-input-wrapper"
                 >
                     <input
                         type="text"
@@ -79,13 +79,7 @@
                     >
                         {{ 'hero.date.departure'|trans }}
                     </label>
-                </div>
-
-                <div
-                    id="calendar-tooltip"
-                    class="calendar-tooltip hidden"
-                >
-                    <div id="calendar"></div>
+                    <i class="bi bi-calendar3 calendar-icon"></i>
                 </div>
             </div>
 
@@ -107,10 +101,7 @@
 
                     {% for i in 1..10 %}
                         <option value="{{ i }}">
-                            {{ i }} {{ 'hero.guests.person'|trans }}
-                            {% if i > 1 %}
-                                {{ 'hero.guests.plural'|trans }}
-                            {% endif %}
+                            {{ i }} {% if i == 1 %}personne{% else %}personnes{% endif %}
                         </option>
                     {% endfor %}
                 </select>
@@ -156,13 +147,6 @@
     </div>
 </section>
 
-<link
-    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-    rel="stylesheet"
-/>
-
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -192,52 +176,32 @@ document.addEventListener('DOMContentLoaded', function () {
         sfGuests.value = guestsUI.value;
     });
 
-    // Calendar setup
-    const tooltip = document.getElementById('calendar-tooltip');
+    // Initialize Flatpickr for date range selection
+    flatpickr('#startDateInput', {
+        mode: 'range',
+        dateFormat: 'Y-m-d',
+        minDate: 'today',
+        locale: '{{ app.request.locale }}',
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length === 2) {
+                const start = flatpickr.formatDate(selectedDates[0], 'Y-m-d');
+                const end = flatpickr.formatDate(selectedDates[1], 'Y-m-d');
+                
+                startUI.value = start;
+                endUI.value = end;
+                
+                sfStart.value = start;
+                sfEnd.value = end;
+            }
+        }
+    });
 
-    let currentSelection = null;
-
-    document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
-        el.addEventListener('click', function (event) {
-            event.stopPropagation();
-            currentSelection = this.dataset.type;
-
-            tooltip.classList.remove('hidden');
-
-            setTimeout(() => {
-                calendar.updateSize();
-            }, 10);
+    // Add click handlers to calendar icons
+    document.querySelectorAll('.calendar-icon').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.preventDefault();
+            startUI.click();
         });
     });
-
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
-            tooltip.classList.add('hidden');
-        }
-    });
-
-    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        initialView: 'dayGridMonth',
-        selectable: true,
-
-       
-        locale: '{{ app.request.locale }}',
-
-        select: function (info) {
-
-            const start = info.startStr;
-            const end = info.endStr;
-
-            startUI.value = start;
-            endUI.value = end;
-
-            sfStart.value = start;
-            sfEnd.value = end;
-
-            tooltip.classList.add('hidden');
-        }
-    });
-
-    calendar.render();
 });
 </script>

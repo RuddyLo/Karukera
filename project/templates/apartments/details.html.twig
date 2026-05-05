@@ -224,9 +224,28 @@ window.stripePublicKey = "{{ stripe_public_key }}";
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <script>
+// Récupérer les dates de la query string et les pré-remplir
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchStartDate = urlParams.get('startDate');
+    const searchEndDate = urlParams.get('endDate');
+
+    if (searchStartDate && searchEndDate) {
+        document.getElementById('reservation_form_startDate').value = searchStartDate;
+        document.getElementById('reservation_form_endDate').value = searchEndDate;
+    }
+});
+</script>
+
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     let startDate = null;
 let isSelecting = false;
+
+// Récupérer les dates de la query string
+const urlParams = new URLSearchParams(window.location.search);
+const searchStartDate = urlParams.get('startDate');
+const searchEndDate = urlParams.get('endDate');
 
 const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
     locale: 'fr',
@@ -297,6 +316,21 @@ const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), 
 });
 
 calendar.render();
+
+// Pré-remplir avec les dates de la recherche
+if (searchStartDate && searchEndDate) {
+    let end = new Date(searchEndDate);
+    end.setDate(end.getDate() + 1);
+    let endPlus = end.toISOString().split('T')[0];
+
+    calendar.addEvent({
+        id: 'selection',
+        start: searchStartDate,
+        end: endPlus,
+        display: 'background',
+        color: '#617da1'
+    });
+}
 });
 </script>
 <script>

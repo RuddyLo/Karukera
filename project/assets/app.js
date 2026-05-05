@@ -15,8 +15,12 @@ import './externals/bootstrap/js/bootstrap.bundle.min.js';
 import './externals/isotope-layout/isotope.pkgd.min.js';
 import './externals/php-email-form/validate.js';
 
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+
 import $ from 'jquery';
 global.$ = global.jQuery = $;
+global.flatpickr = flatpickr;
 
 
 import 'datatables.net-bs5';
