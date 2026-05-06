@@ -237,97 +237,134 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     let startDate = null;
-let isSelecting = false;
+    let isSelecting = false;
 
-// Récupérer les dates de la query string
-const urlParams = new URLSearchParams(window.location.search);
-const searchStartDate = urlParams.get('startDate');
-const searchEndDate = urlParams.get('endDate');
+    // Récupérer les dates de la query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchStartDate = urlParams.get('startDate');
+    const searchEndDate = urlParams.get('endDate');
 
-const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-    locale: 'fr',
-    selectable: false,
-    validRange: {
-        start: new Date()
-    },
-    events: '{{ path("reservations_json", {id: apartment.id}) }}',
+    const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        locale: 'fr',
+        selectable: false,
+        validRange: {
+            start: new Date()
+        },
+        events: '{{ path("reservations_json", {id: apartment.id}) }}',
 
-    dateClick(info) {
-
-        // 👉 Si une sélection complète existe → RESET (3e clic)
-        if (!isSelecting && startDate === null && calendar.getEventById('selection')) {
-            calendar.getEventById('selection').remove();
-
-            document.getElementById('reservation_form_startDate').value = '';
-            document.getElementById('reservation_form_endDate').value = '';
-
-            return;
-        }
-
-        // 👉 1er clic
-        if (!startDate) {
-            startDate = info.dateStr;
-            isSelecting = true;
-
-            calendar.getEventById('selection')?.remove();
-
-            calendar.addEvent({
-                id: 'selection',
-                start: startDate,
-                end: startDate,
-                display: 'background',
-                color: '#617da1'
-            });
-
-        } else {
-            // 👉 2e clic → créer range
-            let endDate = info.dateStr;
-
-            calendar.getEventById('selection')?.remove();
-
-            if (endDate < startDate) {
-                [startDate, endDate] = [endDate, startDate];
+        dateMouseEnter(info) {
+            if (!isSelecting || !startDate) {
+                return;
             }
 
-            // ✅ +1 jour pour corriger FullCalendar
-            let end = new Date(endDate);
+            let hoverDate = info.dateStr;
+            let previewStart = startDate;
+            let previewEnd = hoverDate;
+
+            if (hoverDate < startDate) {
+                [previewStart, previewEnd] = [hoverDate, startDate];
+            }
+
+            let end = new Date(previewEnd);
             end.setDate(end.getDate() + 1);
             let endPlus = end.toISOString().split('T')[0];
 
-            calendar.addEvent({
-                id: 'selection',
-                start: startDate,
-                end: endPlus,
-                display: 'background',
-                color: '#617da1'
-            });
+            const selection = calendar.getEventById('selection');
+            if (selection) {
+                selection.setDates(previewStart, endPlus);
+            } else {
+                calendar.addEvent({
+                    id: 'selection',
+                    start: previewStart,
+                    end: endPlus,
+                    display: 'background',
+                    color: '#617da1'
+                });
+            }
+        },
 
-            document.getElementById('reservation_form_startDate').value = startDate;
-            document.getElementById('reservation_form_endDate').value = endDate;
+        dateClick(info) {
 
-            // 👉 fin sélection
-            startDate = null;
-            isSelecting = false;
+            // 👉 Si une sélection complète existe → RESET (3e clic)
+            if (!isSelecting && startDate === null && calendar.getEventById('selection')) {
+                calendar.getEventById('selection').remove();
+
+                document.getElementById('reservation_form_startDate').value = '';
+                document.getElementById('reservation_form_endDate').value = '';
+
+                return;
+            }
+
+            // 👉 1er clic
+            if (!startDate) {
+                startDate = info.dateStr;
+                isSelecting = true;
+
+                calendar.getEventById('selection')?.remove();
+
+                let end = new Date(info.date);
+                end.setDate(end.getDate() + 1);
+                let endPlus = end.toISOString().split('T')[0];
+
+                calendar.addEvent({
+                    id: 'selection',
+                    start: startDate,
+                    end: endPlus,
+                    display: 'background',
+                    color: '#617da1'
+                });
+
+                document.getElementById('reservation_form_startDate').value = startDate;
+                document.getElementById('reservation_form_endDate').value = startDate;
+            } else {
+                // 👉 2e clic → créer range
+                let endDate = info.dateStr;
+
+                calendar.getEventById('selection')?.remove();
+
+                if (endDate < startDate) {
+                    [startDate, endDate] = [endDate, startDate];
+                }
+
+                // ✅ +1 jour pour corriger FullCalendar
+                let end = new Date(endDate);
+                end.setDate(end.getDate() + 1);
+                let endPlus = end.toISOString().split('T')[0];
+
+                calendar.addEvent({
+                    id: 'selection',
+                    start: startDate,
+                    end: endPlus,
+                    display: 'background',
+                    color: '#617da1'
+                });
+
+                document.getElementById('reservation_form_startDate').value = startDate;
+                document.getElementById('reservation_form_endDate').value = endDate;
+
+                // 👉 fin sélection
+                startDate = null;
+                isSelecting = false;
+            }
         }
-    }
-});
-
-calendar.render();
-
-// Pré-remplir avec les dates de la recherche
-if (searchStartDate && searchEndDate) {
-    let end = new Date(searchEndDate);
-    end.setDate(end.getDate() + 1);
-    let endPlus = end.toISOString().split('T')[0];
-
-    calendar.addEvent({
-        id: 'selection',
-        start: searchStartDate,
-        end: endPlus,
-        display: 'background',
-        color: '#617da1'
     });
-}
+
+    calendar.render();
+
+    // Pré-remplir avec les dates de la recherche
+    if (searchStartDate && searchEndDate) {
+        let end = new Date(searchEndDate);
+        end.setDate(end.getDate() + 1);
+        let endPlus = end.toISOString().split('T')[0];
+
+        calendar.addEvent({
+            id: 'selection',
+            start: searchStartDate,
+            end: endPlus,
+            display: 'background',
+            color: '#617da1'
+        });
+    }
 });
 </script>
 <script>
