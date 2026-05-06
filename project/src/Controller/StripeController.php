@@ -12,6 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class StripeController extends AbstractController
@@ -76,7 +79,8 @@ class StripeController extends AbstractController
     public function webhook(
         Request $request,
         EntityManagerInterface $em,
-        ApartmentRepository $apartmentRepository
+        ApartmentRepository $apartmentRepository,
+        MailerInterface $mailer
     ): Response {
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
@@ -131,6 +135,7 @@ class StripeController extends AbstractController
                         $em->persist($reservation);
                         $em->flush();
 
+                        $this->sendReservationConfirmationEmails($reservation, $mailer);
                         error_log('Webhook: Reservation created - ID: ' . $reservation->getId());
                     }
                 }
@@ -145,7 +150,8 @@ class StripeController extends AbstractController
     public function success(
         Request $request,
         EntityManagerInterface $em,
-        ApartmentRepository $apartmentRepository
+        ApartmentRepository $apartmentRepository,
+        MailerInterface $mailer
     ): Response {
         $paymentIntentId = $request->query->get('payment_intent');
         $meta = null;
@@ -186,6 +192,8 @@ class StripeController extends AbstractController
                             $reservation->setReference($reservation->generateReference());
                             $em->persist($reservation);
                             $em->flush();
+
+                            $this->sendReservationConfirmationEmails($reservation, $mailer);
                         }
                     }
                     
@@ -211,5 +219,57 @@ class StripeController extends AbstractController
     {
         $this->addFlash('warning', 'Le paiement a été annulé.');
         return $this->redirectToRoute('app.home');
+    }
+
+    private function sendReservationConfirmationEmails(Reservation $reservation, MailerInterface $mailer): void
+    {
+        $userEmail = $reservation->getUser()?->getEmail();
+        $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'contact@oasiskarurio.com';
+
+        if (!$userEmail) {
+            return;
+        }
+
+        $apartmentName = $reservation->getApartment()->getName();
+        $startDate = $reservation->getStartDate()->format('d/m/Y');
+        $endDate = $reservation->getEndDate()->format('d/m/Y');
+
+        $from = new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio');
+
+        $clientSubject = 'Votre réservation est confirmée';
+        $clientHtml = sprintf(
+            '<p>Bonjour,</p><p>Votre réservation pour l’appartement <strong>%s</strong> du %s au %s est confirmée.</p><p>Merci pour votre confiance.</p>',
+            $apartmentName,
+            $startDate,
+            $endDate
+        );
+
+        $adminSubject = 'Nouvelle réservation confirmée';
+        $adminHtml = sprintf(
+            '<p>Une nouvelle réservation a été confirmée.</p><p>Réservation #%d</p><p>Appartement : %s</p><p>Période : %s → %s</p><p>Client : %s</p>',
+            $reservation->getId(),
+            $apartmentName,
+            $startDate,
+            $endDate,
+            $userEmail
+        );
+
+        try {
+            $mailer->send((new Email())
+                ->from($from)
+                ->to($userEmail)
+                ->subject($clientSubject)
+                ->html($clientHtml)
+            );
+
+            $mailer->send((new Email())
+                ->from($from)
+                ->to($adminEmail)
+                ->subject($adminSubject)
+                ->html($adminHtml)
+            );
+        } catch (\Exception $e) {
+            error_log('Reservation confirmation email error: ' . $e->getMessage());
+        }
     }
 }

@@ -1,0 +1,15 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}Modifier réseau social{% endblock %}
+
+{% block content %}
+<div class="container card shadow p-4">
+    <h1>Mise à jour du réseau social</h1>
+
+    {{ include('admin/social_media/_form.html.twig') }}
+
+    <div class="mt-4">
+        {{ include('admin/social_media/_delete_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}

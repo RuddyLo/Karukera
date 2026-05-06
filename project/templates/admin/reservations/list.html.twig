@@ -80,11 +80,21 @@
                                         <span class="badge bg-success">En cours</span>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <a href="{{ path('admin_reservation_show', {id: reservation.id}) }}" 
-                                       class="btn btn-sm btn-primary">
-                                        Détails
-                                    </a>
+                                <td class="align-middle">
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        <a href="{{ path('admin_reservation_show', {id: reservation.id}) }}" 
+                                           class="btn btn-sm btn-primary text-nowrap">
+                                            Détails
+                                        </a>
+                                        {% if isFinished %}
+                                            <form class="m-0" method="post" action="{{ path('admin_reservation_send_review', {id: reservation.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('send_review' ~ reservation.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-success text-nowrap">
+                                                    Envoyer email avis
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}

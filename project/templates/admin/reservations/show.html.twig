@@ -95,6 +95,23 @@
         </div>
 
         <div class="col-md-4">
+            {% set isFinished = reservation.endDate < date() %}
+            {% if isFinished %}
+                <div class="card shadow border-success mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Envoyer un lien d’avis</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ path('admin_reservation_send_review', {id: reservation.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('send_review' ~ reservation.id) }}">
+                            <button type="submit" class="btn btn-success w-100">
+                                Envoyer un email Trustpilot
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
             {% if reservation and not reservation.isCautionRefunded() and not reservation.isCautionConcerved() %}
             <div class="card shadow border-warning">
                 <div class="card-header bg-warning">

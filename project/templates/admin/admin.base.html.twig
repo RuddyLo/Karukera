@@ -12,8 +12,8 @@
     {% endblock %}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
-            {{ include('./ajaxLink.html.twig') }}
-            
+            {{ include('ajaxLink.html.twig') }}
+
 
         {% endblock %}
 </head>
@@ -51,6 +51,11 @@
                             </a>
                         </li>
                         <li class="nav-item py-2">
+                            <a href="{{ path('admin.social_media') }}" class="nav-link px-0 align-middle text-white">
+                                <i class="bi bi-share-fill mx-4"></i><span class="ms-1 d-none d-sm-inline">Réseaux sociaux</span>
+                            </a>
+                        </li>
+                        <li class="nav-item py-2">
                             <a href="{{path('admin.news.index')}}" class="nav-link px-0 align-middle text-white">
                                 <i class="bi bi-people-fill mx-4"></i><span class="ms-1 d-none d-sm-inline">Nouveautés</span>
                             </a>
@@ -78,13 +83,21 @@
 
             {# Contenu principal #}
             <div class="col py-3 w-100 content-wrapper">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
                 {% block content %}
             
                 {% endblock %}
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     {% endblock body %}
 
 

@@ -53,6 +53,25 @@ $(document).on('click', '.event-delete-equipment', function () {
     })
 });
 
+$(document).on('click', '.event-delete-social-media', function () {
+    let dataUuid = $(this);
+    Swal.fire({
+        title: 'Suppression',
+        text: "Voulez vous vraiment supprimer ce réseau social ?",
+        icon: "warning",
+        confirmButtonText: "Confirmer",
+        showCancelButton: true,
+        cancelButtonText: "Non",
+        confirmButtonColor: 'green',
+        cancelButtonColor: '#ddd',
+    }).then((result) => {
+        if(result.isConfirmed) {
+            $("#delete-social-media-form").find("#delete-social-media-id").val(dataUuid.data('uuid'));
+            $("#delete-social-media-form").submit();
+        }
+    })
+});
+
 
 $(document).on('click', '.event-delete-price-period', function () {
     

@@ -23,13 +23,12 @@
         }
     };
 
-    let ajaxLink = {
-        
+    window.ajaxLink = window.ajaxLink || {};
+    window.ajaxLink = Object.assign(window.ajaxLink, {
         apartment: {
             list        : "{{ path('admin.ajax.apartment') }}" ,
             show        : "{{ path('admin.apartment.show', {id : 123456789}) }}" ,
             edit        : "{{ path('admin.apartment.edit', {id : 123456789}) }}" ,
-            
         },
         user: {
             list        :"{{ path('admin.ajax.user')}}",
@@ -38,8 +37,12 @@
         equipment: {
             list            :"{{path('admin.ajax.equipment')}}" ,
             edit            :"{{path('admin.equipment.edit', {id:123456789} )}}"
+        },
+        social_media: {
+            list            :"{{ path('admin.ajax.social_media') }}",
+            show            :"{{ path('admin.social_media.show', {id:123456789}) }}",
+            edit            :"{{ path('admin.social_media.edit', {id:123456789}) }}"
         }
-
-    }
+    });
 
 </script>

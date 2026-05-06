@@ -2,15 +2,15 @@
 
     <div class="footer-content">
       <div class="container">
-        <div class="row">
+        <div class="row align-items-start">
 
           <div class="col-lg-3 col-md-6">
             <div class="footer-info">
-              <h1 class="">Les Oasis <span>de KaruKera</span>.</h1>
+              <h1 class="">Les Oasis <span>de Karurio</span>.</h1>
               <p>
                 oasis de karurio, 12 rue morne tricolore 97180 Sainte Anne<br>
                 <strong>{{ 'footer.phone'|trans }}:</strong> +33 755503086<br>
-                <strong>{{ 'footer.email'|trans }}:</strong> contact@oasisdekarukera.com<br>
+                <strong>{{ 'footer.email'|trans }}:</strong> contact@oasiskarurio.com<br>
               </p>
             </div>
           </div>
@@ -26,10 +26,18 @@
           </div>
 
           <div class="social-links col-lg-3">
-            <a href="#" class="tiktok btn"><i class="text-white bi bi-tiktok"></i></a>
-            <a href="#" class="twitter btn"><i class="text-white bi bi-twitter"></i></a>
-            <a href="#" class="facebook btn"><i class="text-white bi bi-facebook"></i></a>
-            <a href="#" class="instagram btn"><i class="text-white bi bi-instagram"></i></a>
+            {% if social_medias is defined and social_medias|length > 0 %}
+                {% for social in social_medias %}
+                    <a href="{{ social.url }}" class="btn {{ social.platform|lower }}" target="_blank" rel="noopener" title="{{ social.platform }}">
+                        <i class="{{ social.icon }} text-white" style="font-size: 24px;"></i>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <a href="#" class="tiktok btn"><i class="text-white bi bi-tiktok" style="font-size: 24px;"></i></a>
+                <a href="#" class="twitter btn"><i class="text-white bi bi-twitter" style="font-size: 24px;"></i></a>
+                <a href="#" class="facebook btn"><i class="text-white bi bi-facebook" style="font-size: 24px;"></i></a>
+                <a href="#" class="instagram btn"><i class="text-white bi bi-instagram" style="font-size: 24px;"></i></a>
+            {% endif %}
           </div>
 
         </div>
@@ -40,7 +48,7 @@
       <div class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center">
         <div class="d-flex flex-column align-items-center align-items-lg-start">
           <div class="copyright">
-            &copy; Copyright <strong><span>lesoasisdekarukera</span></strong>. {{ 'footer.rights'|trans }}
+            &copy; Copyright <strong><span>lesoasisdekarurio</span></strong>. {{ 'footer.rights'|trans }}
           </div>
         </div>
       </div>

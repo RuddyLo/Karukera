@@ -1,0 +1,35 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}Réseau social{% endblock %}
+
+{% block content %}
+<div class="container card shadow p-4">
+    <h1>Réseau social</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ social_media.id }}</td>
+            </tr>
+            <tr>
+                <th>Plateforme</th>
+                <td>{{ social_media.platform }}</td>
+            </tr>
+            <tr>
+                <th>URL</th>
+                <td>{{ social_media.url }}</td>
+            </tr>
+            <tr>
+                <th>Icône</th>
+                <td>{{ social_media.icon }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin.social_media') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('admin.social_media.edit', {'id': social_media.id}) }}" class="btn btn-primary">Modifier</a>
+
+    {{ include('admin/social_media/_delete_form.html.twig') }}
+</div>
+{% endblock %}
