@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Blog\Article;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -81,5 +83,11 @@ class ArticleCrudController extends AbstractCrudController
         return $filters
             ->add(BooleanFilter::new('published'))
             ->add(EntityFilter::new('category'));
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->addBatchAction(Action::BATCH_DELETE);
     }
 }
