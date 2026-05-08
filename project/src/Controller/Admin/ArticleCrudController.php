@@ -87,7 +87,6 @@ class ArticleCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        return $actions
-            ->addBatchAction(Action::BATCH_DELETE);
+        return $actions;
     }
 }
