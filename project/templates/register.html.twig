@@ -1,67 +1,106 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .register-card {
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        }
+        .register-card .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="card" style="border-radius: 1rem; max-width: 30vw;">
-                <div class="row g-0">
-                    <div class="d-flex align-items-center">
-                        <div class="card-body p-4 p-lg-5 text-black">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+                <div class="card register-card">
+                    <div class="card-body p-4 p-md-5">
 
-                            {% for type, messages in app.flashes %}
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
-                                        {{ message|trans }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                {% endfor %}
+                        {% for type, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                                    {{ message|trans }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
                             {% endfor %}
+                        {% endfor %}
 
-                            {{ form_start(registrationForm) }}
+                        <h4 class="fw-bold mb-1">{{ 'register.title'|trans }}</h4>
+                        <p class="text-muted mb-4 small">{{ 'register.already_registered'|trans }}
+                            <a href="{{ path('app.login',{'_locale': app.request.locale}) }}">{{ 'register.login_link'|trans }}</a>
+                        </p>
 
-                            <h5 class="h3 fw-bold mb-3 pb-3" style="letter-spacing: 1px;">{{ 'register.title'|trans }}</h5>
+                        {{ form_start(registrationForm) }}
 
-                            <div data-mdb-input-init class="form-outline mb-4">
-                                {{ form_row(registrationForm.email) }}
+                        <p class="section-label">{{ 'register.section.identity'|trans }}</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.firstName) }}
+                                {{ form_widget(registrationForm.firstName) }}
+                                {{ form_errors(registrationForm.firstName) }}
                             </div>
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.lastName) }}
+                                {{ form_widget(registrationForm.lastName) }}
+                                {{ form_errors(registrationForm.lastName) }}
+                            </div>
+                        </div>
 
-                            <div data-mdb-input-init class="form-outline mb-4">
+                        <p class="section-label mt-3">{{ 'register.section.contact'|trans }}</p>
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.phone) }}
+                                {{ form_widget(registrationForm.phone) }}
+                                {{ form_errors(registrationForm.phone) }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.address) }}
+                                {{ form_widget(registrationForm.address) }}
+                                {{ form_errors(registrationForm.address) }}
+                            </div>
+                        </div>
+
+                        <p class="section-label mt-3">{{ 'register.section.password'|trans }}</p>
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
                                 {{ form_label(registrationForm.plainPassword.first) }}
                                 {{ form_widget(registrationForm.plainPassword.first) }}
                                 {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
-                                    <div class="text-danger">
-                                        {{ form_errors(registrationForm.plainPassword.first) }}
-                                    </div>
+                                    <div class="text-danger small">{{ form_errors(registrationForm.plainPassword.first) }}</div>
                                 {% endif %}
                             </div>
-
-                            <div data-mdb-input-init class="form-outline mb-4">
+                            <div class="col-sm-6">
                                 {{ form_label(registrationForm.plainPassword.second) }}
                                 {{ form_widget(registrationForm.plainPassword.second) }}
                                 {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
-                                    <div class="text-danger">
-                                        {{ form_errors(registrationForm.plainPassword.second) }}
-                                    </div>
+                                    <div class="text-danger small">{{ form_errors(registrationForm.plainPassword.second) }}</div>
                                 {% endif %}
                             </div>
-
-                            <div class="pt-1 mb-4" style="display:none;">
-                                {{ form_row(registrationForm.submit) }}
-                            </div>
-
-                            <div class="pt-1 mb-4">
-                                <button class="btn btn-info btn-lg btn-block w-100 text-white" type="submit">
-                                    {{ 'register.submit'|trans }}
-                                </button>
-                            </div>
-
-                            <p class="mt-3">
-                                {{ 'register.already_registered'|trans }}
-                                <a href="{{ path('app.login',{'_locale': app.request.locale}) }}">{{ 'register.login_link'|trans }}</a>
-                            </p>
-
-                            {{ form_end(registrationForm) }}
                         </div>
+
+                        <div style="display:none;">{{ form_row(registrationForm.submit) }}</div>
+
+                        <button class="btn btn-info btn-lg w-100 text-white fw-semibold" type="submit">
+                            {{ 'register.submit'|trans }}
+                        </button>
+
+                        {{ form_end(registrationForm) }}
                     </div>
                 </div>
             </div>

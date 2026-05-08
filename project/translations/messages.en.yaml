@@ -95,8 +95,16 @@ register:
     flash:
         success: "Registration successful, please log in!"
         duplicate_email: "This email address is already in use."
+    section:
+        identity: "Identity"
+        contact: "Contact details"
+        password: "Security"
     register:
     form:
+        first_name: "First name"
+        last_name: "Last name"
+        phone: "Phone number"
+        address: "Address"
         email: "Email address"
         password: "Password"
         password_confirm: "Confirm password"

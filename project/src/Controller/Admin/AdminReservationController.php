@@ -74,7 +74,7 @@ class AdminReservationController extends AbstractController
             return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
         }
 
-        $reviewUrl = 'https://fr.trustpilot.com/review/votre-entreprise.com';
+        $reviewUrl = 'https://fr.trustpilot.com/review/oasiskarurio.com';
         $subject = 'Merci pour votre séjour - laissez-nous un avis Trustpilot';
         $htmlContent = sprintf(
             '<p>Bonjour,</p><p>Merci d’avoir séjourné avec nous. Nous serions ravis que vous laissiez un avis sur Trustpilot.</p><p><a href="%s" target="_blank" rel="noopener">Laisser un avis</a></p><p>Merci encore et à bientôt,</p><p>Oasis de Karurio</p>',
