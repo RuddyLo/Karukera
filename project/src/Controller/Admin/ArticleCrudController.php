@@ -87,6 +87,6 @@ class ArticleCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        return $actions;
+        return $actions->remove(Crud::PAGE_INDEX, Action::BATCH_DELETE);
     }
 }
