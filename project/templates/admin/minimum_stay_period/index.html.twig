@@ -1,0 +1,59 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Périodes de Minimum de Séjour{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Périodes de Minimum de Séjour</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('minimum_stay_period_new') }}" class="btn btn-primary">
+                + Ajouter une période
+            </a>
+        </div>
+    </div>
+
+    {% if minimum_stay_periods|length > 0 %}
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Appartement</th>
+                    <th>Date de début</th>
+                    <th>Date de fin</th>
+                    <th>Minimum de jours</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for period in minimum_stay_periods %}
+                    <tr>
+                        <td>{{ period.apartment.name }}</td>
+                        <td>{{ period.startDate|date('d/m/Y') }}</td>
+                        <td>{{ period.endDate|date('d/m/Y') }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ period.minimumDays }} jour(s)</span>
+                        </td>
+                        <td>
+                            <a href="{{ path('minimum_stay_period_show', {'id': period.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                            <a href="{{ path('minimum_stay_period_edit', {'id': period.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ period.id }}')">Supprimer</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">Aucune période de minimum de séjour configurée.</div>
+    {% endif %}
+</div>
+
+<script>
+function confirmDelete(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette période ?')) {
+        document.getElementById('delete-form-' + id).submit();
+    }
+}
+</script>
+{% endblock %}

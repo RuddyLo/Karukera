@@ -238,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     let startDate = null;
     let isSelecting = false;
+    let minimumStayRequirements = {}; // Map date to minimum days
 
     // Récupérer les dates de la query string
     const urlParams = new URLSearchParams(window.location.search);
@@ -250,7 +251,28 @@ document.addEventListener('DOMContentLoaded', function () {
         validRange: {
             start: new Date()
         },
-        events: '{{ path("reservations_json", {id: apartment.id}) }}',
+        events: [
+            '{{ path("reservations_json", {id: apartment.id}) }}',
+            '{{ path("minimumStay_json", {id: apartment.id}) }}'
+        ],
+
+        eventDidMount(info) {
+            // Store minimum stay requirements in our map
+            if (info.event.extendedProps.minimumDays) {
+                const startDate = info.event.startStr;
+                const endDate = info.event.endStr;
+                const minDays = info.event.extendedProps.minimumDays;
+
+                // For each day in the range, store the minimum
+                let current = new Date(startDate);
+                let end = new Date(endDate);
+                while (current < end) {
+                    const dateStr = current.toISOString().split('T')[0];
+                    minimumStayRequirements[dateStr] = Math.max(minimumStayRequirements[dateStr] || 0, minDays);
+                    current.setDate(current.getDate() + 1);
+                }
+            }
+        },
 
         dateMouseEnter(info) {
             if (!isSelecting || !startDate) {
@@ -265,22 +287,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 [previewStart, previewEnd] = [hoverDate, startDate];
             }
 
-            let end = new Date(previewEnd);
-            end.setDate(end.getDate() + 1);
-            let endPlus = end.toISOString().split('T')[0];
+            // Calculate days
+            const start = new Date(previewStart);
+            const end = new Date(previewEnd);
+            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+            // Check minimum stay requirement
+            const minRequired = getMaxMinimumForRange(previewStart, previewEnd);
+            const isValid = days >= minRequired;
+
+            let end2 = new Date(previewEnd);
+            end2.setDate(end2.getDate() + 1);
+            let endPlus = end2.toISOString().split('T')[0];
 
             const selection = calendar.getEventById('selection');
+            const color = isValid ? '#617da1' : '#e74c3c'; // Red if invalid
+            
             if (selection) {
                 selection.setDates(previewStart, endPlus);
+                selection.setProp('backgroundColor', color);
             } else {
                 calendar.addEvent({
                     id: 'selection',
                     start: previewStart,
                     end: endPlus,
                     display: 'background',
-                    color: '#617da1'
+                    backgroundColor: color
                 });
             }
+
+            // Show warning if invalid
+            updateMinimumStayWarning(days, minRequired, isValid);
         },
 
         dateClick(info) {
@@ -291,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 document.getElementById('reservation_form_startDate').value = '';
                 document.getElementById('reservation_form_endDate').value = '';
+                clearMinimumStayWarning();
 
                 return;
             }
@@ -311,11 +349,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     start: startDate,
                     end: endPlus,
                     display: 'background',
-                    color: '#617da1'
+                    backgroundColor: '#617da1'
                 });
 
                 document.getElementById('reservation_form_startDate').value = startDate;
                 document.getElementById('reservation_form_endDate').value = startDate;
+                clearMinimumStayWarning();
             } else {
                 // 👉 2e clic → créer range
                 let endDate = info.dateStr;
@@ -326,21 +365,38 @@ document.addEventListener('DOMContentLoaded', function () {
                     [startDate, endDate] = [endDate, startDate];
                 }
 
+                // Calculate days
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                const minRequired = getMaxMinimumForRange(startDate, endDate);
+
+                // Check if valid
+                if (days < minRequired) {
+                    // Invalid selection - show error and reset
+                    alert(`Erreur: Minimum ${minRequired} jour(s) requis pour cette période. Vous avez sélectionné ${days} jour(s).`);
+                    startDate = null;
+                    isSelecting = false;
+                    clearMinimumStayWarning();
+                    return;
+                }
+
                 // ✅ +1 jour pour corriger FullCalendar
-                let end = new Date(endDate);
-                end.setDate(end.getDate() + 1);
-                let endPlus = end.toISOString().split('T')[0];
+                let end2 = new Date(endDate);
+                end2.setDate(end2.getDate() + 1);
+                let endPlus = end2.toISOString().split('T')[0];
 
                 calendar.addEvent({
                     id: 'selection',
                     start: startDate,
                     end: endPlus,
                     display: 'background',
-                    color: '#617da1'
+                    backgroundColor: '#617da1'
                 });
 
                 document.getElementById('reservation_form_startDate').value = startDate;
                 document.getElementById('reservation_form_endDate').value = endDate;
+                clearMinimumStayWarning();
 
                 // 👉 fin sélection
                 startDate = null;
@@ -362,8 +418,52 @@ document.addEventListener('DOMContentLoaded', function () {
             start: searchStartDate,
             end: endPlus,
             display: 'background',
-            color: '#617da1'
+            backgroundColor: '#617da1'
         });
+    }
+
+    // Helper function to get maximum minimum stay requirement for a date range
+    function getMaxMinimumForRange(startStr, endStr) {
+        let maxMinimum = 0;
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        
+        let current = new Date(start);
+        while (current <= end) {
+            const dateStr = current.toISOString().split('T')[0];
+            maxMinimum = Math.max(maxMinimum, minimumStayRequirements[dateStr] || 0);
+            current.setDate(current.getDate() + 1);
+        }
+        
+        return maxMinimum;
+    }
+
+    // Helper function to update warning message
+    function updateMinimumStayWarning(days, minRequired, isValid) {
+        let warningEl = document.getElementById('minimum-stay-warning');
+        if (!warningEl) {
+            warningEl = document.createElement('div');
+            warningEl.id = 'minimum-stay-warning';
+            warningEl.style.marginTop = '10px';
+            const calendarContainer = document.getElementById('calendar');
+            calendarContainer.parentElement.insertBefore(warningEl, calendarContainer.nextElementSibling);
+        }
+
+        if (!isValid && minRequired > 0) {
+            warningEl.innerHTML = `<div class="alert alert-warning mb-2">⚠️ Minimum ${minRequired} jour(s) requis. Vous avez sélectionné ${days} jour(s).</div>`;
+        } else if (minRequired > 0) {
+            warningEl.innerHTML = `<div class="alert alert-info mb-2">✓ Minimum ${minRequired} jour(s) requis - Sélection valide (${days} jour(s)).</div>`;
+        } else {
+            warningEl.innerHTML = '';
+        }
+    }
+
+    // Helper function to clear warning
+    function clearMinimumStayWarning() {
+        const warningEl = document.getElementById('minimum-stay-warning');
+        if (warningEl) {
+            warningEl.innerHTML = '';
+        }
     }
 });
 </script>

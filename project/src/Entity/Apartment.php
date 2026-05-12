@@ -52,6 +52,9 @@ class Apartment  implements Translatable
     #[ORM\OneToMany(targetEntity: PricePeriod::class, mappedBy: 'apartment')]
     private Collection $pricePeriods;
 
+    #[ORM\OneToMany(targetEntity: MinimumStayPeriod::class, mappedBy: 'apartment', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $minimumStayPeriods;
+
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'apartment')]
     private Collection $reviews;
 
@@ -71,6 +74,7 @@ class Apartment  implements Translatable
         $this->equipments = new ArrayCollection();
         $this->reservations = new ArrayCollection();
         $this->pricePeriods = new ArrayCollection();
+        $this->minimumStayPeriods = new ArrayCollection();
         $this->reviews = new ArrayCollection();
     }
 
@@ -290,6 +294,36 @@ class Apartment  implements Translatable
             // set the owning side to null (unless already changed)
             if ($review->getApartment() === $this) {
                 $review->setApartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MinimumStayPeriod>
+     */
+    public function getMinimumStayPeriods(): Collection
+    {
+        return $this->minimumStayPeriods;
+    }
+
+    public function addMinimumStayPeriod(MinimumStayPeriod $minimumStayPeriod): static
+    {
+        if (!$this->minimumStayPeriods->contains($minimumStayPeriod)) {
+            $this->minimumStayPeriods->add($minimumStayPeriod);
+            $minimumStayPeriod->setApartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMinimumStayPeriod(MinimumStayPeriod $minimumStayPeriod): static
+    {
+        if ($this->minimumStayPeriods->removeElement($minimumStayPeriod)) {
+            // set the owning side to null (unless already changed)
+            if ($minimumStayPeriod->getApartment() === $this) {
+                $minimumStayPeriod->setApartment(null);
             }
         }
 

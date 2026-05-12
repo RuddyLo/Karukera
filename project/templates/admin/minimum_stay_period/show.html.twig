@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Période de Minimum de Séjour{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Période de Minimum de Séjour</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('minimum_stay_period_edit', {'id': minimum_stay_period.id}) }}" class="btn btn-warning">
+                Modifier
+            </a>
+            <a href="{{ path('minimum_stay_period_index') }}" class="btn btn-secondary">
+                ← Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Appartement</h6>
+                    <p>{{ minimum_stay_period.apartment.name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted">Minimum de jours</h6>
+                    <p><span class="badge bg-info">{{ minimum_stay_period.minimumDays }} jour(s)</span></p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Date de début</h6>
+                    <p>{{ minimum_stay_period.startDate|date('d/m/Y') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted">Date de fin</h6>
+                    <p>{{ minimum_stay_period.endDate|date('d/m/Y') }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="mt-3">
+                <a href="{{ path('minimum_stay_period_edit', {'id': minimum_stay_period.id}) }}" class="btn btn-warning">
+                    Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

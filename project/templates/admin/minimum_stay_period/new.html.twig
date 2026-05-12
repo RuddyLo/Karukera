@@ -1,0 +1,56 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Nouvelle Période de Minimum de Séjour{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Ajouter une Période de Minimum de Séjour</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('minimum_stay_period_index') }}" class="btn btn-secondary">
+                ← Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.apartment) }}
+                </div>
+            </div>
+            <div class="row">
+                {{ form_row(form.minimumDays) }}
+            </div>
+            <div class="row">
+                {{ form_row(form.startDate) }}
+                {{ form_row(form.endDate) }}
+            </div>
+
+            <button class="btn btn-primary mt-3">Créer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const calendar = new FullCalendar.Calendar(document.getElementById('minimum-stay-calendar'), {
+        locale: 'fr',
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+        }
+    });
+
+    calendar.render();
+});
+</script>
+{% endblock %}

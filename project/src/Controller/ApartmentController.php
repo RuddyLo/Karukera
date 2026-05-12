@@ -7,8 +7,9 @@ use App\Entity\Reservation;
 use App\Form\ReservationFormType;
 use App\Repository\ApartmentRepository;
 use App\Repository\PricePeriodRepository;
+use App\Repository\MinimumStayPeriodRepository;
 use App\Repository\ReservationRepository;
-use App\Service\ReservationCheckerService;
+use App\Service\ReservationValidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +23,7 @@ class ApartmentController extends AbstractController
     public function __construct(
         private ApartmentRepository $apartmentRepository,
         private PricePeriodRepository $repo,
+        private MinimumStayPeriodRepository $minimumStayPeriodRepository,
     ) {
     }
 
@@ -37,7 +39,7 @@ class ApartmentController extends AbstractController
 
     #[Route('/{id}/details', name: 'app.apartment.details')]
     public function details(Apartment $apartment, Request $request,EntityManagerInterface $em,
-         ReservationCheckerService $reservationCheckerService): Response
+         ReservationValidationService $validationService): Response
     {
         $reservation = new Reservation();
         $reservation->setApartment($apartment);
@@ -47,8 +49,11 @@ class ApartmentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$reservationCheckerService->isAvailable($reservation)) {
-                $this->addFlash('danger', 'L\'appartement est déjà réservé sur cette période. Veuillez choisir une autre periode.');
+            $errors = $validationService->validate($reservation);
+            if (!empty($errors)) {
+                foreach ($errors as $error) {
+                    $this->addFlash('danger', $error);
+                }
                 return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
             } else {
                 $em->persist($reservation);
@@ -64,8 +69,6 @@ class ApartmentController extends AbstractController
             ? $pricePeriod->getPrice()
             : $apartment->getPrice();
 
-       
-
         return $this->render('apartments/details.html.twig', [
             'form' => $form->createView(),
             'apartment' => $apartment,
@@ -74,10 +77,10 @@ class ApartmentController extends AbstractController
         ]);
     }
 
-    #[Route('/reservations/json', name: 'reservations_json')]
-    public function reservationsJson(ReservationRepository $repo): JsonResponse
+    #[Route('/{id}/reservations/json', name: 'reservations_json')]
+    public function reservationsJson(ReservationRepository $repo, Apartment $apartment): JsonResponse
     {
-        $reservations = $repo->findAll();
+        $reservations = $repo->findBy(['apartment' => $apartment]);
         $events = [];
 
         foreach ($reservations as $reservation) {
@@ -92,5 +95,26 @@ class ApartmentController extends AbstractController
         return $this->json($events);
     }
 
+    #[Route('/{id}/minimumStay/json', name: 'minimumStay_json')]
+    public function minimumStayJson(Apartment $apartment): JsonResponse
+    {
+        $minimumStayPeriods = $this->minimumStayPeriodRepository->findByApartment($apartment);
+        $events = [];
+
+        foreach ($minimumStayPeriods as $minimum) {
+            $events[] = [
+                'title' => $minimum->getMinimumDays() . ' j. min',
+                'start' => $minimum->getStartDate()->format('Y-m-d'),
+                'end'   => $minimum->getEndDate()->format('Y-m-d'),
+                'color' => '#f39c12',
+                'display' => 'background',
+                'extendedProps' => [
+                    'minimumDays' => $minimum->getMinimumDays(),
+                ],
+            ];
+        }
+
+        return $this->json($events);
+    }
       
 }
