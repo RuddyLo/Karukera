@@ -47,6 +47,22 @@ class ReservationRepository extends ServiceEntityRepository
     //    }
 
 
+    public function findOverlappingApartmentIds(string $start, string $end): array
+    {
+        $rows = $this->createQueryBuilder('r')
+            ->select('IDENTITY(r.apartment) as apartment_id')
+            ->where('r.startDate < :end')
+            ->andWhere('r.endDate > :start')
+            ->andWhere('r.status NOT IN (:canceled)')
+            ->setParameter('start', new \DateTime($start))
+            ->setParameter('end', new \DateTime($end))
+            ->setParameter('canceled', ['canceled'])
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_column($rows, 'apartment_id');
+    }
+
     public function findReservationsBetweenDates($apartment, \DateTimeInterface $start, \DateTimeInterface $end): array
     {
         return $this->createQueryBuilder('r')

@@ -22,7 +22,12 @@
                 <div class="row">
                     {% for apartment_result in results %}
                         <div class="card-container d-flex col-md-4 mb-3">
-                            <a href="{{ path('app.apartment.details', { id: apartment_result.id, _locale: app.request.locale, startDate: filters.startDate, endDate: filters.endDate }) }}"
+                            <a href="{{ path('app.apartment.details', {
+                                    id: apartment_result.id,
+                                    _locale: app.request.locale,
+                                    startDate: (apartment_result.id in conflictIds) ? null : filters.startDate,
+                                    endDate:   (apartment_result.id in conflictIds) ? null : filters.endDate
+                                }) }}"
                                class="text-decoration-none text-dark w-100 shadow">
                                 <div class="card appart-card border-0">
                                     <div class="appart-image-wrapper">
@@ -36,9 +41,18 @@
                                             <strong>Ar {{ apartment_result.price }}</strong> / nuit
                                         </p>
                                         {% if filters.startDate and filters.endDate %}
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle"></i> {{ 'search.available'|trans }}
-                                            </span>
+                                            {% if apartment_result.id in conflictIds %}
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-exclamation-triangle"></i> Dates partiellement réservées
+                                                </span>
+                                                <p class="text-muted mt-1 mb-0" style="font-size:11px;">
+                                                    Certaines dates sont indisponibles — consultez les détails pour ajuster votre séjour.
+                                                </p>
+                                            {% else %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> {{ 'search.available'|trans }}
+                                                </span>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>

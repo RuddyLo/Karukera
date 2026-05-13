@@ -17,7 +17,6 @@
                 <select
                     class="form-select custom-select-height"
                     id="apartmentSelect"
-                    name="apartmentUI"
                     required
                 >
                     <option
@@ -30,7 +29,7 @@
                     </option>
 
                     {% for apartment in apartments %}
-                        <option value="{{ apartment.name }}">
+                        <option value="{{ apartment.name }}" data-id="{{ apartment.id }}">
                             {{ apartment.name }}
                         </option>
                     {% endfor %}
@@ -150,58 +149,158 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ================================
-    // SYMFONY HIDDEN FORM FIELDS
-    // ================================
     const sfApartment = document.getElementById('sf_name');
-    const sfStart = document.getElementById('sf_start');
-    const sfEnd = document.getElementById('sf_end');
-    const sfGuests = document.getElementById('sf_guests');
-
-    // ================================
-    // VISIBLE UI FIELDS
-    // ================================
+    const sfStart     = document.getElementById('sf_start');
+    const sfEnd       = document.getElementById('sf_end');
+    const sfGuests    = document.getElementById('sf_guests');
     const uiApartment = document.getElementById('apartmentSelect');
-    const startUI = document.getElementById('startDateInput');
-    const endUI = document.getElementById('endDateInput');
-    const guestsUI = document.getElementById('guestsInput');
+    const startUI     = document.getElementById('startDateInput');
+    const endUI       = document.getElementById('endDateInput');
+    const guestsUI    = document.getElementById('guestsInput');
 
-    // Sync apartment
+    guestsUI.addEventListener('change', () => { sfGuests.value = guestsUI.value; });
+
+    // URL templates (locale-aware via Twig)
+    const reservationsUrl = id => '{{ path('reservations_json', {'id': '__ID__'}) }}'.replace('__ID__', id);
+    const minimumStayUrl  = id => '{{ path('minimumStay_json',  {'id': '__ID__'}) }}'.replace('__ID__', id);
+
+    let reservedDatesSet   = new Set();
+    let minimumStayPeriods = [];
+    let fpInstance         = null;
+
+    // Tooltip
+    const tooltip = document.createElement('div');
+    Object.assign(tooltip.style, {
+        display: 'none', position: 'fixed', zIndex: '9999',
+        background: 'rgba(0,0,0,0.75)', color: '#fff',
+        padding: '5px 11px', borderRadius: '6px', fontSize: '12px',
+        pointerEvents: 'none', whiteSpace: 'nowrap',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    });
+    document.body.appendChild(tooltip);
+    let tooltipTimer = null;
+
+    function showTooltip(anchorEl, msg) {
+        tooltip.textContent = msg;
+        tooltip.style.display = 'block';
+        const rect = anchorEl.getBoundingClientRect();
+        tooltip.style.top  = (rect.bottom + 8) + 'px';
+        tooltip.style.left = rect.left + 'px';
+        clearTimeout(tooltipTimer);
+        tooltipTimer = setTimeout(() => { tooltip.style.display = 'none'; }, 3000);
+    }
+
+    function localDateStr(date) {
+        return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    }
+
+    function iterateDates(startStr, endStr, cb) {
+        let cur = new Date(startStr + 'T00:00:00');
+        const end = new Date(endStr + 'T00:00:00');
+        while (cur <= end) { cb(localDateStr(cur)); cur.setDate(cur.getDate() + 1); }
+    }
+
+    function getMaxMinStay(startStr, endStr) {
+        let max = 1;
+        for (const p of minimumStayPeriods) {
+            if (p.start <= endStr && p.end >= startStr) max = Math.max(max, p.minimumDays);
+        }
+        return max;
+    }
+
+    function clearDates(instance) {
+        instance.clear();
+        sfStart.value = ''; sfEnd.value = '';
+        startUI.value = ''; endUI.value = '';
+    }
+
+    function hasApartmentSelected() {
+        return !!uiApartment.selectedOptions[0]?.dataset?.id;
+    }
+
+    function initFlatpickr() {
+        if (fpInstance) { fpInstance.destroy(); fpInstance = null; }
+        fpInstance = flatpickr('#startDateInput', {
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            minDate: 'today',
+            locale: '{{ app.request.locale }}',
+            disable: [(date) => reservedDatesSet.has(localDateStr(date))],
+            onDayCreate(selectedDates, dateStr, instance, dayElem) {
+                if (dayElem.dateObj && reservedDatesSet.has(localDateStr(dayElem.dateObj))) {
+                    dayElem.style.backgroundColor = 'rgba(180,180,180,0.35)';
+                    dayElem.style.color           = '#aaa';
+                    dayElem.style.textDecoration  = 'line-through';
+                }
+            },
+            onOpen(selectedDates, dateStr, instance) {
+                if (!hasApartmentSelected()) {
+                    instance.close();
+                    showTooltip(startUI, 'Veuillez d\'abord sélectionner un appartement');
+                }
+            },
+            onChange(selectedDates, dateStr, instance) {
+                if (selectedDates.length !== 2) return;
+                const start = flatpickr.formatDate(selectedDates[0], 'Y-m-d');
+                const end   = flatpickr.formatDate(selectedDates[1], 'Y-m-d');
+
+                let hasReserved = false;
+                iterateDates(start, end, d => { if (reservedDatesSet.has(d)) hasReserved = true; });
+                if (hasReserved) {
+                    clearDates(instance);
+                    showTooltip(startUI, 'Une date dans la sélection est déjà réservée.');
+                    return;
+                }
+
+                const days        = Math.ceil((selectedDates[1] - selectedDates[0]) / 86400000) + 1;
+                const minRequired = getMaxMinStay(start, end);
+                if (days < minRequired) {
+                    clearDates(instance);
+                    showTooltip(startUI, `Séjour minimum de ${minRequired} nuit${minRequired > 1 ? 's' : ''} requis.`);
+                    return;
+                }
+
+                sfStart.value = start; sfEnd.value = end;
+                startUI.value = start; endUI.value = end;
+            }
+        });
+    }
+
+    async function loadApartmentData(apartmentId) {
+        reservedDatesSet   = new Set();
+        minimumStayPeriods = [];
+        try {
+            const [resData, minData] = await Promise.all([
+                fetch(reservationsUrl(apartmentId)).then(r => r.json()),
+                fetch(minimumStayUrl(apartmentId)).then(r => r.json()),
+            ]);
+            for (const ev of resData) {
+                // ev.end est le jour de checkout : on l'exclut des dates bloquées
+                const dayBeforeEnd = new Date(ev.end + 'T00:00:00');
+                dayBeforeEnd.setDate(dayBeforeEnd.getDate() - 1);
+                if (ev.start <= localDateStr(dayBeforeEnd)) {
+                    iterateDates(ev.start, localDateStr(dayBeforeEnd), d => reservedDatesSet.add(d));
+                }
+            }
+            for (const ev of minData) {
+                minimumStayPeriods.push({ start: ev.start, end: ev.end, minimumDays: ev.extendedProps.minimumDays });
+            }
+        } catch (e) {
+            console.error('Erreur chargement données appartement:', e);
+        }
+        initFlatpickr();
+    }
+
+    initFlatpickr();
+
     uiApartment.addEventListener('change', () => {
         sfApartment.value = uiApartment.value;
+        const id = uiApartment.selectedOptions[0]?.dataset?.id;
+        if (id) loadApartmentData(id);
     });
 
-    // Sync guests
-    guestsUI.addEventListener('change', () => {
-        sfGuests.value = guestsUI.value;
-    });
-
-    // Initialize Flatpickr for date range selection
-    flatpickr('#startDateInput', {
-        mode: 'range',
-        dateFormat: 'Y-m-d',
-        minDate: 'today',
-        locale: '{{ app.request.locale }}',
-        onChange: function(selectedDates, dateStr, instance) {
-            if (selectedDates.length === 2) {
-                const start = flatpickr.formatDate(selectedDates[0], 'Y-m-d');
-                const end = flatpickr.formatDate(selectedDates[1], 'Y-m-d');
-                
-                startUI.value = start;
-                endUI.value = end;
-                
-                sfStart.value = start;
-                sfEnd.value = end;
-            }
-        }
-    });
-
-    // Add click handlers to calendar icons
     document.querySelectorAll('.calendar-icon').forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.preventDefault();
-            startUI.click();
-        });
+        icon.addEventListener('click', e => { e.preventDefault(); fpInstance?.open(); });
     });
 });
 </script>

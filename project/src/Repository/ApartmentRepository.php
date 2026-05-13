@@ -136,7 +136,7 @@ class ApartmentRepository extends ServiceEntityRepository
         return [$em->getResult(), $this->countApartmentFiltered($search)];
     }
 
-   public function searchApartments(?string $name, ?string $start, ?string $end): array
+   public function searchApartments(?string $name): array
 {
     $conn = $this->getEntityManager()->getConnection();
 
@@ -147,21 +147,6 @@ class ApartmentRepository extends ServiceEntityRepository
         AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
     ";
 
-    $params = ['name' => $name];
-
-    if ($start && $end) {
-        $sql .= "
-            AND apartment.id NOT IN (
-                SELECT reservation.apartment_id
-                FROM reservation
-                WHERE reservation.start_date < :endDate
-                AND reservation.end_date > :startDate
-            )
-        ";
-        $params['startDate'] = $start;
-        $params['endDate']   = $end;
-    }
-
-    return $conn->prepare($sql)->executeQuery($params)->fetchAllAssociative();
+    return $conn->prepare($sql)->executeQuery(['name' => $name])->fetchAllAssociative();
 }
 }

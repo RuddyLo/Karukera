@@ -6,6 +6,7 @@ use App\Entity\News;
 use App\Form\ContactFormType;
 use App\Repository\ApartmentRepository;
 use App\Repository\Blog\ArticleRepository;
+use App\Repository\ReservationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,6 +24,7 @@ class HomeController extends AbstractController
         private ApartmentRepository $apartmentRepository,
         private ArticleRepository $articleRepository,
         private NewsRepository $newsRepository,
+        private ReservationRepository $reservationRepository,
     ) {}
 
     #[Route('/', name: 'root_redirect')]
@@ -77,13 +79,18 @@ public function search(Request $request, ApartmentRepository $repo): Response
         $endDate   = $data['endDate'] ?? null;
     }
 
-    $results    = $repo->searchApartments($name, $startDate, $endDate);
+    $results     = $repo->searchApartments($name);
+    $conflictIds = [];
+    if ($startDate && $endDate) {
+        $conflictIds = $this->reservationRepository->findOverlappingApartmentIds($startDate, $endDate);
+    }
     $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
 
     return $this->render('search/results.html.twig', [
-        'results'    => $results,
-        'filters'    => compact('name', 'startDate', 'endDate'),
-        'apartments' => $apartments,
+        'results'     => $results,
+        'conflictIds' => $conflictIds,
+        'filters'     => compact('name', 'startDate', 'endDate'),
+        'apartments'  => $apartments,
     ]);
 }
 
