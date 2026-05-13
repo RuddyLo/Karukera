@@ -408,36 +408,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 
-    // Hover par délégation — fiable car le conteneur reste dans le DOM lors des re-renders FC
-    let lastHoveredDate = null;
-    const calendarEl = document.getElementById('calendar');
-
-    calendarEl.addEventListener('mouseover', function (e) {
-        if (!isSelecting || !startDate) return;
-
-        const cell = e.target.closest('[data-date]');
-        if (!cell) return;
-
-        const hoverDate = cell.dataset.date;
-        if (hoverDate === lastHoveredDate) return;
-        lastHoveredDate = hoverDate;
-
-        let previewStart = startDate;
-        let previewEnd = hoverDate;
-        if (hoverDate < startDate) [previewStart, previewEnd] = [hoverDate, startDate];
-
-        const days = Math.ceil((new Date(previewEnd) - new Date(previewStart)) / 86400000) + 1;
-        const hasConflict = hasReservedInRange(previewStart, previewEnd);
-        const minRequired = getMaxMinimumForRange(previewStart, previewEnd);
-        const isValid = !hasConflict && days >= minRequired;
-
-        highlightCells(previewStart, previewEnd, isValid);
-
-    });
-
-    calendarEl.addEventListener('mouseleave', function () {
-        lastHoveredDate = null;
-    });
 
     // Pré-remplir avec les dates de la recherche
     if (searchStartDate && searchEndDate) {

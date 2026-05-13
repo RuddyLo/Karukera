@@ -103,9 +103,10 @@ class ApartmentController extends AbstractController
 
         foreach ($minimumStayPeriods as $minimum) {
             $events[] = [
-                'title' => $minimum->getMinimumDays() . ' j. min',
+                
                 'start' => $minimum->getStartDate()->format('Y-m-d'),
                 'end'   => $minimum->getEndDate()->format('Y-m-d'),
+                'backgroundColor' => '#cdf1e4c7',
                 'display' => 'background',
                 'extendedProps' => [
                     'minimumDays' => $minimum->getMinimumDays(),
