@@ -106,7 +106,6 @@ class ApartmentController extends AbstractController
                 'title' => $minimum->getMinimumDays() . ' j. min',
                 'start' => $minimum->getStartDate()->format('Y-m-d'),
                 'end'   => $minimum->getEndDate()->format('Y-m-d'),
-                'color' => '#f39c12',
                 'display' => 'background',
                 'extendedProps' => [
                     'minimumDays' => $minimum->getMinimumDays(),

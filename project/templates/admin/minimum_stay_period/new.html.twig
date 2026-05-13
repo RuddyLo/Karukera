@@ -1,4 +1,4 @@
-{% extends "base.html.twig" %}
+{% extends 'admin/admin.base.html.twig' %}
 
 {% block title %}Nouvelle Période de Minimum de Séjour{% endblock %}
 
@@ -37,20 +37,4 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const calendar = new FullCalendar.Calendar(document.getElementById('minimum-stay-calendar'), {
-        locale: 'fr',
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth'
-        }
-    });
-
-    calendar.render();
-});
-</script>
 {% endblock %}

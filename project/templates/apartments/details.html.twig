@@ -211,8 +211,6 @@
     </div>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
-
 <script>
 window.apartmentId = {{ apartment.id }};
 window.stripePublicKey = "{{ stripe_public_key }}";
@@ -221,7 +219,6 @@ window.stripePublicKey = "{{ stripe_public_key }}";
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <script>
-// Récupérer les dates de la query string et les pré-remplir
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const searchStartDate = urlParams.get('startDate');
@@ -238,9 +235,66 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     let startDate = null;
     let isSelecting = false;
-    let minimumStayRequirements = {}; // Map date to minimum days
+    let minimumStayRequirements = {};
+    let reservedDates = new Set();
+    let selectionComplete = false;
 
-    // Récupérer les dates de la query string
+    const bookingBtn = document.getElementById('preview-reservation-btn');
+
+    function setBookingValid(isValid) {
+        if (!bookingBtn) return;
+        bookingBtn.disabled = !isValid;
+        bookingBtn.classList.toggle('opacity-50', !isValid);
+        bookingBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+    }
+
+    setBookingValid(false);
+
+    const tooltip = document.createElement('div');
+    Object.assign(tooltip.style, {
+        display: 'none', position: 'fixed', zIndex: '9999',
+        background: 'rgba(0,0,0,0.75)', color: '#fff',
+        padding: '5px 11px', borderRadius: '6px', fontSize: '12px',
+        pointerEvents: 'none', whiteSpace: 'nowrap',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)', transition: 'opacity .15s'
+    });
+    document.body.appendChild(tooltip);
+
+    function showTooltip(el, message, isError) {
+        const rect = el.getBoundingClientRect();
+        tooltip.textContent = message;
+        tooltip.style.background = isError ? 'rgba(192,57,43,0.9)' : 'rgba(40,40,40,0.82)';
+        tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+        tooltip.style.top = (rect.top - 36 + window.scrollY) + 'px';
+        tooltip.style.transform = 'translateX(-50%)';
+        tooltip.style.position = 'absolute';
+        tooltip.style.display = 'block';
+    }
+
+    function hideTooltip() {
+        tooltip.style.display = 'none';
+    }
+
+    function highlightCells(startStr, endStr, isValid) {
+        clearHighlight();
+        const color = isValid ? 'rgba(97,125,161,0.3)' : 'rgba(231,76,60,0.3)';
+        let current = new Date(startStr);
+        const end = new Date(endStr);
+        while (current <= end) {
+            const dateStr = current.toISOString().split('T')[0];
+            const cell = document.querySelector(`[data-date="${dateStr}"]`);
+            if (cell) { cell.style.backgroundColor = color; cell.dataset.sel = '1'; }
+            current.setDate(current.getDate() + 1);
+        }
+    }
+
+    function clearHighlight() {
+        document.querySelectorAll('[data-sel]').forEach(el => {
+            el.style.backgroundColor = '';
+            delete el.dataset.sel;
+        });
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const searchStartDate = urlParams.get('startDate');
     const searchEndDate = urlParams.get('endDate');
@@ -251,178 +305,157 @@ document.addEventListener('DOMContentLoaded', function () {
         validRange: {
             start: new Date()
         },
-        events: [
+        eventSources: [
             '{{ path("reservations_json", {id: apartment.id}) }}',
             '{{ path("minimumStay_json", {id: apartment.id}) }}'
         ],
 
         eventDidMount(info) {
-            // Store minimum stay requirements in our map
-            if (info.event.extendedProps.minimumDays) {
-                const startDate = info.event.startStr;
-                const endDate = info.event.endStr;
-                const minDays = info.event.extendedProps.minimumDays;
+            const evStart = info.event.startStr;
+            const evEnd = info.event.endStr;
 
-                // For each day in the range, store the minimum
-                let current = new Date(startDate);
-                let end = new Date(endDate);
+            if (info.event.extendedProps.minimumDays) {
+                const minDays = info.event.extendedProps.minimumDays;
+                let current = new Date(evStart);
+                const end = new Date(evEnd);
                 while (current < end) {
                     const dateStr = current.toISOString().split('T')[0];
                     minimumStayRequirements[dateStr] = Math.max(minimumStayRequirements[dateStr] || 0, minDays);
                     current.setDate(current.getDate() + 1);
                 }
+            } else if (info.event.display !== 'background') {
+                // Événement de réservation — stocker chaque jour occupé (end exclusif FC)
+                reservedDates.add(evStart); // toujours ajouter le start
+                let current = new Date(evStart);
+                current.setDate(current.getDate() + 1);
+                const end = new Date(evEnd);
+                while (current < end) {
+                    reservedDates.add(current.toISOString().split('T')[0]);
+                    current.setDate(current.getDate() + 1);
+                }
             }
-        },
-
-        dateMouseEnter(info) {
-            if (!isSelecting || !startDate) {
-                return;
-            }
-
-            let hoverDate = info.dateStr;
-            let previewStart = startDate;
-            let previewEnd = hoverDate;
-
-            if (hoverDate < startDate) {
-                [previewStart, previewEnd] = [hoverDate, startDate];
-            }
-
-            // Calculate days
-            const start = new Date(previewStart);
-            const end = new Date(previewEnd);
-            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-
-            // Check minimum stay requirement
-            const minRequired = getMaxMinimumForRange(previewStart, previewEnd);
-            const isValid = days >= minRequired;
-
-            let end2 = new Date(previewEnd);
-            end2.setDate(end2.getDate() + 1);
-            let endPlus = end2.toISOString().split('T')[0];
-
-            const selection = calendar.getEventById('selection');
-            const color = isValid ? '#617da1' : '#e74c3c'; // Red if invalid
-            
-            if (selection) {
-                selection.setDates(previewStart, endPlus);
-                selection.setProp('backgroundColor', color);
-            } else {
-                calendar.addEvent({
-                    id: 'selection',
-                    start: previewStart,
-                    end: endPlus,
-                    display: 'background',
-                    backgroundColor: color
-                });
-            }
-
-            // Show warning if invalid
-            updateMinimumStayWarning(days, minRequired, isValid);
         },
 
         dateClick(info) {
 
-            // 👉 Si une sélection complète existe → RESET (3e clic)
-            if (!isSelecting && startDate === null && calendar.getEventById('selection')) {
-                calendar.getEventById('selection').remove();
-
+            // 👉 RESET (3e clic — sélection complète existante)
+            if (selectionComplete) {
+                selectionComplete = false;
+                clearHighlight();
                 document.getElementById('reservation_form_startDate').value = '';
                 document.getElementById('reservation_form_endDate').value = '';
-                clearMinimumStayWarning();
-
+                setBookingValid(false);
+                hideTooltip();
+                lastHoveredDate = null;
                 return;
             }
 
             // 👉 1er clic
             if (!startDate) {
+                if (reservedDates.has(info.dateStr)) {
+                    showTooltip(info.dayEl, '⚠ Cette date est déjà réservée', true);
+                    setTimeout(hideTooltip, 2500);
+                    return;
+                }
                 startDate = info.dateStr;
                 isSelecting = true;
-
-                calendar.getEventById('selection')?.remove();
-
-                let end = new Date(info.date);
-                end.setDate(end.getDate() + 1);
-                let endPlus = end.toISOString().split('T')[0];
-
-                calendar.addEvent({
-                    id: 'selection',
-                    start: startDate,
-                    end: endPlus,
-                    display: 'background',
-                    backgroundColor: '#617da1'
-                });
-
-                document.getElementById('reservation_form_startDate').value = startDate;
-                document.getElementById('reservation_form_endDate').value = startDate;
-                clearMinimumStayWarning();
+                lastHoveredDate = null;
+                highlightCells(startDate, startDate, true);
+                document.getElementById('reservation_form_startDate').value = '';
+                document.getElementById('reservation_form_endDate').value = '';
+                setBookingValid(false);
+                hideTooltip();
             } else {
                 // 👉 2e clic → créer range
                 let endDate = info.dateStr;
+                if (endDate < startDate) [startDate, endDate] = [endDate, startDate];
 
-                calendar.getEventById('selection')?.remove();
+                const days = Math.ceil((new Date(endDate) - new Date(startDate)) / 86400000) + 1;
 
-                if (endDate < startDate) {
-                    [startDate, endDate] = [endDate, startDate];
-                }
-
-                // Calculate days
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                const minRequired = getMaxMinimumForRange(startDate, endDate);
-
-                // Check if valid
-                if (days < minRequired) {
-                    // Invalid selection - show error and reset
-                    alert(`Erreur: Minimum ${minRequired} jour(s) requis pour cette période. Vous avez sélectionné ${days} jour(s).`);
+                if (hasReservedInRange(startDate, endDate)) {
+                    showTooltip(info.dayEl, '⚠ Une date de cette période est déjà réservée', true);
+                    setTimeout(hideTooltip, 3000);
+                    clearHighlight();
                     startDate = null;
                     isSelecting = false;
-                    clearMinimumStayWarning();
+                    lastHoveredDate = null;
                     return;
                 }
 
-                // ✅ +1 jour pour corriger FullCalendar
-                let end2 = new Date(endDate);
-                end2.setDate(end2.getDate() + 1);
-                let endPlus = end2.toISOString().split('T')[0];
+                const minRequired = getMaxMinimumForRange(startDate, endDate);
+                if (days < minRequired) {
+                    showTooltip(info.dayEl, `⚠ Minimum ${minRequired} j. requis — ${days} j. sélectionné`, true);
+                    setTimeout(hideTooltip, 3000);
+                    clearHighlight();
+                    startDate = null;
+                    isSelecting = false;
+                    lastHoveredDate = null;
+                    return;
+                }
 
-                calendar.addEvent({
-                    id: 'selection',
-                    start: startDate,
-                    end: endPlus,
-                    display: 'background',
-                    backgroundColor: '#617da1'
-                });
-
+                highlightCells(startDate, endDate, true);
                 document.getElementById('reservation_form_startDate').value = startDate;
                 document.getElementById('reservation_form_endDate').value = endDate;
-                clearMinimumStayWarning();
-
-                // 👉 fin sélection
+                setBookingValid(true);
+                selectionComplete = true;
+                hideTooltip();
                 startDate = null;
                 isSelecting = false;
+                lastHoveredDate = null;
             }
         }
     });
 
     calendar.render();
 
+    // Hover par délégation — fiable car le conteneur reste dans le DOM lors des re-renders FC
+    let lastHoveredDate = null;
+    const calendarEl = document.getElementById('calendar');
+
+    calendarEl.addEventListener('mouseover', function (e) {
+        if (!isSelecting || !startDate) return;
+
+        const cell = e.target.closest('[data-date]');
+        if (!cell) return;
+
+        const hoverDate = cell.dataset.date;
+        if (hoverDate === lastHoveredDate) return;
+        lastHoveredDate = hoverDate;
+
+        let previewStart = startDate;
+        let previewEnd = hoverDate;
+        if (hoverDate < startDate) [previewStart, previewEnd] = [hoverDate, startDate];
+
+        const days = Math.ceil((new Date(previewEnd) - new Date(previewStart)) / 86400000) + 1;
+        const hasConflict = hasReservedInRange(previewStart, previewEnd);
+        const minRequired = getMaxMinimumForRange(previewStart, previewEnd);
+        const isValid = !hasConflict && days >= minRequired;
+
+        highlightCells(previewStart, previewEnd, isValid);
+
+    });
+
+    calendarEl.addEventListener('mouseleave', function () {
+        lastHoveredDate = null;
+    });
+
     // Pré-remplir avec les dates de la recherche
     if (searchStartDate && searchEndDate) {
-        let end = new Date(searchEndDate);
-        end.setDate(end.getDate() + 1);
-        let endPlus = end.toISOString().split('T')[0];
-
-        calendar.addEvent({
-            id: 'selection',
-            start: searchStartDate,
-            end: endPlus,
-            display: 'background',
-            backgroundColor: '#617da1'
-        });
+        highlightCells(searchStartDate, searchEndDate, true);
+        setBookingValid(true);
     }
 
     // Helper function to get maximum minimum stay requirement for a date range
+    function hasReservedInRange(startStr, endStr) {
+        let current = new Date(startStr);
+        const end = new Date(endStr);
+        while (current <= end) {
+            if (reservedDates.has(current.toISOString().split('T')[0])) return true;
+            current.setDate(current.getDate() + 1);
+        }
+        return false;
+    }
+
     function getMaxMinimumForRange(startStr, endStr) {
         let maxMinimum = 0;
         const start = new Date(startStr);
@@ -438,33 +471,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return maxMinimum;
     }
 
-    // Helper function to update warning message
-    function updateMinimumStayWarning(days, minRequired, isValid) {
-        let warningEl = document.getElementById('minimum-stay-warning');
-        if (!warningEl) {
-            warningEl = document.createElement('div');
-            warningEl.id = 'minimum-stay-warning';
-            warningEl.style.marginTop = '10px';
-            const calendarContainer = document.getElementById('calendar');
-            calendarContainer.parentElement.insertBefore(warningEl, calendarContainer.nextElementSibling);
-        }
-
-        if (!isValid && minRequired > 0) {
-            warningEl.innerHTML = `<div class="alert alert-warning mb-2">⚠️ Minimum ${minRequired} jour(s) requis. Vous avez sélectionné ${days} jour(s).</div>`;
-        } else if (minRequired > 0) {
-            warningEl.innerHTML = `<div class="alert alert-info mb-2">✓ Minimum ${minRequired} jour(s) requis - Sélection valide (${days} jour(s)).</div>`;
-        } else {
-            warningEl.innerHTML = '';
-        }
-    }
-
-    // Helper function to clear warning
-    function clearMinimumStayWarning() {
-        const warningEl = document.getElementById('minimum-stay-warning');
-        if (warningEl) {
-            warningEl.innerHTML = '';
-        }
-    }
 });
 </script>
 <script>
