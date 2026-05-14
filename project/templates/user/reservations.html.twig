@@ -46,7 +46,7 @@
                         <p class="mb-1">
                             <i class="bi bi-clock"></i>
                             {% set days = (reservation.endDate.timestamp - reservation.startDate.timestamp) / 86400 %}
-                            {{ days }} {{ 'reservations.nights'|trans }}
+                            {{ days|round(0, 'floor') }} jour{{ days > 1 ? 's' : '' }}
                         </p>
 
                         

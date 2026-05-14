@@ -114,7 +114,23 @@
                     </div>
                     <div class="p-4">
                         {% if app.user %}
-                            <button type="button" id="preview-reservation-btn" class="btn p-4 bg-success text-white mt-4 w-100">
+                            <div class="mb-3 mt-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="accept-cgv">
+                                    <label class="form-check-label small" for="accept-cgv">
+                                        J'ai lu et j'accepte les
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#cgv-modal" class="fw-semibold">Conditions Générales de Vente</a>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="accept-privacy">
+                                    <label class="form-check-label small" for="accept-privacy">
+                                        J'ai lu et j'accepte la
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacy-modal" class="fw-semibold">Politique de Confidentialité</a>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="button" id="preview-reservation-btn" class="btn p-4 bg-success text-white mt-2 w-100 opacity-50" disabled style="cursor:not-allowed;">
                                 Faire ma réservation
                             </button>
                         {% else %}
@@ -124,7 +140,7 @@
                         {% endif %}
                     </div>
 
-                    {{ form_end(form) }}
+                    {{ form_end(form, {'render_rest': false}) }}
                 </div>
             </div>
         </div>
@@ -194,6 +210,26 @@
                     </div>
                 </div>
 
+                {% if not is_granted('ROLE_ADMIN') %}
+                <div class="card mb-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-success mb-3">Total à payer</h6>
+                        <div class="row mb-2">
+                            <div class="col-8">Séjour</div>
+                            <div class="col-4 text-end"><span id="recap-total-sejour"></span> €</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-8">Caution (avec frais)</div>
+                            <div class="col-4 text-end"><span id="recap-total-caution"></span> €</div>
+                        </div>
+                        <div class="row fw-bold fs-5 pt-2 border-top">
+                            <div class="col-8">Total</div>
+                            <div class="col-4 text-end text-success"><span id="recap-grand-total"></span> €</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 <h6 class="fw-bold mb-3">
                     {% if is_granted('ROLE_ADMIN') %}
                         Mode Administrateur
@@ -223,6 +259,157 @@
                         Payer le séjour →
                     </button>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal CGV dynamique #}
+<div class="modal fade" id="cgv-modal" tabindex="-1" aria-labelledby="cgvModalLabel">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="cgvModalLabel">Conditions Générales de Vente</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container py-2">
+                    <p class="text-muted small mb-4">Document généré le {{ "now"|date("d/m/Y") }}</p>
+
+                    <h6 class="fw-bold">PARTIES</h6>
+                    <div class="border rounded p-3 mb-4 bg-light">
+                        {% if app.user %}
+                        <p class="mb-1"><strong>Locataire :</strong></p>
+                        <p class="mb-1">{{ app.user.firstName }} {{ app.user.lastName }}</p>
+                        <p class="mb-1">Email : {{ app.user.email }}</p>
+                        {% if app.user.phone %}<p class="mb-1">Téléphone : {{ app.user.phone }}</p>{% endif %}
+                        {% if app.user.address %}<p class="mb-0">Adresse : {{ app.user.address }}</p>{% endif %}
+                        {% endif %}
+                    </div>
+
+                    <h6 class="fw-bold">Article 1 – Objet de la location</h6>
+                    <p>Le présent contrat porte sur la location saisonnière de l'hébergement suivant :</p>
+                    <div class="border rounded p-3 mb-4 bg-light">
+                        <p class="mb-1 fw-semibold">{{ apartment.name }}</p>
+                        {% if apartment.description %}<p class="mb-2 text-muted small">{{ apartment.description }}</p>{% endif %}
+                        <p class="mb-0"><strong>Prix de base :</strong> {{ price }} € / nuit</p>
+                        {% if apartment.equipments|length > 0 %}
+                        <p class="mb-1 mt-2 fw-semibold small">Équipements inclus :</p>
+                        <ul class="mb-0 small columns-2">
+                            {% for equipment in apartment.equipments %}
+                            <li>{{ equipment.name }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+
+                    <h6 class="fw-bold">Article 2 – Durée de la location</h6>
+                    <p>La durée exacte sera précisée lors de la confirmation de la réservation. La réservation ne devient définitive qu'après réception et confirmation du paiement.</p>
+
+                    <h6 class="fw-bold">Article 3 – Prix et modalités de paiement</h6>
+                    <p>3.1 Le prix de la location est de <strong>{{ price }} € par nuit</strong>.</p>
+                    <p>3.2 Le montant total est calculé en fonction du nombre de nuits réservées.</p>
+                    <p>3.3 Le paiement est effectué intégralement à la réservation par carte bancaire via la plateforme de paiement sécurisée Stripe.</p>
+
+                    <h6 class="fw-bold">Article 4 – Dépôt de garantie</h6>
+                    <p>4.1 Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>250 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
+                    <p>4.2 Ce dépôt est remboursable dans son intégralité dans un délai de 7 jours ouvrés suivant la fin du séjour, sous réserve de l'état du logement.</p>
+                    <p>4.3 En cas de dégradations constatées, le bailleur se réserve le droit de conserver tout ou partie du dépôt de garantie.</p>
+
+                    <h6 class="fw-bold">Article 5 – Conditions d'annulation</h6>
+                    <ul>
+                        <li>Plus de 30 jours avant l'arrivée : remboursement intégral</li>
+                        <li>Entre 15 et 30 jours avant l'arrivée : remboursement à 50 %</li>
+                        <li>Moins de 15 jours avant l'arrivée : aucun remboursement</li>
+                    </ul>
+                    <p>En cas d'annulation par le bailleur : remboursement intégral du montant payé.</p>
+
+                    <h6 class="fw-bold">Article 6 – Obligations du locataire</h6>
+                    <ul>
+                        <li>Utiliser le logement en bon père de famille</li>
+                        <li>Respecter le règlement intérieur fourni lors de l'entrée dans les lieux</li>
+                        <li>Ne pas dépasser la capacité d'accueil maximale autorisée</li>
+                        <li>Ne pas organiser de fêtes ou rassemblements sans accord préalable</li>
+                        <li>Restituer le logement dans l'état de propreté et d'ordre initial</li>
+                        <li>Il est strictement interdit de fumer à l'intérieur du logement</li>
+                    </ul>
+
+                    <h6 class="fw-bold">Article 7 – Responsabilités</h6>
+                    <p>Le locataire est responsable de tous les dommages causés au logement et à son contenu durant son séjour. Il est vivement conseillé de souscrire une assurance villégiature couvrant sa responsabilité civile.</p>
+
+                    <h6 class="fw-bold">Article 8 – Droit applicable</h6>
+                    <p class="mb-0">Le présent contrat est soumis au droit français. Tout litige sera soumis aux tribunaux compétents du ressort de la juridiction du lieu de situation du bien.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button id="cgv-accept-btn" class="btn btn-success" data-bs-dismiss="modal">J'accepte les CGV</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal Politique de confidentialité #}
+<div class="modal fade" id="privacy-modal" tabindex="-1" aria-labelledby="privacyModalLabel">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="privacyModalLabel">Politique de Confidentialité</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container py-2">
+                    <p class="text-muted small mb-4">Mise à jour le {{ "now"|date("d/m/Y") }}</p>
+
+                    <h6 class="fw-bold">1. Collecte des données personnelles</h6>
+                    <p>Nous collectons les informations suivantes lors de votre utilisation de notre plateforme :</p>
+                    <ul>
+                        <li>Nom et prénom</li>
+                        <li>Adresse email</li>
+                        <li>Numéro de téléphone</li>
+                        <li>Adresse postale</li>
+                        <li>Données de paiement (traitées de manière sécurisée par Stripe)</li>
+                        <li>Historique des réservations</li>
+                    </ul>
+
+                    <h6 class="fw-bold">2. Utilisation des données</h6>
+                    <p>Vos données personnelles sont utilisées pour :</p>
+                    <ul>
+                        <li>Gérer vos réservations et votre compte</li>
+                        <li>Traiter les paiements</li>
+                        <li>Vous contacter concernant vos séjours</li>
+                        <li>Respecter nos obligations légales</li>
+                    </ul>
+
+                    <h6 class="fw-bold">3. Conservation des données</h6>
+                    <p>Vos données sont conservées pendant la durée nécessaire à la fourniture de nos services, dans le respect des obligations légales applicables.</p>
+
+                    <h6 class="fw-bold">4. Vos droits (RGPD)</h6>
+                    <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                    <ul>
+                        <li><strong>Droit d'accès</strong> à vos données personnelles</li>
+                        <li><strong>Droit de rectification</strong> des informations inexactes</li>
+                        <li><strong>Droit à l'effacement</strong> ("droit à l'oubli")</li>
+                        <li><strong>Droit d'opposition</strong> au traitement de vos données</li>
+                        <li><strong>Droit à la portabilité</strong> de vos données</li>
+                    </ul>
+
+                    <h6 class="fw-bold">5. Sécurité des données</h6>
+                    <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre tout accès non autorisé, toute perte ou destruction.</p>
+
+                    <h6 class="fw-bold">6. Partage des données</h6>
+                    <p>Nous ne vendons pas vos données à des tiers. Vos données peuvent être partagées uniquement avec nos prestataires de services (notamment Stripe pour le traitement des paiements) dans le cadre strict de la fourniture de nos services.</p>
+
+                    <h6 class="fw-bold">7. Cookies</h6>
+                    <p>Notre site utilise des cookies techniques nécessaires à son fonctionnement. Aucun cookie de tracking tiers n'est utilisé sans votre consentement préalable.</p>
+
+                    <h6 class="fw-bold">8. Contact</h6>
+                    <p class="mb-0">Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter via la plateforme.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button id="privacy-accept-btn" class="btn btn-success" data-bs-dismiss="modal">J'accepte la Politique de Confidentialité</button>
             </div>
         </div>
     </div>
@@ -263,12 +450,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const apartmentPath = '{{ path('app.apartment.details', {'id': apartment.id}) }}';
     const baseLoginWithTarget = baseLoginUrl + '?_target_path=' + encodeURIComponent(apartmentPath);
 
-    function setBookingValid(isValid, startStr, endStr) {
+    let _datesValid = false;
+    let _lastStart = null;
+    let _lastEnd = null;
+
+    function areTermsAccepted() {
+        const cgv = document.getElementById('accept-cgv');
+        const privacy = document.getElementById('accept-privacy');
+        return (!cgv || cgv.checked) && (!privacy || privacy.checked);
+    }
+
+    function updateBookingBtn() {
+        const canBook = _datesValid && areTermsAccepted();
         if (bookingBtn) {
-            bookingBtn.disabled = !isValid;
-            bookingBtn.classList.toggle('opacity-50', !isValid);
-            bookingBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+            bookingBtn.disabled = !canBook;
+            bookingBtn.classList.toggle('opacity-50', !canBook);
+            bookingBtn.style.cursor = canBook ? 'pointer' : 'not-allowed';
         }
+    }
+
+    function setBookingValid(isValid, startStr, endStr) {
+        _datesValid = isValid;
+        _lastStart = startStr || null;
+        _lastEnd = endStr || null;
         if (loginLink) {
             if (isValid && startStr && endStr) {
                 const target = encodeURIComponent(apartmentPath + '?startDate=' + startStr + '&endDate=' + endStr);
@@ -277,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 loginLink.href = baseLoginWithTarget;
             }
         }
+        updateBookingBtn();
     }
 
     setBookingValid(false);
@@ -430,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('reservation_form_startDate').value = '';
                 document.getElementById('reservation_form_endDate').value = '';
                 setBookingValid(false);
-                hideTooltip();
+                showTooltip(info.dayEl, 'Sélectionnez la date de fin', false);
             } else {
                 // 👉 2e clic → créer range
                 let endDate = info.dateStr;
@@ -497,16 +702,34 @@ document.addEventListener('DOMContentLoaded', function () {
         const end = new Date(endStr);
         // FullCalendar: end est EXCLUSIF, donc convertir endDate inclusif en exclusif
         end.setDate(end.getDate() + 1);
-        
+
         let current = new Date(start);
         while (current < end) {
             const dateStr = current.toISOString().split('T')[0];
             maxMinimum = Math.max(maxMinimum, minimumStayRequirements[dateStr] || 0);
             current.setDate(current.getDate() + 1);
         }
-        
+
         return maxMinimum;
     }
+
+    // Réactualiser le bouton quand les cases sont cochées/décochées
+    document.getElementById('accept-cgv')?.addEventListener('change', updateBookingBtn);
+    document.getElementById('accept-privacy')?.addEventListener('change', updateBookingBtn);
+
+    // Bouton "J'accepte" dans le modal CGV → coche la case (fermeture via data-bs-dismiss)
+    document.getElementById('cgv-accept-btn')?.addEventListener('click', function() {
+        const cb = document.getElementById('accept-cgv');
+        if (cb) cb.checked = true;
+        updateBookingBtn();
+    });
+
+    // Bouton "J'accepte" dans le modal Politique → coche la case (fermeture via data-bs-dismiss)
+    document.getElementById('privacy-accept-btn')?.addEventListener('click', function() {
+        const cb = document.getElementById('accept-privacy');
+        if (cb) cb.checked = true;
+        updateBookingBtn();
+    });
 
 });
 </script>

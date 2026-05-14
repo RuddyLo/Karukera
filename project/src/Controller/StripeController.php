@@ -105,7 +105,7 @@ class StripeController extends AbstractController
         $price = $data['price'] ?? $apartment->getPrice();
 
         $rentAmount  = $price * $days;
-        $caution     = round($price * self::CAUTION_RATE, 2);
+        $caution     = $days <= 3 ? 250.0 : 500.0;
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
         $paymentIntentRent = PaymentIntent::create([

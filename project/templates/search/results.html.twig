@@ -19,17 +19,17 @@
                     </p>
                 {% endif %}
 
-                <div class="row">
+                <div class="row justify-content-center">
                     {% for apartment_result in results %}
-                        <div class="card-container d-flex col-md-4 mb-3">
+                        <div class="card-container d-flex col-md-10 col-sm-12 mx-auto mb-4">
                             <a href="{{ path('app.apartment.details', {
                                     id: apartment_result.id,
                                     _locale: app.request.locale,
                                     startDate: (apartment_result.id in conflictIds) ? null : filters.startDate,
                                     endDate:   (apartment_result.id in conflictIds) ? null : filters.endDate
                                 }) }}"
-                               class="text-decoration-none text-dark w-100 shadow">
-                                <div class="card appart-card border-0">
+                               class="text-decoration-none text-dark w-100 shadow-sm rounded">
+                                <div class="card appart-card border-0 rounded overflow-hidden">
                                     <div class="appart-image-wrapper">
                                         <img src="{{ asset(apartment_result.image_url) }}"
                                              alt="{{ apartment_result.name }}"
@@ -37,8 +37,8 @@
                                     </div>
                                     <div class="card-body p-3">
                                         <h2 class="appart-title mb-1">{{ apartment_result.name }}</h2>
-                                        <p class="appart-price mb-1">
-                                            <strong>Ar {{ apartment_result.price }}</strong> / nuit
+                                        <p class="appart-price mb-2">
+                                            <strong>{{ apartment_result.price }} €</strong> / nuit
                                         </p>
                                         {% if filters.startDate and filters.endDate %}
                                             {% if apartment_result.id in conflictIds %}
@@ -85,73 +85,23 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet'/>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
 <script>
-    const defaultLat = {{ results[0].latitude ?? -18.8792 }};
-    const defaultLng = {{ results[0].longitude ?? 47.5079 }};
-
-    const map = L.map('map').setView([defaultLat, defaultLng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    const map = L.map('map').setView([46.6034, 1.8883], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
     {% for apartment in results %}
-        {% if apartment.latitude is defined and apartment.longitude is defined %}
-            L.marker([{{ apartment.latitude }}, {{ apartment.longitude }}])
-                .addTo(map)
-                .bindPopup("<b>{{ apartment.name|e('js') }}</b><br>Ar {{ apartment.price }} / nuit");
-        {% endif %}
+        L.marker([46.6034 + {{ loop.index0 * 0.15 }}, 1.8883 + {{ loop.index0 * 0.2 }}])
+            .addTo(map)
+            .bindPopup(
+                "<b>{{ apartment.name|e('js') }}</b><br>" +
+                "<i class='bi bi-geo-alt-fill text-danger'></i> France<br>" +
+                "<strong>{{ apartment.price }} €</strong> / nuit"
+            );
     {% endfor %}
-
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const sfApartment = document.getElementById('sf_name');
-        const sfStart     = document.getElementById('sf_start');
-        const sfEnd       = document.getElementById('sf_end');
-        const sfGuests    = document.getElementById('sf_guests');
-
-        const uiApartment = document.getElementById('apartmentSelect');
-        const startUI     = document.getElementById('startDateInput');
-        const endUI       = document.getElementById('endDateInput');
-        const guestsUI    = document.getElementById('guestsInput');
-
-        // Sync au submit pour ne rien rater
-        document.querySelector('.hero-search').addEventListener('submit', function () {
-            sfApartment.value = uiApartment.value;
-            sfGuests.value    = guestsUI.value;
-        });
-
-        const tooltip = document.getElementById('calendar-tooltip');
-
-        document.querySelectorAll('.date-range, #startDateInput, #endDateInput').forEach(el => {
-            el.addEventListener('click', function (event) {
-                event.stopPropagation();
-                tooltip.classList.remove('hidden');
-                setTimeout(() => { calendar.updateSize(); }, 10);
-            });
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!event.target.closest('.calendar-tooltip') && !event.target.closest('.date-trigger')) {
-                tooltip.classList.add('hidden');
-            }
-        });
-
-        var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            initialView: 'dayGridMonth',
-            selectable: true,
-            locale: '{{ app.request.locale }}',
-            select: function (info) {
-                startUI.value = info.startStr;
-                endUI.value   = info.endStr;
-                sfStart.value = info.startStr;
-                sfEnd.value   = info.endStr;
-                tooltip.classList.add('hidden');
-            }
-        });
-
-        calendar.render();
-    });
 </script>
 
 {% endblock %}

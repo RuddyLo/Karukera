@@ -28,6 +28,13 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
         return;
     }
 
+    const cgvEl = document.getElementById('accept-cgv');
+    const privacyEl = document.getElementById('accept-privacy');
+    if ((cgvEl && !cgvEl.checked) || (privacyEl && !privacyEl.checked)) {
+        toastr.warning('Veuillez accepter les CGV et la Politique de Confidentialité pour continuer.');
+        return;
+    }
+
     const startDate = document.getElementById('reservation_form_startDate').value;
     const endDate = document.getElementById('reservation_form_endDate').value;
     const priceElement = document.getElementById('apartment_price');
@@ -76,6 +83,16 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
         document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
         document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
         document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
+        const refundEl = document.getElementById('recap-caution-refund');
+        if (refundEl) refundEl.textContent = data.cautionAmount.toFixed(2);
+
+        const grandTotal = data.rentAmount + data.cautionWithFees;
+        const totalSejourEl = document.getElementById('recap-total-sejour');
+        if (totalSejourEl) totalSejourEl.textContent = data.rentAmount.toFixed(2);
+        const totalCautionEl = document.getElementById('recap-total-caution');
+        if (totalCautionEl) totalCautionEl.textContent = data.cautionWithFees.toFixed(2);
+        const grandTotalEl = document.getElementById('recap-grand-total');
+        if (grandTotalEl) grandTotalEl.textContent = grandTotal.toFixed(2);
 
         const paymentElementContainer = document.getElementById('payment-element-rent');
         if (paymentElementContainer && !paymentElementContainer.hasChildNodes()) {
