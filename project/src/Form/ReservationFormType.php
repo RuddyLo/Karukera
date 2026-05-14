@@ -8,6 +8,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,8 +34,23 @@ class ReservationFormType extends AbstractType
                     'placeholder' => 'Choisissez une date de fin',
                     'readonly' => true,
                 ]
-    ])
-            
+            ])
+            ->add('acceptTerms', CheckboxType::class, [
+                'label' => 'J\'accepte les Conditions Générales de Vente',
+                'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-check-input',
+                ]
+            ])
+            ->add('acceptPrivacy', CheckboxType::class, [
+                'label' => 'J\'accepte la Politique de Confidentialité',
+                'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-check-input',
+                ]
+            ])
         ;
     }
 
