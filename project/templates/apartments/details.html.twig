@@ -194,18 +194,35 @@
                     </div>
                 </div>
 
-                <h6 class="fw-bold mb-3">Informations de paiement</h6>
-                <div id="payment-element-rent"></div>
-                <div id="payment-error" class="text-danger mt-3"></div>
-
-                
+                <h6 class="fw-bold mb-3">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        Mode Administrateur
+                    {% else %}
+                        Informations de paiement
+                    {% endif %}
+                </h6>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Mode Admin :</strong> Cette réservation sera créée immédiatement sans paiement Stripe.
+                    </div>
+                {% else %}
+                    <div id="payment-element-rent"></div>
+                    <div id="payment-error" class="text-danger mt-3"></div>
+                {% endif %}
             </div>
 
             <div class="modal-footer bg-light">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button id="checkout-button" class="btn btn-success btn-lg px-5">
-                    Payer le séjour →
-                </button>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <button id="checkout-button" class="btn btn-success btn-lg px-5">
+                        Créer la réservation →
+                    </button>
+                {% else %}
+                    <button id="checkout-button" class="btn btn-success btn-lg px-5">
+                        Payer le séjour →
+                    </button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -214,6 +231,7 @@
 <script>
 window.apartmentId = {{ apartment.id }};
 window.stripePublicKey = "{{ stripe_public_key }}";
+window.isUserAdmin = {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }};
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
@@ -293,7 +311,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const color = isValid ? 'rgba(97,125,161,0.3)' : 'rgba(231,76,60,0.3)';
         let current = new Date(startStr);
         const end = new Date(endStr);
-        while (current <= end) {
+        // FullCalendar: end est EXCLUSIF, donc marquer jusqu'à end - 1 jour
+        end.setDate(end.getDate() + 1); // Convertir endDate inclusif en exclusif
+        while (current < end) {
             const dateStr = current.toISOString().split('T')[0];
             const cell = document.querySelector(`[data-date="${dateStr}"]`);
             if (cell) { cell.style.backgroundColor = color; cell.dataset.sel = '1'; }
@@ -462,7 +482,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function hasReservedInRange(startStr, endStr) {
         let current = new Date(startStr);
         const end = new Date(endStr);
-        while (current <= end) {
+        // FullCalendar: end est EXCLUSIF, donc convertir endDate inclusif en exclusif
+        end.setDate(end.getDate() + 1);
+        while (current < end) {
             if (reservedDates.has(current.toISOString().split('T')[0])) return true;
             current.setDate(current.getDate() + 1);
         }
@@ -473,9 +495,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let maxMinimum = 0;
         const start = new Date(startStr);
         const end = new Date(endStr);
+        // FullCalendar: end est EXCLUSIF, donc convertir endDate inclusif en exclusif
+        end.setDate(end.getDate() + 1);
         
         let current = new Date(start);
-        while (current <= end) {
+        while (current < end) {
             const dateStr = current.toISOString().split('T')[0];
             maxMinimum = Math.max(maxMinimum, minimumStayRequirements[dateStr] || 0);
             current.setDate(current.getDate() + 1);

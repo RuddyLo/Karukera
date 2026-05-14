@@ -84,10 +84,14 @@ class ApartmentController extends AbstractController
         $events = [];
 
         foreach ($reservations as $reservation) {
+            // FullCalendar utilise end EXCLUSIF (jour après le dernier jour occupé)
+            $endDate = clone $reservation->getEndDate();
+            $endDate->modify('+1 day');
+            
             $events[] = [
                 'title' => 'Réservé',
                 'start' => $reservation->getStartDate()->format('Y-m-d'),
-                'end'   => $reservation->getEndDate()->format('Y-m-d'),
+                'end'   => $endDate->format('Y-m-d'),
                 'color' => '#ff4d4d', // rouge
             ];
         }

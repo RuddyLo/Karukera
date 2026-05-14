@@ -23,6 +23,66 @@ class StripeController extends AbstractController
     private const STRIPE_FEE_RATE = 0.015;
     private const STRIPE_FEE_FIXED = 0.25;
 
+    #[Route('/stripe/create-admin-reservation', name: 'stripe_create_admin_reservation', methods: ['POST'])]
+    public function createAdminReservation(
+        Request $request,
+        ApartmentRepository $apartmentRepository,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        $data = json_decode($request->getContent(), true);
+
+        $apartment = $apartmentRepository->find($data['apartment_id']);
+        if (!$apartment) {
+            return new JsonResponse(['error' => 'Apartment not found'], 404);
+        }
+
+        $startDate = new \DateTime($data['start_date']);
+        $endDate   = new \DateTime($data['end_date']);
+
+        // Check for existing reservation in same period
+        $existingReservation = $em->getRepository(Reservation::class)
+            ->findOneBy([
+                'user' => $this->getUser(),
+                'apartment' => $apartment,
+                'startDate' => $startDate
+            ]);
+
+        if ($existingReservation) {
+            return new JsonResponse(['error' => 'Une réservation existe déjà pour cette période'], 400);
+        }
+
+        try {
+            $reservation = new Reservation();
+            $reservation->setApartment($apartment);
+            $reservation->setUser($this->getUser());
+            $reservation->setStartDate($startDate);
+            $reservation->setEndDate($endDate);
+            $reservation->setConfirmed(true);
+            $reservation->setStatus('confirmed');
+            $reservation->setCautionConcerved(false);
+            $reservation->setCautionRefunded(false);
+            $reservation->setReference($reservation->generateReference());
+            
+            $em->persist($reservation);
+            $em->flush();
+
+            $this->sendReservationConfirmationEmails($reservation, $mailer);
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Réservation créée avec succès (mode admin)',
+                'reservation_id' => $reservation->getId(),
+                'reference' => $reservation->getReference()
+            ]);
+        } catch (\Exception $e) {
+            error_log('Admin reservation creation error: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Erreur lors de la création de la réservation'], 500);
+        }
+    }
+
     #[Route('/stripe/create-payment-intent', name: 'stripe_create_payment_intent', methods: ['POST'])]
     public function createPaymentIntent(
         Request $request,

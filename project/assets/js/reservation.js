@@ -41,37 +41,48 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
     document.getElementById('recap-start').textContent = startDate;
     document.getElementById('recap-end').textContent = endDate;
 
-    const response = await fetch('/stripe/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            apartment_id: window.apartmentId,
-            start_date: startDate,
-            end_date: endDate,
-            price: price
-        })
-    });
+    // Check if user is admin
+    if (window.isUserAdmin) {
+        // Admin mode: don't create payment intent, just show modal
+        document.getElementById('recap-days').textContent = '∞';
+        document.getElementById('recap-rent').textContent = '—';
+        document.getElementById('recap-caution').textContent = '—';
+        document.getElementById('recap-caution-total').textContent = '—';
+        document.getElementById('recap-fees').textContent = '—';
+    } else {
+        // User mode: create payment intent
+        const response = await fetch('/stripe/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                apartment_id: window.apartmentId,
+                start_date: startDate,
+                end_date: endDate,
+                price: price
+            })
+        });
 
-    const data = await response.json();
-    
-    if (data.error) {
-        toastr.error(data.error);
-        return;
-    }
+        const data = await response.json();
+        
+        if (data.error) {
+            toastr.error(data.error);
+            return;
+        }
 
-    clientSecretRent = data.clientSecretRent;
+        clientSecretRent = data.clientSecretRent;
 
-    document.getElementById('recap-days').textContent = data.days;
-    document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
-    document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
-    document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
-    document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
+        document.getElementById('recap-days').textContent = data.days;
+        document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
+        document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
+        document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
+        document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
 
-    const paymentElementContainer = document.getElementById('payment-element-rent');
-    if (paymentElementContainer && !paymentElementContainer.hasChildNodes()) {
-        elementsRent = stripe.elements({ clientSecret: clientSecretRent });
-        const paymentElement = elementsRent.create('payment');
-        paymentElement.mount('#payment-element-rent');
+        const paymentElementContainer = document.getElementById('payment-element-rent');
+        if (paymentElementContainer && !paymentElementContainer.hasChildNodes()) {
+            elementsRent = stripe.elements({ clientSecret: clientSecretRent });
+            const paymentElement = elementsRent.create('payment');
+            paymentElement.mount('#payment-element-rent');
+        }
     }
 
     const modal = new bootstrap.Modal(document.getElementById('reservation-modal'));
@@ -79,24 +90,64 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
 });
 
 document.getElementById('checkout-button')?.addEventListener('click', async function() {
-    if (!elementsRent) {
-        toastr.error('Le formulaire de paiement n\'est pas prêt.');
-        return;
-    }
+    const startDate = document.getElementById('reservation_form_startDate').value;
+    const endDate = document.getElementById('reservation_form_endDate').value;
 
-    this.disabled = true;
-    this.textContent = 'Paiement en cours...';
+    if (window.isUserAdmin) {
+        // Admin mode: create reservation without payment
+        this.disabled = true;
+        this.textContent = 'Création en cours...';
 
-    const { error } = await stripe.confirmPayment({
-        elements: elementsRent,
-        confirmParams: {
-            return_url: window.location.origin + '/payment/success',
+        try {
+            const response = await fetch('/stripe/create-admin-reservation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    apartment_id: window.apartmentId,
+                    start_date: startDate,
+                    end_date: endDate
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toastr.success(data.message);
+                document.getElementById('reservation-modal').addEventListener('hidden.bs.modal', function() {
+                    window.location.reload();
+                }, { once: true });
+                bootstrap.Modal.getInstance(document.getElementById('reservation-modal')).hide();
+            } else {
+                toastr.error(data.error || 'Erreur lors de la création');
+                this.disabled = false;
+                this.textContent = 'Créer la réservation →';
+            }
+        } catch (error) {
+            toastr.error('Erreur serveur: ' + error.message);
+            this.disabled = false;
+            this.textContent = 'Créer la réservation →';
         }
-    });
+    } else {
+        // User mode: normal Stripe payment
+        if (!elementsRent) {
+            toastr.error('Le formulaire de paiement n\'est pas prêt.');
+            return;
+        }
 
-    if (error) {
-        document.getElementById('payment-error').textContent = error.message;
-        this.disabled = false;
-        this.textContent = 'Payer la location';
+        this.disabled = true;
+        this.textContent = 'Paiement en cours...';
+
+        const { error } = await stripe.confirmPayment({
+            elements: elementsRent,
+            confirmParams: {
+                return_url: window.location.origin + '/payment/success',
+            }
+        });
+
+        if (error) {
+            document.getElementById('payment-error').textContent = error.message;
+            this.disabled = false;
+            this.textContent = 'Payer la location';
+        }
     }
 });
