@@ -4,12 +4,12 @@
 
 {% block content %}
 
-<div class="container-fluid p-4" style="">
-    <div class="row gx-5" style="height: 100vh; overflow: hidden;">
+<div class="container-fluid p-4 search-results-page">
+    <div class="row gx-5 align-items-start">
 
         <!-- LEFT COLUMN: RESULTS -->
-        <div class="col-lg-7" id="left-scroll">
-            <div class="results-container">
+        <div class="col-12 col-lg-7 d-flex flex-column">
+            <div class="results-container flex-fill">
 
                 <!-- RESULTS -->
                 {% if filters.startDate and filters.endDate %}
@@ -34,7 +34,7 @@
                                         <img src="{{ asset(apartment_result.image_url) }}"
                                              alt="{{ apartment_result.name }}"
                                              class="appart-image"
-                                             style="max-width: 600px; max-height: 600px; width: auto; height: auto; object-fit: cover;">
+                                             style="max-width: 600px; max-height: 600px;">
                                     </div>
                                     <div class="card-body p-3">
                                         <h2 class="appart-title mb-1">{{ apartment_result.name }}</h2>
@@ -77,8 +77,10 @@
         </div>
 
         <!-- RIGHT COLUMN: MAP -->
-        <div class="col-lg-5">
-            <div id="map" style="height: 700px; border-radius: 12px;"></div>
+        <div class="col-12 col-lg-5">
+            <div class="map-wrapper rounded overflow-hidden">
+                <div id="map" class="map-responsive"></div>
+            </div>
         </div>
 
     </div>
