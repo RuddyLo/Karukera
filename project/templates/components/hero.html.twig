@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const minRequired = getMaxMinStay(start, end);
                 if (days < minRequired) {
                     clearDates(instance);
-                    showTooltip(startUI, `Séjour minimum de ${minRequired} nuit${minRequired > 1 ? 's' : ''} requis.`);
+                    showTooltip(startUI, `Séjour minimum de ${minRequired -1 } nuit${minRequired > 1 ? 's' : ''} requis.`);
                     return;
                 }
 

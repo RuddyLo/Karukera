@@ -101,11 +101,11 @@ class StripeController extends AbstractController
 
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
-        $days      = max(1, $startDate->diff($endDate)->days + 1);
+        $days      = max(1, $startDate->diff($endDate)->days);
         $price = $data['price'] ?? $apartment->getPrice();
 
         $rentAmount  = $price * $days;
-        $caution     = $days <= 3 ? 250.0 : 500.0;
+        $caution     = $days <= 3 ? 400.0 : 500.0;
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
         $paymentIntentRent = PaymentIntent::create([
