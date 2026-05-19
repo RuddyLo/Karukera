@@ -56,46 +56,47 @@ class AdminReservationController extends AbstractController
     }
 
     #[Route('/{id}/send-review-invite', name: 'admin_reservation_send_review', methods: ['POST'])]
-    public function sendReviewInvite(
-        Reservation $reservation,
-        Request $request,
-        MailerInterface $mailer
-    ): Response {
-        if (!$this->isCsrfTokenValid('send_review' . $reservation->getId(), $request->request->get('_token'))) {
-            $this->addFlash('error', 'Jeton CSRF invalide.');
-            return $this->redirectToRoute('admin_reservations_list');
-        }
+public function sendReviewInvite(
+    Reservation $reservation,
+    Request $request,
+    MailerInterface $mailer
+): Response {
+    if (!$this->isCsrfTokenValid('send_review' . $reservation->getId(), $request->request->get('_token'))) {
+        $this->addFlash('error', 'Jeton CSRF invalide.');
+        return $this->redirectToRoute('admin_reservations_list');
+    }
 
-        $user = $reservation->getUser();
-        $emailAddress = $user?->getEmail();
+    $user = $reservation->getUser();
+    $emailAddress = $user?->getEmail();
 
-        if (!$emailAddress) {
-            $this->addFlash('error', 'Impossible d’envoyer l’email : adresse introuvable.');
-            return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
-        }
-
-        $reviewUrl = 'https://fr.trustpilot.com/review/oasiskarurio.com';
-        $subject = 'Merci pour votre séjour - laissez-nous un avis Trustpilot';
-        $htmlContent = sprintf(
-            '<p>Bonjour,</p><p>Merci d’avoir séjourné avec nous. Nous serions ravis que vous laissiez un avis sur Trustpilot.</p><p><a href="%s" target="_blank" rel="noopener">Laisser un avis</a></p><p>Merci encore et à bientôt,</p><p>Oasis de Karurio</p>',
-            $reviewUrl
-        );
-
-        try {
-            $email = (new Email())
-->from(new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio'))
-                ->to($emailAddress)
-                ->subject($subject)
-                ->html($htmlContent);
-
-            $mailer->send($email);
-            $this->addFlash('success', 'Email de demande d’avis envoyé au client.');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de l’envoi de l’email : ' . $e->getMessage());
-        }
-
+    if (!$emailAddress) {
+        $this->addFlash('error', 'Impossible d\'envoyer l\'email : adresse introuvable.');
         return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
     }
+
+    $reviewUrl = 'https://fr.trustpilot.com/review/oasiskarurio.com';
+    $subject = 'Merci pour votre séjour - laissez-nous un avis Trustpilot';
+    $htmlContent = sprintf(
+        '<p>Bonjour,</p><p>Merci d\'avoir séjourné avec nous. Nous serions ravis que vous laissiez un avis sur Trustpilot.</p><p><a href="%s" target="_blank" rel="noopener">Laisser un avis</a></p><p>Merci encore et à bientôt,</p><p>Oasis de Karurio</p>',
+        $reviewUrl
+    );
+
+    try {
+        $email = (new Email())
+            ->from(new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio'))
+            ->to($emailAddress)
+            ->bcc('oasiskarurio.com+fae2506764@invite.trustpilot.com')
+            ->subject($subject)
+            ->html($htmlContent);
+
+        $mailer->send($email);
+        $this->addFlash('success', 'Email de demande d\'avis envoyé au client.');
+    } catch (\Exception $e) {
+        $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+    }
+
+    return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
+}
 
     #[Route('/{id}/refund-caution', name: 'admin_refund_caution', methods: ['POST'])]
     public function refundCaution(
