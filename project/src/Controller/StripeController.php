@@ -288,17 +288,17 @@ class StripeController extends AbstractController
     private function sendReservationConfirmationEmails(Reservation $reservation, MailerInterface $mailer): void
     {
         $userEmail = $reservation->getUser()?->getEmail();
-        $adminEmail = $_ENV[‘ADMIN_EMAIL’] ?? ‘contact@oasiskarurio.com’;
+        $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'contact@oasiskarurio.com';
 
         if (!$userEmail) {
             return;
         }
 
-        $firstName     = $reservation->getUser()?->getFirstName() ?? ‘Client’;
+        $firstName     = $reservation->getUser()?->getFirstName() ?? 'Client';
         $apartmentName = $reservation->getApartment()->getName();
-        $startDate     = $reservation->getStartDate()->format(‘d/m/Y’);
-        $endDate       = $reservation->getEndDate()->format(‘d/m/Y’);
-        $reference     = $reservation->getReference() ?? ‘N/A’;
+        $startDate     = $reservation->getStartDate()->format('d/m/Y');
+        $endDate       = $reservation->getEndDate()->format('d/m/Y');
+        $reference     = $reservation->getReference() ?? 'N/A';
 
         $rentAmount    = 0;
         $cautionAmount = 0;
@@ -314,11 +314,11 @@ class StripeController extends AbstractController
             } catch (\Exception) {}
         }
 
-        $from = new Address($_ENV[‘MAILER_FROM_ADDRESS’] ?? ‘no-reply@oasiskarurio.com’, ‘Oasis de Karurio’);
+        $from = new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio');
 
-        $clientSubject = ‘Confirmation de votre réservation – Oasis de Karurio’;
+        $clientSubject = 'Confirmation de votre réservation – Oasis de Karurio';
         $clientHtml = sprintf(
-            ‘
+            '
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#333;">
   <div style="background:#2c7a4b;padding:24px 32px;border-radius:8px 8px 0 0;">
     <h1 style="color:#fff;margin:0;font-size:22px;">Oasis de Karurio</h1>
@@ -352,8 +352,8 @@ class StripeController extends AbstractController
       </ul>
     </div>
 
-    <p style="font-size:14px;color:#555;">Le règlement intérieur et les conditions de réservation acceptés lors du paiement s\’appliquent à l\’ensemble du séjour.</p>
-    <p style="font-size:14px;color:#555;">Les informations d\’arrivée et l\’accès au logement vous seront envoyés avant votre check-in.</p>
+    <p style="font-size:14px;color:#555;">Le règlement intérieur et les conditions de réservation acceptés lors du paiement s\'appliquent à l\'ensemble du séjour.</p>
+    <p style="font-size:14px;color:#555;">Les informations d\'arrivée et l\'accès au logement vous seront envoyés avant votre check-in.</p>
     <p>Nous restons disponibles pour toute question et vous souhaitons un excellent séjour en Guadeloupe.</p>
 
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
@@ -363,21 +363,21 @@ class StripeController extends AbstractController
       <a href="mailto:contact@oasiskarurio.com" style="color:#2c7a4b;">contact@oasiskarurio.com</a>
     </p>
   </div>
-</div>’,
+</div>',
             htmlspecialchars($firstName),
             htmlspecialchars($reference),
             htmlspecialchars($apartmentName),
             $startDate,
             $endDate,
-            number_format($rentAmount, 2, ‘,’, ‘ ‘),
-            number_format($total, 2, ‘,’, ‘ ‘),
-            number_format($cautionAmount, 2, ‘,’, ‘ ‘),
-            number_format($cautionAmount, 2, ‘,’, ‘ ‘)
+            number_format($rentAmount, 2, ',', ' '),
+            number_format($total, 2, ',', ' '),
+            number_format($cautionAmount, 2, ',', ' '),
+            number_format($cautionAmount, 2, ',', ' ')
         );
 
-        $adminSubject = ‘Nouvelle réservation – ‘ . $apartmentName . ‘ (‘ . $startDate . ‘ → ‘ . $endDate . ‘)’;
+        $adminSubject = 'Nouvelle réservation – ' . $apartmentName . ' (' . $startDate . ' → ' . $endDate . ')';
         $adminHtml = sprintf(
-            ‘<p>Une nouvelle réservation a été confirmée.</p>
+            '<p>Une nouvelle réservation a été confirmée.</p>
              <ul>
                <li>Référence : <strong>%s</strong></li>
                <li>Appartement : <strong>%s</strong></li>
@@ -386,17 +386,17 @@ class StripeController extends AbstractController
                <li>Séjour : <strong>%s €</strong></li>
                <li>Caution : <strong>%s €</strong></li>
                <li>Total : <strong>%s €</strong></li>
-             </ul>’,
+             </ul>',
             htmlspecialchars($reference),
             htmlspecialchars($apartmentName),
             $startDate,
             $endDate,
             htmlspecialchars($firstName),
-            htmlspecialchars($reservation->getUser()?->getLastName() ?? ‘’),
+            htmlspecialchars($reservation->getUser()?->getLastName() ?? ''),
             htmlspecialchars($userEmail),
-            number_format($rentAmount, 2, ‘,’, ‘ ‘),
-            number_format($cautionAmount, 2, ‘,’, ‘ ‘),
-            number_format($total, 2, ‘,’, ‘ ‘)
+            number_format($rentAmount, 2, ',', ' '),
+            number_format($cautionAmount, 2, ',', ' '),
+            number_format($total, 2, ',', ' ')
         );
 
         try {
@@ -414,7 +414,7 @@ class StripeController extends AbstractController
                 ->html($adminHtml)
             );
         } catch (\Exception $e) {
-            error_log(‘Reservation confirmation email error: ‘ . $e->getMessage());
+            error_log('Reservation confirmation email error: ' . $e->getMessage());
         }
     }
 }
