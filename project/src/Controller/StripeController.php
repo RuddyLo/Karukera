@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Reservation;
 use App\Repository\ApartmentRepository;
+use App\Repository\PricePeriodRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
@@ -86,10 +87,11 @@ class StripeController extends AbstractController
     #[Route('/stripe/create-payment-intent', name: 'stripe_create_payment_intent', methods: ['POST'])]
     public function createPaymentIntent(
         Request $request,
-        ApartmentRepository $apartmentRepository
+        ApartmentRepository $apartmentRepository,
+        PricePeriodRepository $pricePeriodRepository
     ): JsonResponse {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        
+
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
         $data = json_decode($request->getContent(), true);
@@ -102,7 +104,9 @@ class StripeController extends AbstractController
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
         $days      = max(1, $startDate->diff($endDate)->days);
-        $price = $data['price'] ?? $apartment->getPrice();
+
+        $pricePeriod = $pricePeriodRepository->findCurrentPricePeriod($startDate, $apartment);
+        $price = $pricePeriod ? (float) $pricePeriod->getPrice() : (float) $apartment->getPrice();
 
         $rentAmount  = $price * $days;
         $caution     = $days <= 3 ? 400.0 : 500.0;

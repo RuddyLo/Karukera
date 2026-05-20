@@ -16,8 +16,7 @@
                 <hr class="w-75">
             </div>
             <div class="col-sm-6 text-end">
-                <h4>{{ price }} €</h4>
-                
+                <h4 id="page-price-display">{{ price }} € <small class="text-muted fs-6" id="page-price-label">/ nuit</small></h4>
             </div>
         </div>
 
@@ -421,6 +420,8 @@
 window.apartmentId = {{ apartment.id }};
 window.stripePublicKey = "{{ stripe_public_key }}";
 window.isUserAdmin = {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }};
+window.priceForDateUrl = "{{ path('app.apartment.price_for_date', {id: apartment.id, _locale: app.request.locale}) }}";
+window.basePrice = {{ price }};
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
@@ -487,6 +488,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     setBookingValid(false);
+
+    function fetchAndShowPrice(startStr, showSwal = true) {
+        fetch(window.priceForDateUrl + '?date=' + startStr)
+            .then(r => r.json())
+            .then(data => {
+                const priceEl = document.getElementById('page-price-display');
+                if (priceEl) {
+                    priceEl.innerHTML = data.price + ' €  <small class="text-muted fs-6" id="page-price-label">(pour la période séléctionnée) / nuit</small>';
+                }
+                const recapPriceEl = document.getElementById('apartment_price');
+                if (recapPriceEl) {
+                    recapPriceEl.textContent = data.price + ' €';
+                    recapPriceEl.dataset.price = data.price;
+                }
+                if (showSwal && window.Swal) {
+                    const periodInfo = data.hasPeriod
+                        ? `<br><small class="text-muted">Période tarifaire : ${data.periodStart} → ${data.periodEnd}</small>`
+                        : '';
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Prix pour votre séjour',
+                        html: `Le tarif applicable est de <strong>${data.price} € / nuit</strong>${periodInfo}`,
+                        confirmButtonText: 'OK',
+                    });
+                }
+            });
+    }
+
+    function resetPriceDisplay() {
+        const priceEl = document.getElementById('page-price-display');
+        if (priceEl) {
+            priceEl.innerHTML = window.basePrice + ' € <small class="text-muted fs-6" id="page-price-label">/ nuit</small>';
+        }
+        const recapPriceEl = document.getElementById('apartment_price');
+        if (recapPriceEl) {
+            recapPriceEl.textContent = window.basePrice + ' €';
+            recapPriceEl.dataset.price = window.basePrice;
+        }
+    }
 
     const tooltip = document.createElement('div');
     Object.assign(tooltip.style, {
@@ -581,6 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('reservation_form_endDate').value = searchEndDate;
             setBookingValid(true, searchStartDate, searchEndDate);
             selectionComplete = true;
+            fetchAndShowPrice(searchStartDate, false);
         },
 
         eventDidMount(info) {
@@ -619,6 +660,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('reservation_form_endDate').value = '';
                 setBookingValid(false);
                 hideTooltip();
+                resetPriceDisplay();
                 lastHoveredDate = null;
                 return;
             }
@@ -672,6 +714,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setBookingValid(true, startDate, endDate);
                 selectionComplete = true;
                 hideTooltip();
+                fetchAndShowPrice(startDate);
                 startDate = null;
                 isSelecting = false;
                 lastHoveredDate = null;

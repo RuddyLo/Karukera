@@ -77,6 +77,23 @@ class ApartmentController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/price-for-date', name: 'app.apartment.price_for_date')]
+    public function priceForDate(Apartment $apartment, Request $request): JsonResponse
+    {
+        $dateStr = $request->query->get('date');
+        $date = $dateStr ? new \DateTime($dateStr) : new \DateTime('today');
+
+        $pricePeriod = $this->repo->findCurrentPricePeriod($date, $apartment);
+        $price = $pricePeriod ? (float) $pricePeriod->getPrice() : (float) $apartment->getPrice();
+
+        return $this->json([
+            'price'       => $price,
+            'hasPeriod'   => $pricePeriod !== null,
+            'periodStart' => $pricePeriod?->getStartDate()?->format('d/m/Y'),
+            'periodEnd'   => $pricePeriod?->getEndDate()?->format('d/m/Y'),
+        ]);
+    }
+
     #[Route('/{id}/reservations/json', name: 'reservations_json')]
     public function reservationsJson(ReservationRepository $repo, Apartment $apartment): JsonResponse
     {
