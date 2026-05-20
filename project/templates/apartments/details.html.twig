@@ -293,7 +293,7 @@
                     <div class="border rounded p-3 mb-4 bg-light">
                         <p class="mb-1 fw-semibold">{{ apartment.name }}</p>
                         {% if apartment.description %}<p class="mb-2 text-muted small">{{ apartment.description }}</p>{% endif %}
-                        <p class="mb-0"><strong>Prix de base :</strong> {{ price }} € / nuit</p>
+                        <p class="mb-0"><strong>Prix :</strong> <span id="cgv-price-1">{{ price }}</span> € / nuit</p>
                         {% if apartment.equipments|length > 0 %}
                         <p class="mb-1 mt-2 fw-semibold small">Équipements inclus :</p>
                         <ul class="mb-0 small columns-2">
@@ -308,7 +308,7 @@
                     <p>La durée exacte sera précisée lors de la confirmation de la réservation. La réservation ne devient définitive qu'après réception et confirmation du paiement.</p>
 
                     <h6 class="fw-bold">Article 3 – Prix et modalités de paiement</h6>
-                    <p>3.1 Le prix de la location est de <strong>{{ price }} € par nuit</strong>.</p>
+                    <p>3.1 Le prix de la location est de <strong><span id="cgv-price-2">{{ price }}</span> € par nuit</strong>.</p>
                     <p>3.2 Le montant total est calculé en fonction du nombre de dates réservées.</p>
                     <p>3.3 Le paiement est effectué intégralement à la réservation par carte bancaire via la plateforme de paiement sécurisée Stripe.</p>
 
@@ -502,6 +502,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     recapPriceEl.textContent = data.price + ' €';
                     recapPriceEl.dataset.price = data.price;
                 }
+                ['cgv-price-1', 'cgv-price-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = data.price;
+                });
                 if (showSwal && window.Swal) {
                     const periodInfo = data.hasPeriod
                         ? `<br><small class="text-muted">Période tarifaire : ${data.periodStart} → ${data.periodEnd}</small>`
@@ -526,6 +530,10 @@ document.addEventListener('DOMContentLoaded', function () {
             recapPriceEl.textContent = window.basePrice + ' €';
             recapPriceEl.dataset.price = window.basePrice;
         }
+        ['cgv-price-1', 'cgv-price-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = window.basePrice;
+        });
     }
 
     const tooltip = document.createElement('div');
