@@ -288,34 +288,115 @@ class StripeController extends AbstractController
     private function sendReservationConfirmationEmails(Reservation $reservation, MailerInterface $mailer): void
     {
         $userEmail = $reservation->getUser()?->getEmail();
-        $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'contact@oasiskarurio.com';
+        $adminEmail = $_ENV[‘ADMIN_EMAIL’] ?? ‘contact@oasiskarurio.com’;
 
         if (!$userEmail) {
             return;
         }
 
+        $firstName     = $reservation->getUser()?->getFirstName() ?? ‘Client’;
         $apartmentName = $reservation->getApartment()->getName();
-        $startDate = $reservation->getStartDate()->format('d/m/Y');
-        $endDate = $reservation->getEndDate()->format('d/m/Y');
+        $startDate     = $reservation->getStartDate()->format(‘d/m/Y’);
+        $endDate       = $reservation->getEndDate()->format(‘d/m/Y’);
+        $reference     = $reservation->getReference() ?? ‘N/A’;
 
-        $from = new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio');
+        $rentAmount    = 0;
+        $cautionAmount = 0;
+        $total         = 0;
 
-        $clientSubject = 'Votre réservation est confirmée';
+        if ($reservation->getRentPaymentIntentId()) {
+            try {
+                $intent        = \Stripe\PaymentIntent::retrieve($reservation->getRentPaymentIntentId());
+                $rentAmount    = (float) ($intent->metadata->rent_amount ?? 0);
+                $cautionAmount = (float) ($intent->metadata->caution_amount ?? 0);
+                $cautionFees   = (float) ($intent->metadata->caution_with_fees ?? $cautionAmount);
+                $total         = $rentAmount + $cautionFees;
+            } catch (\Exception) {}
+        }
+
+        $from = new Address($_ENV[‘MAILER_FROM_ADDRESS’] ?? ‘no-reply@oasiskarurio.com’, ‘Oasis de Karurio’);
+
+        $clientSubject = ‘Confirmation de votre réservation – Oasis de Karurio’;
         $clientHtml = sprintf(
-            '<p>Bonjour,</p><p>Votre réservation pour l’appartement <strong>%s</strong> du %s au %s est confirmée.</p><p>Merci pour votre confiance.</p>',
-            $apartmentName,
-            $startDate,
-            $endDate
-        );
+            ‘
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#333;">
+  <div style="background:#2c7a4b;padding:24px 32px;border-radius:8px 8px 0 0;">
+    <h1 style="color:#fff;margin:0;font-size:22px;">Oasis de Karurio</h1>
+  </div>
+  <div style="padding:32px;border:1px solid #e0e0e0;border-top:none;border-radius:0 0 8px 8px;">
+    <p style="font-size:16px;">Bonjour <strong>%s</strong>,</p>
+    <p>Nous avons le plaisir de confirmer votre réservation pour votre séjour en Guadeloupe.</p>
 
-        $adminSubject = 'Nouvelle réservation confirmée';
-        $adminHtml = sprintf(
-            '<p>Une nouvelle réservation a été confirmée.</p><p>Réservation #%d</p><p>Appartement : %s</p><p>Période : %s → %s</p><p>Client : %s</p>',
-            $reservation->getId(),
-            $apartmentName,
+    <table style="width:100%%;border-collapse:collapse;margin:24px 0;background:#f9f9f9;border-radius:6px;">
+      <tr><td colspan="2" style="padding:12px 16px;background:#2c7a4b;color:#fff;border-radius:6px 6px 0 0;font-weight:bold;">📋 Détails de la réservation</td></tr>
+      <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;width:40%%;">Référence</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong></td></tr>
+      <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">📍 Appartement</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong></td></tr>
+      <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">📅 Arrivée</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong> à partir de 15h00</td></tr>
+      <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">📅 Départ</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong> avant 11h00</td></tr>
+      <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">💳 Montant du séjour</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s €</strong></td></tr>
+      <tr><td style="padding:10px 16px;">💰 Total payé</td><td style="padding:10px 16px;"><strong>%s €</strong></td></tr>
+    </table>
+
+    <div style="background:#fff8e1;border-left:4px solid #f9a825;padding:16px 20px;margin:24px 0;border-radius:0 6px 6px 0;">
+      <p style="margin:0 0 8px;font-weight:bold;">🔒 Dépôt de garantie : %s €</p>
+      <p style="margin:0;font-size:14px;color:#555;">Une empreinte bancaire de <strong>%s €</strong> a été prélevée. Elle vous sera remboursée sous 48h suivant votre check-out, sauf en cas de dommage, non-respect du règlement intérieur ou frais supplémentaires constatés après le départ.</p>
+    </div>
+
+    <div style="background:#f5f5f5;padding:16px 20px;border-radius:6px;margin:24px 0;">
+      <p style="margin:0 0 10px;font-weight:bold;">📌 Rappel des principales règles :</p>
+      <ul style="margin:0;padding-left:20px;color:#555;font-size:14px;line-height:1.8;">
+        <li>Logement non-fumeur</li>
+        <li>Fêtes et événements interdits</li>
+        <li>Voyageurs supplémentaires non autorisés</li>
+        <li>Respect du voisinage et du calme</li>
+      </ul>
+    </div>
+
+    <p style="font-size:14px;color:#555;">Le règlement intérieur et les conditions de réservation acceptés lors du paiement s\’appliquent à l\’ensemble du séjour.</p>
+    <p style="font-size:14px;color:#555;">Les informations d\’arrivée et l\’accès au logement vous seront envoyés avant votre check-in.</p>
+    <p>Nous restons disponibles pour toute question et vous souhaitons un excellent séjour en Guadeloupe.</p>
+
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+    <p style="margin:0;font-size:13px;color:#888;">
+      <strong>Oasis de Karukera</strong><br>
+      +33 755 50 30 86<br>
+      <a href="mailto:contact@oasiskarurio.com" style="color:#2c7a4b;">contact@oasiskarurio.com</a>
+    </p>
+  </div>
+</div>’,
+            htmlspecialchars($firstName),
+            htmlspecialchars($reference),
+            htmlspecialchars($apartmentName),
             $startDate,
             $endDate,
-            $userEmail
+            number_format($rentAmount, 2, ‘,’, ‘ ‘),
+            number_format($total, 2, ‘,’, ‘ ‘),
+            number_format($cautionAmount, 2, ‘,’, ‘ ‘),
+            number_format($cautionAmount, 2, ‘,’, ‘ ‘)
+        );
+
+        $adminSubject = ‘Nouvelle réservation – ‘ . $apartmentName . ‘ (‘ . $startDate . ‘ → ‘ . $endDate . ‘)’;
+        $adminHtml = sprintf(
+            ‘<p>Une nouvelle réservation a été confirmée.</p>
+             <ul>
+               <li>Référence : <strong>%s</strong></li>
+               <li>Appartement : <strong>%s</strong></li>
+               <li>Période : <strong>%s → %s</strong></li>
+               <li>Client : <strong>%s %s</strong> (%s)</li>
+               <li>Séjour : <strong>%s €</strong></li>
+               <li>Caution : <strong>%s €</strong></li>
+               <li>Total : <strong>%s €</strong></li>
+             </ul>’,
+            htmlspecialchars($reference),
+            htmlspecialchars($apartmentName),
+            $startDate,
+            $endDate,
+            htmlspecialchars($firstName),
+            htmlspecialchars($reservation->getUser()?->getLastName() ?? ‘’),
+            htmlspecialchars($userEmail),
+            number_format($rentAmount, 2, ‘,’, ‘ ‘),
+            number_format($cautionAmount, 2, ‘,’, ‘ ‘),
+            number_format($total, 2, ‘,’, ‘ ‘)
         );
 
         try {
@@ -333,7 +414,7 @@ class StripeController extends AbstractController
                 ->html($adminHtml)
             );
         } catch (\Exception $e) {
-            error_log('Reservation confirmation email error: ' . $e->getMessage());
+            error_log(‘Reservation confirmation email error: ‘ . $e->getMessage());
         }
     }
 }
