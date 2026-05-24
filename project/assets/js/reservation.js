@@ -78,6 +78,13 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
 
         clientSecretRent = data.clientSecretRent;
 
+        const pricePerNight = data.days > 0 ? data.rentAmount / data.days : data.rentAmount;
+        const recapPriceEl = document.getElementById('apartment_price');
+        if (recapPriceEl) {
+            recapPriceEl.textContent = pricePerNight.toFixed(2) + ' €';
+            recapPriceEl.dataset.price = pricePerNight.toFixed(2);
+        }
+
         document.getElementById('recap-days').textContent = data.days;
         document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
         document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);

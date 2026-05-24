@@ -10,6 +10,7 @@ import Swiper from 'swiper';
 import $ from 'jquery'
 import toastr from 'toastr'
 import Swal from 'sweetalert2';
+window.Swal = Swal;
 
 
 

@@ -33,10 +33,10 @@ class UserReservationsController extends AbstractController
                     $cautionIntent = PaymentIntent::retrieve($reservation->getCautionPaymentIntentId());
 
                     $paymentData = [
-                        'rent_amount'    => $rentIntent->amount / 100,
+                        'rent_amount'    => $rentIntent->metadata->rent_amount ?? $rentIntent->amount / 100,
                         'rent_status'    => $rentIntent->status,
-                        'caution_amount' => $cautionIntent->metadata->caution_amount ?? 0,
-                        'total'          => ($rentIntent->amount / 100) + ($cautionIntent->metadata->caution_amount ?? 0),
+                        'caution_amount' => $rentIntent->metadata->caution_amount ?? 0,
+                        'total'          => $rentIntent->amount / 100,
                     ];
                 } catch (\Exception $e) {
                     $paymentData = null;

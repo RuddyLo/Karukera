@@ -16,8 +16,7 @@
                 <hr class="w-75">
             </div>
             <div class="col-sm-6 text-end">
-                <h4>{{ price }} €</h4>
-                
+                <h4 id="page-price-display">{{ price }} € <small class="text-muted fs-6" id="page-price-label">/ nuit</small></h4>
             </div>
         </div>
 
@@ -294,7 +293,7 @@
                     <div class="border rounded p-3 mb-4 bg-light">
                         <p class="mb-1 fw-semibold">{{ apartment.name }}</p>
                         {% if apartment.description %}<p class="mb-2 text-muted small">{{ apartment.description }}</p>{% endif %}
-                        <p class="mb-0"><strong>Prix de base :</strong> {{ price }} € / nuit</p>
+                        <p class="mb-0"><strong>Prix :</strong> <span id="cgv-price-1">{{ price }}</span> € / nuit</p>
                         {% if apartment.equipments|length > 0 %}
                         <p class="mb-1 mt-2 fw-semibold small">Équipements inclus :</p>
                         <ul class="mb-0 small columns-2">
@@ -309,12 +308,12 @@
                     <p>La durée exacte sera précisée lors de la confirmation de la réservation. La réservation ne devient définitive qu'après réception et confirmation du paiement.</p>
 
                     <h6 class="fw-bold">Article 3 – Prix et modalités de paiement</h6>
-                    <p>3.1 Le prix de la location est de <strong>{{ price }} € par nuit</strong>.</p>
+                    <p>3.1 Le prix de la location est de <strong><span id="cgv-price-2">{{ price }}</span> € par nuit</strong>.</p>
                     <p>3.2 Le montant total est calculé en fonction du nombre de dates réservées.</p>
                     <p>3.3 Le paiement est effectué intégralement à la réservation par carte bancaire via la plateforme de paiement sécurisée Stripe.</p>
 
                     <h6 class="fw-bold">Article 4 – Dépôt de garantie</h6>
-                    <p>4.1 Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>250 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
+                    <p>4.1 Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>400 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
                     <p>4.2 Ce dépôt est remboursable dans son intégralité dans un délai de 7 jours ouvrés suivant la fin du séjour, sous réserve de l'état du logement.</p>
                     <p>4.3 En cas de dégradations constatées, le bailleur se réserve le droit de conserver tout ou partie du dépôt de garantie.</p>
 
@@ -421,6 +420,8 @@
 window.apartmentId = {{ apartment.id }};
 window.stripePublicKey = "{{ stripe_public_key }}";
 window.isUserAdmin = {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }};
+window.priceForDateUrl = "{{ path('app.apartment.price_for_date', {id: apartment.id, _locale: app.request.locale}) }}";
+window.basePrice = {{ price }};
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
@@ -487,6 +488,53 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     setBookingValid(false);
+
+    function fetchAndShowPrice(startStr, showSwal = true) {
+        fetch(window.priceForDateUrl + '?date=' + startStr)
+            .then(r => r.json())
+            .then(data => {
+                const priceEl = document.getElementById('page-price-display');
+                if (priceEl) {
+                    priceEl.innerHTML = data.price + ' €  <small class="text-muted fs-6" id="page-price-label">(pour la période séléctionnée) / nuit</small>';
+                }
+                const recapPriceEl = document.getElementById('apartment_price');
+                if (recapPriceEl) {
+                    recapPriceEl.textContent = data.price + ' €';
+                    recapPriceEl.dataset.price = data.price;
+                }
+                ['cgv-price-1', 'cgv-price-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = data.price;
+                });
+                if (showSwal && window.Swal) {
+                    const periodInfo = data.hasPeriod
+                        ? `<br><small class="text-muted">Période tarifaire : ${data.periodStart} → ${data.periodEnd}</small>`
+                        : '';
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Prix pour votre séjour',
+                        html: `Le tarif applicable est de <strong>${data.price} € / nuit</strong>${periodInfo}`,
+                        confirmButtonText: 'OK',
+                    });
+                }
+            });
+    }
+
+    function resetPriceDisplay() {
+        const priceEl = document.getElementById('page-price-display');
+        if (priceEl) {
+            priceEl.innerHTML = window.basePrice + ' € <small class="text-muted fs-6" id="page-price-label">/ nuit</small>';
+        }
+        const recapPriceEl = document.getElementById('apartment_price');
+        if (recapPriceEl) {
+            recapPriceEl.textContent = window.basePrice + ' €';
+            recapPriceEl.dataset.price = window.basePrice;
+        }
+        ['cgv-price-1', 'cgv-price-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = window.basePrice;
+        });
+    }
 
     const tooltip = document.createElement('div');
     Object.assign(tooltip.style, {
@@ -581,6 +629,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('reservation_form_endDate').value = searchEndDate;
             setBookingValid(true, searchStartDate, searchEndDate);
             selectionComplete = true;
+            fetchAndShowPrice(searchStartDate, false);
         },
 
         eventDidMount(info) {
@@ -619,6 +668,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('reservation_form_endDate').value = '';
                 setBookingValid(false);
                 hideTooltip();
+                resetPriceDisplay();
                 lastHoveredDate = null;
                 return;
             }
@@ -672,6 +722,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setBookingValid(true, startDate, endDate);
                 selectionComplete = true;
                 hideTooltip();
+                fetchAndShowPrice(startDate);
                 startDate = null;
                 isSelecting = false;
                 lastHoveredDate = null;
