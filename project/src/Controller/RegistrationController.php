@@ -85,6 +85,7 @@ class RegistrationController extends AbstractController
 
         return $this->render('register.html.twig', [
             'registrationForm' => $form->createView(),
+            'recaptcha_key' => $_ENV['RECAPTCHA3_KEY'],
         ]);
     }
 

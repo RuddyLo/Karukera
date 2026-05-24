@@ -129,6 +129,7 @@ public function search(Request $request, ApartmentRepository $repo): Response
 
         return $this->render('components/contact.html.twig', [
             'form' => $form->createView(),
+            'recaptcha_key' => $_ENV['RECAPTCHA3_KEY'],
         ]);
     }
 

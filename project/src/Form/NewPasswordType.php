@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -30,6 +32,10 @@ class NewPasswordType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'reset.form.submit_new',
                 'attr'  => ['class' => 'btn btn-info btn-lg w-100 text-white mt-3'],
+            ])
+            ->add('captcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3(),
+                'action_name' => 'reset_password',
             ]);
     }
 }

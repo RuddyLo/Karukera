@@ -41,7 +41,7 @@
                             <a href="{{ path('app.login',{'_locale': app.request.locale}) }}">{{ 'register.login_link'|trans }}</a>
                         </p>
 
-                        {{ form_start(registrationForm) }}
+                        {{ form_start(registrationForm, {'attr': {'id': 'registration-form'}}) }}
 
                         <p class="section-label">{{ 'register.section.identity'|trans }}</p>
                         <div class="row g-3 mb-3">
@@ -96,6 +96,9 @@
 
                         <div style="display:none;">{{ form_row(registrationForm.submit) }}</div>
 
+                        {# Captcha invisible v3 #}
+                        {{ form_widget(registrationForm.captcha) }}
+
                         <button class="btn btn-info btn-lg w-100 text-white fw-semibold" type="submit">
                             {{ 'register.submit'|trans }}
                         </button>
@@ -106,4 +109,24 @@
             </div>
         </div>
     </div>
+
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_key }}&onload=recaptchaCallback_registration_form_captcha" async defer></script>
+<script>
+    var recaptchaCallback_registration_form_captcha = function() {
+        grecaptcha.execute('{{ recaptcha_key }}', {action: 'register'}).then(function(token) {
+            document.getElementById('registration_form_captcha').value = token;
+        });
+    };
+
+    document.getElementById('registration-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ recaptcha_key }}', {action: 'register'}).then(function(token) {
+                document.getElementById('registration_form_captcha').value = token;
+                form.submit();
+            });
+        });
+    });
+</script>
 {% endblock %}

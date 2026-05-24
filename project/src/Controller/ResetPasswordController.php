@@ -62,6 +62,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('security/forgot_password.html.twig', [
             'form' => $form->createView(),
+            'recaptcha_key' => $_ENV['RECAPTCHA3_KEY'],
         ]);
     }
 
@@ -94,6 +95,7 @@ class ResetPasswordController extends AbstractController
         return $this->render('security/reset_password.html.twig', [
             'form'  => $form->createView(),
             'token' => $token,
+            'recaptcha_key' => $_ENV['RECAPTCHA3_KEY'],
         ]);
     }
 }

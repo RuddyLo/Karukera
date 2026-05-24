@@ -18,7 +18,7 @@
                     <div class="alert alert-success">{{ flash|trans }}</div>
                 {% endfor %}
 
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'id': 'contact-form'}}) }}
 
                 <div class="row">
                     <div class="col-md-6 form-group">
@@ -51,6 +51,9 @@
                         {{ form_widget(form.end_date) }}
                     </div>
                 </div>
+
+                {# Captcha invisible v3 #}
+                {{ form_widget(form.captcha) }}
 
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-primary">
@@ -91,4 +94,24 @@
         </div>
     </div>
 </section>
+
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_key }}&onload=recaptchaCallback_contact_form_captcha" async defer></script>
+<script>
+    var recaptchaCallback_contact_form_captcha = function() {
+        grecaptcha.execute('{{ recaptcha_key }}', {action: 'contact'}).then(function(token) {
+            document.getElementById('contact_form_captcha').value = token;
+        });
+    };
+
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ recaptcha_key }}', {action: 'contact'}).then(function(token) {
+                document.getElementById('contact_form_captcha').value = token;
+                form.submit();
+            });
+        });
+    });
+</script>
 {% endblock %}
