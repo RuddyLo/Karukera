@@ -29,6 +29,8 @@
             list        : "{{ path('admin.ajax.apartment') }}" ,
             show        : "{{ path('admin.apartment.show', {id : 123456789}) }}" ,
             edit        : "{{ path('admin.apartment.edit', {id : 123456789}) }}" ,
+            delete      : "{{ path('admin.apartment.delete', {id : 123456789}) }}" ,
+            deleteToken : "{{ csrf_token('delete_apartment') }}" ,
         },
         user: {
             list        :"{{ path('admin.ajax.user')}}",

@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-
 use function Symfony\Component\Clock\now;
 
 #[Route('/admin/apartment')]
@@ -74,21 +72,8 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
             $apartment->setImageUrl($this->imageUrlDirectory . 'default.jpg');
         }
 
-        // Images supplémentaires
-        foreach ($form->get('images')->getData() as $imageFile) {
-            $fileName = uniqid() . '.' . $this->slugify->slugify(
-                $imageFile->getClientOriginalName()
-            );
-            try {
-                $imageFile->move($this->apartmentImageDirectory, $fileName);
-                $image = new Image();
-                $image->setUrl($this->imageUrlDirectory . $fileName);
-                $apartment->addImage($image);
-                $entityManager->persist($image);
-            } catch (FileException $e) {
-                // log si besoin
-            }
-        }
+        // Images uploadées via AJAX
+        $this->moveTempImages($request->request->all('temp_image_keys'), $apartment, $entityManager);
 
         // Locale
         $locale = $form->get('locale')->getData();
@@ -162,22 +147,8 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
                 );
             }
 
-            $images = $form->get('images')->getData();
-            foreach ($images as $imageFile) {
-                $fileName = uniqid() . '.' . $this->slugify->slugify(
-                    $imageFile->getClientOriginalName()
-                );
-
-                try {
-                    $imageFile->move($this->apartmentImageDirectory, $fileName);
-                } catch (FileException $e) {
-                }
-
-                $image = new Image();
-                $image->setUrl($this->imageUrlDirectory . $fileName);
-                $apartment->addImage($image);
-                $entityManager->persist($image);
-            }
+            // Images uploadées via AJAX
+            $this->moveTempImages($request->request->all('temp_image_keys'), $apartment, $entityManager);
 
             $pricePeriod = $form->get('pricePeriod')->getData();
 
@@ -205,12 +176,30 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
     #[Route('/{id}', name: 'admin.apartment.delete', methods: ['POST'])]
     public function delete(Request $request, Apartment $apartment, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $apartment->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($apartment);
-            $entityManager->flush();
+        if (!$this->isCsrfTokenValid('delete_apartment', $request->request->get('_token'))) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Token CSRF invalide'], 403);
+            }
+            return $this->redirectToRoute('admin.apartment');
         }
 
-        return $this->redirectToRoute('admin.apartment', []);
+        try {
+            $entityManager->remove($apartment);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'error' => 'Impossible de supprimer : cet appartement a des réservations associées.',
+                ], 409);
+            }
+            return $this->redirectToRoute('admin.apartment');
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
+
+        return $this->redirectToRoute('admin.apartment');
     }
 
     #[Route('/ajax/list', name: 'admin.ajax.apartment')]
@@ -239,6 +228,122 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
                 return array_values($value);
             }, $apartment[0]),
         ]);
+    }
+
+    #[Route('/images/upload-temp', name: 'admin.apartment.image.upload_temp', methods: ['POST'])]
+    public function uploadTemp(Request $request): JsonResponse
+    {
+        $file = $request->files->get('file');
+        if (!$file || !$file->isValid()) {
+            $error = $file ? 'Fichier trop volumineux (limite serveur dépassée)' : 'Aucun fichier reçu';
+            return new JsonResponse(['error' => $error], 400);
+        }
+
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!in_array($file->getMimeType(), $allowedTypes)) {
+            return new JsonResponse(['error' => 'Format non supporté (PNG, JPG, WEBP)'], 400);
+        }
+
+        $tempDir = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/images/temp/';
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $baseName = uniqid() . '_' . $this->slugify->slugify(
+            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+        );
+
+        $savedFilename = $this->compressAndSave($file->getPathname(), $file->getMimeType(), $tempDir, $baseName);
+
+        return new JsonResponse([
+            'success' => true,
+            'tempKey' => $savedFilename,
+            'previewUrl' => '/uploads/images/temp/' . $savedFilename,
+        ]);
+    }
+
+    private function compressAndSave(string $srcPath, string $mimeType, string $destDir, string $baseName): string
+    {
+        $filename = $baseName . '.jpg';
+
+        if (!$srcPath || !\function_exists('imagecreatefromjpeg')) {
+            \copy($srcPath, $destDir . $filename);
+            return $filename;
+        }
+
+        $imageInfo = @\getimagesize($srcPath);
+        if (!$imageInfo) {
+            \copy($srcPath, $destDir . $filename);
+            return $filename;
+        }
+
+        // Ajuste le memory_limit selon la taille réelle (4 bytes/pixel × 2 buffers + 64 Mo overhead)
+        $neededMb = (int)(($imageInfo[0] * $imageInfo[1] * 8) / 1024 / 1024) + 64;
+        \ini_set('memory_limit', \max(256, $neededMb) . 'M');
+
+        try {
+            $src = match(true) {
+                \in_array($mimeType, ['image/jpeg', 'image/jpg']) => @\imagecreatefromjpeg($srcPath),
+                $mimeType === 'image/png'  => @\imagecreatefrompng($srcPath),
+                $mimeType === 'image/webp' => @\imagecreatefromwebp($srcPath),
+                default => null,
+            };
+
+            if (!$src) {
+                \copy($srcPath, $destDir . $filename);
+                return $filename;
+            }
+
+            $origWidth  = \imagesx($src);
+            $origHeight = \imagesy($src);
+            $maxWidth   = 1920;
+
+            if ($origWidth > $maxWidth) {
+                $ratio     = $maxWidth / $origWidth;
+                $newWidth  = $maxWidth;
+                $newHeight = (int)($origHeight * $ratio);
+            } else {
+                $newWidth  = $origWidth;
+                $newHeight = $origHeight;
+            }
+
+            $dst   = \imagecreatetruecolor($newWidth, $newHeight);
+            $white = \imagecolorallocate($dst, 255, 255, 255);
+            \imagefilledrectangle($dst, 0, 0, $newWidth, $newHeight, $white);
+
+            \imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+            \imagejpeg($dst, $destDir . $filename, 85);
+
+            \imagedestroy($src);
+            \imagedestroy($dst);
+        } catch (\Throwable) {
+            \copy($srcPath, $destDir . $filename);
+        }
+
+        return $filename;
+    }
+
+    private function moveTempImages(array $tempKeys, Apartment $apartment, EntityManagerInterface $entityManager): void
+    {
+        $tempDir = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/images/temp/';
+
+        foreach ($tempKeys as $tempKey) {
+            $tempPath = $tempDir . $tempKey;
+            if (!file_exists($tempPath)) {
+                continue;
+            }
+
+            if (!file_exists($this->apartmentImageDirectory)) {
+                mkdir($this->apartmentImageDirectory, 0777, true);
+            }
+
+            rename($tempPath, $this->apartmentImageDirectory . $tempKey);
+
+            $image = new Image();
+            $image->setUrl($this->imageUrlDirectory . $tempKey);
+            $apartment->addImage($image);
+            $entityManager->persist($image);
+        }
     }
 
     #[Route('/images/delete/{id}', name: 'ajax.apartment.image.delete', methods: ['DELETE'])]

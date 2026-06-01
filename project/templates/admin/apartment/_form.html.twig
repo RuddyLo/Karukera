@@ -55,15 +55,18 @@
 
             {{ form_row(form.imageUrl,{ 'id': 'apartment_form_imagerUrl' }) }}
         </div>
-        {# Input pour uploader plusieurs images #}
+        {# Upload AJAX image par image #}
         <div class="p-4 shadow mt-3 mb-3">
-            <div class="row mt-3 ">
-                {{ form_row(form.images, { 'attr': { 'multiple': 'multiple', 'id': 'apartment_form_images' } }) }}
+            <label class="form-label fw-semibold">Images de l'appartement</label>
+            <div class="mb-2 d-flex align-items-center gap-2">
+                <label for="apartment-images-input" class="btn btn-outline-primary mb-0">
+                    <i class="bi bi-images"></i> Ajouter des photos
+                </label>
+                <input type="file" id="apartment-images-input" multiple accept="image/jpeg,image/png,image/webp" class="d-none">
+                <small class="text-muted">PNG, JPG, WEBP — compressées automatiquement</small>
             </div>
-
-            <div id="apartment-images-preview" class="row mt-4">
-            </div>
-
+            <div id="upload-status" class="text-muted small mb-2" style="display:none;"></div>
+            <div id="apartment-images-preview" class="row mt-2"></div>
         </div>
             {% if apartment is defined %}
             <div class="row mt-3" id="existing-images">

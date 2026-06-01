@@ -1,5 +1,6 @@
 const { ajax } = require("jquery");
 import $ from 'jquery';
+import Swal from 'sweetalert2';
 
 $(document).ready(() => {
     let apartmentDataTable = $("#apartment-table").DataTable({
@@ -62,18 +63,55 @@ $(document).ready(() => {
 <a title="Modifier EN" href='${ajaxLink.apartment.edit.replace('123456789', row[0])}?locale=en' class='btn btn-secondary'>
     🇺🇸
 </a>
-                                <button title="Suppression" id='delete-apartment' class='btn btn-danger event-delete-apartment' data-uuid=${data}>
+                                <button title="Suppression" class='btn btn-danger event-delete-apartment' data-uuid='${row[0]}'>
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>
                               </span>
                       </div>
-                      
-                      
+
+
                   `
                 }
             },
         ],
 
+    });
+
+    $(document).on('click', '.event-delete-apartment', function () {
+        const id = $(this).data('uuid');
+
+        Swal.fire({
+            title: 'Supprimer cet appartement ?',
+            text: 'Cette action est irréversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+        }).then(result => {
+            if (!result.isConfirmed) return;
+
+            const url = ajaxLink.apartment.delete.replace('123456789', id);
+            const formData = new FormData();
+            formData.append('_token', ajaxLink.apartment.deleteToken);
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData,
+            })
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
+                    apartmentDataTable.ajax.reload(null, false);
+                    Swal.fire({ title: 'Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                } else {
+                    Swal.fire('Impossible', data.error || 'Échec de la suppression', 'warning');
+                }
+            })
+            .catch(() => Swal.fire('Erreur', 'Erreur réseau', 'error'));
+        });
     });
 
     let userDataTable = $("#user-table").DataTable({
