@@ -96,19 +96,6 @@ class ApartmentFormType extends AbstractType
 
                 ]
             ])
-            ->add('images', FileType::class, [
-                'label' => "Images de l'appartement ",
-                'multiple' => true,
-                'mapped' => false,
-                'required' => false,
-                'row_attr' => ['class' => 'form-group col-12'],
-                'attr' => [
-
-                    'accept' => 'image/*',
-                    'class' => 'form-control mt-4',
-                ],
-            ])
-
             ->add('equipments', EntityType::class, [
                 'class' => Equipment::class, 
                 'choice_label' => 'name', 
