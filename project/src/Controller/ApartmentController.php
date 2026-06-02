@@ -54,12 +54,12 @@ class ApartmentController extends AbstractController
                 foreach ($errors as $error) {
                     $this->addFlash('danger', $error);
                 }
-                return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
+                return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId(), '_locale' => $request->getLocale()]);
             } else {
                 $em->persist($reservation);
                 $em->flush();
                 $this->addFlash('success', 'Réservation enregistrée ! Vous pouvez consulter la liste de vos réservations dans votre compte.');
-                return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId()]);
+                return $this->redirectToRoute('app.apartment.details', ['id' => $apartment->getId(), '_locale' => $request->getLocale()]);
             }
         }
 

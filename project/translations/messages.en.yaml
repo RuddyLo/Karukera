@@ -170,6 +170,13 @@ reservations:
     caution_amount: "Deposit"
     total: "Total paid"
 
+apartment_details:
+    equipments_title: "What this apartment offers"
+    book_title: "Book your stay"
+    price_per_night: "/ night"
+    show_all_images: "Show all images"
+    login_to_book: "Log in to book"
+
 blog:
     title: "Our Blog"
     subtitle: "Discover our latest articles and tips."

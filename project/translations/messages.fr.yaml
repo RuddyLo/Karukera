@@ -169,6 +169,13 @@ reservations:
     caution_amount: "Caution"
     total: "Total payé"
 
+apartment_details:
+    equipments_title: "Ce que propose cet appartement"
+    book_title: "Réservez votre séjour"
+    price_per_night: "/ nuit"
+    show_all_images: "Afficher toutes les images"
+    login_to_book: "Se connecter pour réserver"
+
 blog:
     title: "Notre Blog"
     subtitle: "Découvrez nos derniers articles et conseils."

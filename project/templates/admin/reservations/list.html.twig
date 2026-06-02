@@ -53,7 +53,7 @@
                                 </td>
                                 <td>
                                     {% if payment %}
-                                        <span class="badge bg-success">{{ payment.rent_amount }}€</span>
+                                        <span class="badge bg-success">{{ payment.rent_amount }} {{ payment.currency_symbol }}</span>
                                     {% else %}
                                         <span class="text-muted">-</span>
                                     {% endif %}
@@ -61,11 +61,11 @@
                                 <td>
                                     {% if reservation.isCautionRefunded() %}
                                             <span class="badge bg-info">
-                                                {{ payment.caution_amount }}€ remboursés
+                                                {{ payment.caution_amount }} {{ payment.currency_symbol }} remboursés
                                             </span>
                                        {% elseif reservation.isCautionConcerved() %}
                                             <span class="badge bg-warning text-dark">
-                                                {{ payment.caution_amount }}€ conservée
+                                                {{ payment.caution_amount }} {{ payment.currency_symbol }} conservée
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary text-white">Caution non traitée</span>

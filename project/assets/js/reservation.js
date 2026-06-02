@@ -5,6 +5,14 @@ let stripe;
 let elementsRent;
 let clientSecretRent = null;
 
+function getCurrencySymbol() {
+    return (window.selectedCurrency || 'eur') === 'brl' ? 'R$' : '€';
+}
+
+function updateCurrencySymbols() {
+    const symbol = getCurrencySymbol();
+    document.querySelectorAll('.currency-symbol').forEach(el => { el.textContent = symbol; });
+}
 
 function initStripe() {
     if (!window.stripePublicKey) {
@@ -15,12 +23,127 @@ function initStripe() {
     return true;
 }
 
+function showCurrencySpinner(loading) {
+    const spinner = document.getElementById('currency-spinner');
+    const rateEl = document.getElementById('exchange-rate-display');
+    const btns = document.querySelectorAll('#currency-selector button');
+    if (spinner) spinner.style.display = loading ? 'block' : 'none';
+    if (rateEl && loading) rateEl.style.display = 'none';
+    btns.forEach(b => { b.disabled = loading; });
+}
+
+function showExchangeRate(currency, rate) {
+    const rateEl = document.getElementById('exchange-rate-display');
+    if (!rateEl) return;
+    if (currency === 'brl' && rate && rate !== 1) {
+        rateEl.textContent = `Taux appliqué : 1 EUR = ${rate.toFixed(4)} R$ (inclus un frais de conversion de 2%)`;
+        rateEl.style.display = 'block';
+    } else {
+        rateEl.style.display = 'none';
+    }
+}
+
+async function fetchAndMountPaymentIntent(startDate, endDate, price) {
+    clientSecretRent = null;
+    const container = document.getElementById('payment-element-rent');
+    if (container) container.innerHTML = '';
+    elementsRent = null;
+
+    showCurrencySpinner(true);
+
+    let data;
+    try {
+        const response = await fetch('/stripe/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                apartment_id: window.apartmentId,
+                start_date: startDate,
+                end_date: endDate,
+                price: price,
+                currency: window.selectedCurrency || 'eur'
+            })
+        });
+        data = await response.json();
+    } catch (e) {
+        showCurrencySpinner(false);
+        toastr.error('Erreur réseau. Veuillez réessayer.');
+        return false;
+    }
+
+    showCurrencySpinner(false);
+
+    if (data.error) {
+        toastr.error(data.error);
+        return false;
+    }
+
+    clientSecretRent = data.clientSecretRent;
+    if (data.currency) window.selectedCurrency = data.currency;
+    updateCurrencySymbols();
+    showExchangeRate(data.currency, data.exchangeRate);
+
+    const pricePerNight = data.days > 0 ? data.rentAmount / data.days : data.rentAmount;
+    const recapPriceEl = document.getElementById('apartment_price');
+    if (recapPriceEl) {
+        const valEl = document.getElementById('apartment_price_value');
+        if (valEl) valEl.textContent = pricePerNight.toFixed(2);
+        recapPriceEl.dataset.price = pricePerNight.toFixed(2);
+    }
+
+    document.getElementById('recap-days').textContent = data.days;
+    document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
+    document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
+    document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
+    document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
+    const refundEl = document.getElementById('recap-caution-refund');
+    if (refundEl) refundEl.textContent = data.cautionAmount.toFixed(2);
+
+    const grandTotal = data.rentAmount + data.cautionWithFees;
+    const totalSejourEl = document.getElementById('recap-total-sejour');
+    if (totalSejourEl) totalSejourEl.textContent = data.rentAmount.toFixed(2);
+    const totalCautionEl = document.getElementById('recap-total-caution');
+    if (totalCautionEl) totalCautionEl.textContent = data.cautionWithFees.toFixed(2);
+    const grandTotalEl = document.getElementById('recap-grand-total');
+    if (grandTotalEl) grandTotalEl.textContent = grandTotal.toFixed(2);
+
+    if (container) {
+        elementsRent = stripe.elements({ clientSecret: clientSecretRent, locale: window.appLocale || 'fr' });
+        const paymentElement = elementsRent.create('payment');
+        paymentElement.mount('#payment-element-rent');
+    }
+
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.getElementById('preview-reservation-btn')) return;
     initStripe();
+
+    document.querySelectorAll('#currency-selector [data-currency]').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            document.querySelectorAll('#currency-selector [data-currency]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const newCurrency = this.dataset.currency;
+            if (window.selectedCurrency === newCurrency) return;
+
+            window.selectedCurrency = newCurrency;
+
+            const startDate = document.getElementById('reservation_form_startDate').value;
+            const endDate = document.getElementById('reservation_form_endDate').value;
+            const price = parseFloat(document.getElementById('apartment_price').dataset.price);
+
+            const checkoutBtn = document.getElementById('checkout-button');
+            if (checkoutBtn) checkoutBtn.disabled = true;
+
+            await fetchAndMountPaymentIntent(startDate, endDate, price);
+
+            if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.textContent = 'Payer le séjour →'; }
+        });
+    });
 });
 
-document.getElementById('preview-reservation-btn')?.addEventListener('click', async function (e) {
+document.getElementById('preview-reservation-btn')?.addEventListener('click', async function(e) {
     e.preventDefault();
 
     if (!stripe && !initStripe()) {
@@ -48,65 +171,15 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
     document.getElementById('recap-start').textContent = startDate;
     document.getElementById('recap-end').textContent = endDate;
 
-    // Check if user is admin
     if (window.isUserAdmin) {
-        // Admin mode: don't create payment intent, just show modal
         document.getElementById('recap-days').textContent = '∞';
         document.getElementById('recap-rent').textContent = '—';
         document.getElementById('recap-caution').textContent = '—';
         document.getElementById('recap-caution-total').textContent = '—';
         document.getElementById('recap-fees').textContent = '—';
     } else {
-        // User mode: create payment intent
-        const response = await fetch('/stripe/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                apartment_id: window.apartmentId,
-                start_date: startDate,
-                end_date: endDate,
-                price: price
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.error) {
-            toastr.error(data.error);
-            return;
-        }
-
-        clientSecretRent = data.clientSecretRent;
-
-        const pricePerNight = data.days > 0 ? data.rentAmount / data.days : data.rentAmount;
-        const recapPriceEl = document.getElementById('apartment_price');
-        if (recapPriceEl) {
-            recapPriceEl.textContent = pricePerNight.toFixed(2) + ' €';
-            recapPriceEl.dataset.price = pricePerNight.toFixed(2);
-        }
-
-        document.getElementById('recap-days').textContent = data.days;
-        document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);
-        document.getElementById('recap-caution').textContent = data.cautionAmount.toFixed(2);
-        document.getElementById('recap-caution-total').textContent = data.cautionWithFees.toFixed(2);
-        document.getElementById('recap-fees').textContent = data.stripeFees.toFixed(2);
-        const refundEl = document.getElementById('recap-caution-refund');
-        if (refundEl) refundEl.textContent = data.cautionAmount.toFixed(2);
-
-        const grandTotal = data.rentAmount + data.cautionWithFees;
-        const totalSejourEl = document.getElementById('recap-total-sejour');
-        if (totalSejourEl) totalSejourEl.textContent = data.rentAmount.toFixed(2);
-        const totalCautionEl = document.getElementById('recap-total-caution');
-        if (totalCautionEl) totalCautionEl.textContent = data.cautionWithFees.toFixed(2);
-        const grandTotalEl = document.getElementById('recap-grand-total');
-        if (grandTotalEl) grandTotalEl.textContent = grandTotal.toFixed(2);
-
-        const paymentElementContainer = document.getElementById('payment-element-rent');
-        if (paymentElementContainer && !paymentElementContainer.hasChildNodes()) {
-            elementsRent = stripe.elements({ clientSecret: clientSecretRent });
-            const paymentElement = elementsRent.create('payment');
-            paymentElement.mount('#payment-element-rent');
-        }
+        const ok = await fetchAndMountPaymentIntent(startDate, endDate, price);
+        if (!ok) return;
     }
 
     const modal = new bootstrap.Modal(document.getElementById('reservation-modal'));
@@ -118,7 +191,6 @@ document.getElementById('checkout-button')?.addEventListener('click', async func
     const endDate = document.getElementById('reservation_form_endDate').value;
 
     if (window.isUserAdmin) {
-        // Admin mode: create reservation without payment
         this.disabled = true;
         this.textContent = 'Création en cours...';
 
@@ -152,7 +224,6 @@ document.getElementById('checkout-button')?.addEventListener('click', async func
             this.textContent = 'Créer la réservation →';
         }
     } else {
-        // User mode: normal Stripe payment
         if (!elementsRent) {
             toastr.error('Le formulaire de paiement n\'est pas prêt.');
             return;

@@ -124,6 +124,8 @@ public function sendReviewInvite(
         try {
             $intent = PaymentIntent::retrieve($cautionIntentId);
             $cautionAmount = $intent->metadata->caution_amount;
+            $currency = $intent->metadata->currency ?? 'eur';
+            $symbol = $currency === 'brl' ? 'R$' : '€';
 
             Refund::create([
                 'payment_intent' => $cautionIntentId,
@@ -136,7 +138,7 @@ public function sendReviewInvite(
             $em->flush();
 
             $this->sendCautionNotificationEmails($reservation, true, $mailer);
-            $this->addFlash('success', "Caution de {$cautionAmount}€ remboursée intégralement.");
+            $this->addFlash('success', "Caution de {$cautionAmount} {$symbol} remboursée intégralement.");
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur Stripe: ' . $e->getMessage());
         }
@@ -209,14 +211,17 @@ public function sendReviewInvite(
 
             
             if ($cautionIntent) {
+                $currency = $rentIntent->metadata->currency ?? 'eur';
                 return [
                 'rent_intent_id' => $rentIntent->id,
-                'rent_amount' => $rentIntent->amount / 100,
+                'rent_amount' => $rentIntent->metadata->rent_amount ?? $rentIntent->amount / 100,
                 'rent_status' => $rentIntent->status,
                 'caution_intent_id' => $cautionIntent->id,
                 'caution_amount' => $cautionIntent->metadata->caution_amount ?? 0,
                 'caution_with_fees' => $cautionIntent->amount / 100,
                 'caution_status' => $cautionIntent->status,
+                'currency' => $currency,
+                'currency_symbol' => $currency === 'brl' ? 'R$' : '€',
                 ];
             }
             else {

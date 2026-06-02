@@ -17,12 +17,38 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class StripeController extends AbstractController
 {
     private const CAUTION_RATE = 0.30;
     private const STRIPE_FEE_RATE = 0.015;
     private const STRIPE_FEE_FIXED = 0.25;
+    private const STRIPE_FX_RATE = 0.02; // frais de conversion devise Stripe (~2%)
+
+    public function __construct(
+        private HttpClientInterface $httpClient,
+        private CacheInterface $cache
+    ) {}
+
+    private function getExchangeRate(string $from, string $to): float
+    {
+        $key = 'fx_' . strtolower($from) . '_' . strtolower($to);
+        return $this->cache->get($key, function (ItemInterface $item) use ($from, $to) {
+            $item->expiresAfter(3600);
+            $response = $this->httpClient->request('GET', 'https://api.frankfurter.app/latest', [
+                'query' => ['from' => $from, 'to' => $to],
+                'timeout' => 5,
+            ]);
+            $data = $response->toArray();
+            if (!isset($data['rates'][$to])) {
+                throw new \RuntimeException("Rate $to not found");
+            }
+            return (float) $data['rates'][$to];
+        });
+    }
 
     #[Route('/stripe/create-admin-reservation', name: 'stripe_create_admin_reservation', methods: ['POST'])]
     public function createAdminReservation(
@@ -101,6 +127,11 @@ class StripeController extends AbstractController
             return new JsonResponse(['error' => 'Apartment not found'], 404);
         }
 
+        $currency = strtolower($data['currency'] ?? 'eur');
+        if (!in_array($currency, ['eur', 'brl'], true)) {
+            $currency = 'eur';
+        }
+
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
         $days      = max(1, $startDate->diff($endDate)->days);
@@ -112,9 +143,21 @@ class StripeController extends AbstractController
         $caution     = $days <= 3 ? 400.0 : 500.0;
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
+        $rate = 1.0;
+        if ($currency === 'brl') {
+            try {
+                $rate = $this->getExchangeRate('EUR', 'BRL') * (1 + self::STRIPE_FX_RATE);
+            } catch (\Exception) {
+                return new JsonResponse(['error' => 'Impossible de récupérer le taux de change. Veuillez réessayer.'], 503);
+            }
+            $rentAmount      = round($rentAmount * $rate, 2);
+            $caution         = round($caution * $rate, 2);
+            $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + (self::STRIPE_FEE_FIXED * $rate), 2);
+        }
+
         $paymentIntentRent = PaymentIntent::create([
             'amount' => (int) ($rentAmount * 100) + (int) ($cautionWithFees * 100),
-            'currency' => 'eur',
+            'currency' => $currency,
             'automatic_payment_methods' => ['enabled' => true],
             'metadata' => [
                 'type' => 'rent',
@@ -126,6 +169,8 @@ class StripeController extends AbstractController
                 'caution_amount' => $caution,
                 'caution_with_fees' => $cautionWithFees,
                 'days' => $days,
+                'currency' => $currency,
+                'exchange_rate' => $rate,
             ],
         ]);
 
@@ -136,6 +181,8 @@ class StripeController extends AbstractController
             'cautionWithFees' => $cautionWithFees,
             'stripeFees' => round($cautionWithFees - $caution, 2),
             'days' => $days,
+            'currency' => $currency,
+            'exchangeRate' => $rate,
         ]);
     }
 
@@ -270,11 +317,12 @@ class StripeController extends AbstractController
         if ($meta !== null && isset($meta->apartment_id)) {
             $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
             return $this->redirectToRoute('app.apartment.details', [
-                'id' => $meta->apartment_id
+                'id' => $meta->apartment_id,
+                '_locale' => $request->getLocale(),
             ]);
         } else {
             $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
-            return $this->redirectToRoute('app.home');
+            return $this->redirectToRoute('app.home', ['_locale' => $request->getLocale()]);
         }
     }
 

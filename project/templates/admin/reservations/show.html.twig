@@ -74,15 +74,15 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="text-muted">Location</h6>
-                            <p class="fs-4 fw-bold text-success mb-1">{{ payment.rent_amount }}€</p>
+                            <p class="fs-4 fw-bold text-success mb-1">{{ payment.rent_amount }} {{ payment.currency_symbol }}</p>
                             <small class="text-muted">Statut: {{ payment.rent_status }}</small>
                             <br>
                             <small class="text-muted">ID: {{ payment.rent_intent_id }}</small>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">Caution</h6>
-                            <p class="fs-4 fw-bold text-warning mb-1">{{ payment.caution_amount }}€</p>
-                            <small class="text-muted">Total payé (avec frais): {{ payment.caution_with_fees }}€</small>
+                            <p class="fs-4 fw-bold text-warning mb-1">{{ payment.caution_amount }} {{ payment.currency_symbol }}</p>
+                            <small class="text-muted">Total payé (avec frais): {{ payment.caution_with_fees }} {{ payment.currency_symbol }}</small>
                             <br>
                             <small class="text-muted">ID: {{ payment.caution_intent_id }}</small>
                         </div>
@@ -131,9 +131,9 @@
                                     <input type="number" class="form-control" name="amount" 
                                            step="0.01" min="0" max="{{ payment.caution_amount }}" 
                                            placeholder="0.00">
-                                    <span class="input-group-text">€</span>
+                                    <span class="input-group-text">{{ payment.currency_symbol }}</span>
                                 </div>
-                                <small class="text-muted">Max: {{ payment.caution_amount }}€</small>
+                                <small class="text-muted">Max: {{ payment.caution_amount }} {{ payment.currency_symbol }}</small>
                             </div>
 
                             <div class="form-check">
@@ -156,14 +156,14 @@
                     <div class="alert alert-success">
                         <h6 class="fw-bold">✓ Caution conservée</h6>
                         <p class="mb-0">
-                            {{ payment.caution_amount }}€ conservés par l'hôte. 
+                            {{ payment.caution_amount }} {{ payment.currency_symbol }} conservés par l'hôte.
                         </p>
                     </div>
                     {% elseif reservation.isCautionRefunded() %}
                     <div class="alert alert-success">
                         <h6 class="fw-bold">✓ Caution remboursée</h6>
                         <p class="mb-0">
-                            {{ payment.caution_amount }}€ remboursés au client.
+                            {{ payment.caution_amount }} {{ payment.currency_symbol }} remboursés au client.
                         </p>
                     </div>
                     {% endif %}
