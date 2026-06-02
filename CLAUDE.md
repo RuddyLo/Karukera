@@ -52,6 +52,7 @@ Plateforme de location saisonnière (Guadeloupe). Symfony 7 + Docker + Stripe.
 - `CAUTION_RATE = 0.30` (caution = 30% du loyer)
 - `STRIPE_FEE_RATE = 0.015` (1.5%)
 - `STRIPE_FEE_FIXED = 0.25` (€0.25 fixe)
+- `STRIPE_FX_RATE = 0.02` (2% frais conversion devise Stripe — ⚠️ susceptible d'évoluer)
 - Les frais Stripe sont appliqués sur la caution uniquement et payés par le client
 
 **Admin bypass** : les admins peuvent créer des réservations sans paiement via `/stripe/create-admin-reservation`.
@@ -65,21 +66,39 @@ Plateforme de location saisonnière (Guadeloupe). Symfony 7 + Docker + Stripe.
 | `templates/apartments/details.html.twig` | Modal réservation avec Payment Element |
 | `templates/stripe/processing.html.twig` | Page intermédiaire 2e paiement (caution) |
 
-## Tâche en attente : support multi-devises EUR / BRL
+## Support multi-devises EUR / BRL — IMPLÉMENTÉ
 
-La devise est actuellement **hardcodée à `'eur'`** dans `StripeController.php` ligne ~117.
+**Taux de change** : API Frankfurter (`https://api.frankfurter.app/latest`) — gratuite, sans clé, basée BCE, cache 1h Symfony.
 
-**Ce qu'il faut faire :**
-1. Ajouter un sélecteur EUR / BRL dans le modal (`details.html.twig`)
-2. Passer la devise choisie en param lors de l'appel à `/stripe/create-payment-intent`
-3. Ajouter un taux de conversion configurable dans `.env` (ex: `BRL_RATE=5.50`)
-4. Dans `StripeController::createPaymentIntent()` : convertir le montant si BRL, passer la devise au `PaymentIntent::create()`
-5. Mettre à jour `processing.html.twig` pour propager la devise au 2e paiement (caution)
-6. L'entité `Payment` a déjà une colonne `currency` — elle sera utilisée automatiquement
+**Frais de conversion Stripe** : +2% appliqué au taux (`STRIPE_FX_RATE = 0.02` dans `StripeController.php`).
+⚠️ **Ce taux peut évoluer** — à externaliser en `.env` si Stripe change ses conditions.
 
-**Note Stripe** : un `PaymentIntent` accepte une seule devise. Stripe ne convertit pas automatiquement. La conversion est à gérer côté backend.
+**Architecture :**
+- `StripeController` : `HttpClientInterface` + `CacheInterface` injectés en constructeur
+- `createPaymentIntent` : lit `currency` dans le POST, appelle `getExchangeRate()` si BRL, convertit tous les montants
+- Devise + taux de change stockés dans `metadata` du PaymentIntent (`currency`, `exchange_rate`)
+- `currency_symbol` ('€' ou 'R$') déduit de `metadata->currency ?? 'eur'` dans tous les controllers
 
-Estimation : ~1h à 1h30 de dev.
+**UX :**
+- Sélecteur EUR/BRL dans le **modal** de réservation (aspect-ratio 2/3, style actif/hover CSS)
+- Spinner pendant le fetch du taux, taux affiché avec mention `(inclus un frais de conversion de 2%)`
+- Changement de devise → re-fetch PaymentIntent + rechargement Payment Element Stripe
+
+**Propagation devise :**
+- Page "Mes réservations", admin liste/détail : `payment.currency_symbol` partout
+- Refund caution admin : montant + flash message en bonne devise
+- Le refund Stripe lui-même est correct nativement (PI en BRL → remboursement en BRL)
+
+## Traductions (i18n FR/EN)
+
+**Page détails appartement** (`templates/apartments/details.html.twig`) :
+- Clés traduits : `apartment_details.equipments_title`, `book_title`, `price_per_night`, `show_all_images`, `login_to_book`
+- `window.appLocale` injecté par Twig → utilisé par FullCalendar et Stripe Payment Element
+- `_locale` ajouté dans tous les `redirectToRoute('app.apartment.details', ...)` (StripeController + ApartmentController)
+
+⚠️ **Traductions incomplètes — page "Mes réservations"** :
+- Les modales CGV dans `templates/user/reservations.html.twig` sont en français hardcodé (articles 1–8 + politique confidentialité)
+- Reporté volontairement — à traiter dans une session dédiée avec relecture juridique
 
 ## Variables d'environnement importantes
 
@@ -96,7 +115,7 @@ DATABASE_URL=mysql://root:@mysql_karukera:3306/karukera
 ## Lancer le projet
 
 ```bash
-docker-compose up -d          # démarrer les conteneurs
+docker compose up -d          # démarrer les conteneurs (sans tiret)
 # App : http://localhost:8001
 # phpMyAdmin : http://localhost:8080
 ```
