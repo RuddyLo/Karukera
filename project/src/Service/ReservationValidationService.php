@@ -45,7 +45,7 @@ class ReservationValidationService
         $apartment = $reservation->getApartment();
 
         // Calculate number of days
-        $days = (int)$startDate->diff($endDate)->format('%a') + 1;
+        $days = (int)$startDate->diff($endDate)->format('%a');
 
         // Find minimum stay period for this date range
         $minimumStayPeriod = $this->minimumStayPeriodRepository

@@ -48,6 +48,11 @@
                             <h6 class="text-muted">Date de fin</h6>
                             <p class="fw-bold">{{ reservation.endDate|date('d/m/Y') }}</p>
                         </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Durée</h6>
+                            {% set nights = (reservation.endDate.timestamp - reservation.startDate.timestamp) / 86400 %}
+                            <p class="fw-bold">{{ nights|round(0, 'floor') }} nuit{{ nights > 1 ? 's' : '' }}</p>
+                        </div>
                     </div>
 
                     <div class="row">

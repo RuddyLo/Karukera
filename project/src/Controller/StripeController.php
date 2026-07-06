@@ -314,16 +314,8 @@ class StripeController extends AbstractController
             }
         }
 
-        if ($meta !== null && isset($meta->apartment_id)) {
-            $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
-            return $this->redirectToRoute('app.apartment.details', [
-                'id' => $meta->apartment_id,
-                '_locale' => $request->getLocale(),
-            ]);
-        } else {
-            $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
-            return $this->redirectToRoute('app.home', ['_locale' => $request->getLocale()]);
-        }
+        $this->addFlash('success', 'Votre réservation a été confirmée avec succès !');
+        return $this->redirectToRoute('app.user.reservations', ['_locale' => $request->getLocale()]);
     }
 
     #[Route('/payment/cancel', name: 'payment_cancel')]

@@ -28,7 +28,7 @@ class MinimumStayPeriodType extends AbstractType
                 ],
             ])
             ->add('minimumDays', NumberType::class, [
-                'label' => "Nombre minimum de jours",
+                'label' => "Nombre minimum de nuits",
                 'row_attr' => [
                     'class' => 'form-group col-sm-6 my-2',
                 ],

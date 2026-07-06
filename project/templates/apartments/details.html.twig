@@ -16,7 +16,7 @@
                 <hr class="w-75">
             </div>
             <div class="col-sm-6 text-end">
-                <h4 id="page-price-display">{{ price }} € <small class="text-muted fs-6" id="page-price-label">{{ 'apartment_details.price_per_night'|trans }}</small></h4>
+                <h4 id="page-price-display">{{ price }} € <small class="text-muted fs-6" id="page-price-label">{{ 'apartment_details.price_per_night'|trans }}</small> <small class="text-muted fs-6">(TVA incluses)</small></h4>
             </div>
         </div>
 
@@ -188,7 +188,7 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-6 text-muted">Prix</div>
-                            <div class="col-6 text-end" id="apartment_price" data-price="{{ price }}"><span id="apartment_price_value">{{ price }}</span> <span class="currency-symbol">€</span></div>
+                            <div class="col-6 text-end" id="apartment_price" data-price="{{ price }}"><span id="apartment_price_value">{{ price }}</span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small></div>
                         </div>
                         <div class="row mb-3 pb-3 border-bottom">
                             <div class="col-6 text-muted">Nuits</div>
@@ -197,7 +197,7 @@
                         <div class="row mb-3">
                             <div class="col-6 fw-bold fs-5">Montant du séjours</div>
                             <div class="col-6 text-end fw-bold fs-5 text-success">
-                                <span id="recap-rent"></span> <span class="currency-symbol">€</span>
+                                <span id="recap-rent"></span> <span class="currency-symbol">€</span> <small class="text-muted fw-normal fs-6">(TVA incluses)</small>
                             </div>
                         </div>
                     </div>
@@ -208,22 +208,22 @@
                         <h6 class="fw-bold text-info mb-3">Information sur la caution</h6>
                         <div class="row mb-2">
                             <div class="col-8">Caution (remboursable)</div>
-                            <div class="col-4 text-end"><span id="recap-caution"></span> <span class="currency-symbol">€</span></div>
+                            <div class="col-4 text-end"><span id="recap-caution"></span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small></div>
                         </div>
                         <div class="row mb-2 text-muted small">
                             <div class="col-8">+ Frais de transaction</div>
-                            <div class="col-4 text-end"><span id="recap-fees"></span> <span class="currency-symbol">€</span></div>
+                            <div class="col-4 text-end"><span id="recap-fees"></span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small></div>
                         </div>
                         <div class="row mb-0 pt-2 border-top">
                             <div class="col-8 fw-bold">Total caution</div>
                             <div class="col-4 text-end fw-bold">
-                                <span id="recap-caution-total"></span> <span class="currency-symbol">€</span>
+                                <span id="recap-caution-total"></span> <span class="currency-symbol">€</span> <small class="text-muted fw-normal">(TVA incluses)</small>
                             </div>
                         </div>
                         <div class="alert alert-info mt-3 mb-0">
                             <small>
                                 💡 La caution sera remboursée intégralement
-                                (<span id="recap-caution-refund"></span> <span class="currency-symbol">€</span>) après votre séjour...
+                                (<span id="recap-caution-refund"></span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small>) après votre séjour...
                             </small>
                         </div>
                     </div>
@@ -235,15 +235,15 @@
                         <h6 class="fw-bold text-success mb-3">Total à payer</h6>
                         <div class="row mb-2">
                             <div class="col-8">Séjour</div>
-                            <div class="col-4 text-end"><span id="recap-total-sejour"></span> <span class="currency-symbol">€</span></div>
+                            <div class="col-4 text-end"><span id="recap-total-sejour"></span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small></div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-8">Caution (avec frais)</div>
-                            <div class="col-4 text-end"><span id="recap-total-caution"></span> <span class="currency-symbol">€</span></div>
+                            <div class="col-4 text-end"><span id="recap-total-caution"></span> <span class="currency-symbol">€</span> <small class="text-muted">(TVA incluses)</small></div>
                         </div>
                         <div class="row fw-bold fs-5 pt-2 border-top">
                             <div class="col-8">Total</div>
-                            <div class="col-4 text-end text-success"><span id="recap-grand-total"></span> <span class="currency-symbol">€</span></div>
+                            <div class="col-4 text-end text-success"><span id="recap-grand-total"></span> <span class="currency-symbol">€</span> <small class="text-muted fw-normal fs-6">(TVA incluses)</small></div>
                         </div>
                     </div>
                 </div>
@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 const priceEl = document.getElementById('page-price-display');
                 if (priceEl) {
-                    priceEl.innerHTML = data.price + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small>';
+                    priceEl.innerHTML = data.price + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small> <small class="text-muted fs-6">(TVA incluses)</small>';
                 }
                 const recapPriceEl = document.getElementById('apartment_price');
                 if (recapPriceEl) {
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.Swal.fire({
                         icon: 'info',
                         title: 'Prix pour votre séjour',
-                        html: `Le tarif applicable est de <strong>${data.price} € / nuit</strong>${periodInfo}`,
+                        html: `Le tarif applicable est de <strong>${data.price} € / nuit</strong> <small class="text-muted">(TVA incluses)</small>${periodInfo}`,
                         confirmButtonText: 'OK',
                     });
                 }
@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetPriceDisplay() {
         const priceEl = document.getElementById('page-price-display');
         if (priceEl) {
-            priceEl.innerHTML = window.basePrice + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small>';
+            priceEl.innerHTML = window.basePrice + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small> <small class="text-muted fs-6">(TVA incluses)</small>';
         }
         const recapPriceEl = document.getElementById('apartment_price');
         if (recapPriceEl) {
@@ -637,12 +637,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const days = Math.ceil((new Date(searchEndDate) - new Date(searchStartDate)) / 86400000) + 1;
+            const days = Math.ceil((new Date(searchEndDate) - new Date(searchStartDate)) / 86400000);
             const minRequired = getMaxMinimumForRange(searchStartDate, searchEndDate);
             if (days < minRequired ) {
                 showTooltip(
                     document.getElementById('calendar'),
-                    `⚠ Minimum ${minRequired - 1} nuits requis pour cette période`,
+                    `⚠ Minimum ${minRequired} nuits requis pour cette période`,
                     true
                 );
                 setTimeout(hideTooltip, 4000);
@@ -718,7 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let endDate = info.dateStr;
                 if (endDate < startDate) [startDate, endDate] = [endDate, startDate];
 
-                const days = Math.ceil((new Date(endDate) - new Date(startDate)) / 86400000) + 1;
+                const days = Math.ceil((new Date(endDate) - new Date(startDate)) / 86400000);
 
                 if (hasReservedInRange(startDate, endDate)) {
                     showTooltip(info.dayEl, '⚠ Une date de cette période est déjà réservée', true);
@@ -732,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const minRequired = getMaxMinimumForRange(startDate, endDate);
                 if (days < minRequired ) {
-                    showTooltip(info.dayEl, `⚠ Minimum ${minRequired  - 1} nuits requis`, true);
+                    showTooltip(info.dayEl, `⚠ Minimum ${minRequired} nuits requis`, true);
                     setTimeout(hideTooltip, 3000);
                     clearHighlight();
                     startDate = null;

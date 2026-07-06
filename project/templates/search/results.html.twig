@@ -39,7 +39,7 @@
                                     <div class="card-body p-3">
                                         <h2 class="appart-title mb-1">{{ apartment_result.name }}</h2>
                                         <p class="appart-price mb-2">
-                                            <strong>{{ apartment_result.price }} €</strong> / nuit
+                                            <strong>{{ apartment_result.price }} €</strong> / nuit <small class="text-muted">(TVA incluses)</small>
                                         </p>
                                         {% if filters.startDate and filters.endDate %}
                                             {% if apartment_result.id in conflictIds %}

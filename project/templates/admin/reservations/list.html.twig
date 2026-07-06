@@ -50,6 +50,9 @@
                                     {{ reservation.startDate|date('d/m/Y') }}
                                     <br>
                                     <small class="text-muted">→ {{ reservation.endDate|date('d/m/Y') }}</small>
+                                    <br>
+                                    {% set nights = (reservation.endDate.timestamp - reservation.startDate.timestamp) / 86400 %}
+                                    <small class="text-muted">{{ nights|round(0, 'floor') }} nuit{{ nights > 1 ? 's' : '' }}</small>
                                 </td>
                                 <td>
                                     {% if payment %}

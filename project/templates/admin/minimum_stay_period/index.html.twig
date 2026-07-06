@@ -22,7 +22,7 @@
                     <th>Appartement</th>
                     <th>Date de début</th>
                     <th>Date de fin</th>
-                    <th>Minimum de jours</th>
+                    <th>Minimum de nuits</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -33,7 +33,7 @@
                         <td>{{ period.startDate|date('d/m/Y') }}</td>
                         <td>{{ period.endDate|date('d/m/Y') }}</td>
                         <td>
-                            <span class="badge bg-info">{{ period.minimumDays }} jour(s)</span>
+                            <span class="badge bg-info">{{ period.minimumDays }} nuit(s)</span>
                         </td>
                         <td>
                             <a href="{{ path('minimum_stay_period_show', {'id': period.id}) }}" class="btn btn-sm btn-info">Voir</a>

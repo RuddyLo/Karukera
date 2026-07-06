@@ -55,15 +55,15 @@
                         <div class="mt-3 p-2 bg-light rounded">
                             <p class="mb-1 small">
                                 <i class="bi bi-cash"></i>
-                                {{ 'reservations.rent_paid'|trans }} : <strong>{{ payment.rent_amount }} {{ payment.currency_symbol }}</strong>
+                                {{ 'reservations.rent_paid'|trans }} : <strong>{{ payment.rent_amount }} {{ payment.currency_symbol }}</strong> <small class="text-muted">(TVA incluses)</small>
                             </p>
                             <p class="mb-1 small">
                                 <i class="bi bi-shield"></i>
-                                {{ 'reservations.caution_amount'|trans }} : <strong>{{ payment.caution_amount }} {{ payment.currency_symbol }}</strong>
+                                {{ 'reservations.caution_amount'|trans }} : <strong>{{ payment.caution_amount }} {{ payment.currency_symbol }}</strong> <small class="text-muted">(TVA incluses)</small>
                             </p>
                             <p class="mb-0 small fw-bold">
                                 <i class="bi bi-receipt"></i>
-                                {{ 'reservations.total'|trans }} : <strong>{{ payment.total }} {{ payment.currency_symbol }}</strong>
+                                {{ 'reservations.total'|trans }} : <strong>{{ payment.total }} {{ payment.currency_symbol }}</strong> <small class="text-muted">(TVA incluses)</small>
                             </p>
                         </div>
                         {% endif %}
@@ -99,76 +99,145 @@
             {# Modal CGV dynamique pour la réservation #}
             <div class="modal fade" id="cgv-modal-{{ reservation.id }}" tabindex="-1" aria-labelledby="cgvModalLabel-{{ reservation.id }}">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="cgvModalLabel-{{ reservation.id }}">Conditions Générales de Vente</h5>
+                    <div class="modal-content" style="background-color: #f8f9fa;">
+                        <div class="modal-header" style="background-color: #ffffff;">
+                            <h5 class="modal-title fw-bold" id="cgvModalLabel-{{ reservation.id }}">Conditions Générales de Location</h5>
                             <button class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" style="background-color: #f8f9fa;">
                             <div class="container py-2">
-                                <p class="text-muted small mb-4">Document généré le {{ "now"|date("d/m/Y") }}</p>
+                                <h5 class="fw-bold text-center mb-1">CONDITIONS GÉNÉRALES DE LOCATION COURTE DURÉE</h5>
+                                <p class="text-muted small text-center mb-4">Document généré le {{ "now"|date("d/m/Y") }}</p>
 
-                                <h6 class="fw-bold">PARTIES</h6>
+                                <h6 class="fw-bold">1. Parties</h6>
+                                <div class="border rounded p-3 mb-3 bg-light">
+                                    <p class="mb-1"><strong>Le Bailleur :</strong></p>
+                                    <p class="mb-0">Nom : Oasis de Karukera</p>
+                                    <p class="mb-0">Adresse : 12 rue du morne tricolore 97180 Sainte Anne</p>
+                                    <p class="mb-0">Email : contact@oasiskarurio.com</p>
+                                    <p class="mb-0">WhatsApp : +33 7 55 50 30 86</p>
+                                </div>
                                 <div class="border rounded p-3 mb-4 bg-light">
-                                    <p class="mb-1"><strong>Locataire :</strong></p>
-                                    <p class="mb-1">{{ app.user.firstName }} {{ app.user.lastName }}</p>
-                                    <p class="mb-1">Email : {{ app.user.email }}</p>
-                                    {% if app.user.phone %}<p class="mb-1">Téléphone : {{ app.user.phone }}</p>{% endif %}
+                                    <p class="mb-1"><strong>Le Locataire :</strong></p>
+                                    <p class="mb-0">Nom : {{ app.user.firstName }} {{ app.user.lastName }}</p>
                                     {% if app.user.address %}<p class="mb-0">Adresse : {{ app.user.address }}</p>{% endif %}
+                                    <p class="mb-0">Email : {{ app.user.email }}</p>
+                                    {% if app.user.phone %}<p class="mb-0">Téléphone : {{ app.user.phone }}</p>{% endif %}
                                 </div>
 
-                                <h6 class="fw-bold">Article 1 – Objet de la location</h6>
-                                <p>Le présent contrat porte sur la location saisonnière de l'hébergement suivant :</p>
+                                <h6 class="fw-bold">2. Objet du contrat</h6>
+                                <p>Le présent contrat concerne la location saisonnière du logement suivant :</p>
                                 <div class="border rounded p-3 mb-4 bg-light">
-                                    <p class="mb-1 fw-semibold">{{ reservation.apartment.name }}</p>
-                                    {% if reservation.apartment.description %}<p class="mb-2 text-muted small">{{ reservation.apartment.description }}</p>{% endif %}
-                                    <p class="mb-0"><strong>Prix de base :</strong> {{ reservation.apartment.price }} € / nuit</p>
-                                    {% if reservation.apartment.equipments|length > 0 %}
-                                    <p class="mb-1 mt-2 fw-semibold small">Équipements inclus :</p>
-                                    <ul class="mb-0 small">
-                                        {% for equipment in reservation.apartment.equipments %}
-                                        <li>{{ equipment.name }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %}
+                                    <p class="mb-0">Adresse : 12 rue du morne tricolore 97180 Sainte Anne</p>
+                                    <p class="mb-0">Logement : {{ reservation.apartment.name }}</p>
+                                    <p class="mb-0">Type : Appartement</p>
+                                    <p class="mb-0">Capacité maximale : 4</p>
                                 </div>
+                                <p>Le logement est loué à titre de résidence temporaire et de courte durée, à usage exclusif d'habitation.</p>
 
-                                <h6 class="fw-bold">Article 2 – Durée de la location</h6>
-                                <p>La durée exacte sera précisée lors de la confirmation de la réservation. La réservation ne devient définitive qu'après réception et confirmation du paiement.</p>
+                                <h6 class="fw-bold">3. Acceptation</h6>
+                                <p>La validation de la réservation via le paiement et la case cochée vaut acceptation pleine et entière des présentes conditions.</p>
+                                <p>Cette acceptation constitue une signature électronique juridiquement valable.</p>
 
-                                <h6 class="fw-bold">Article 3 – Prix et modalités de paiement</h6>
-                                <p>3.1 Le prix de la location est de <strong>{{ reservation.apartment.price }} € par nuit</strong>.</p>
-                                <p>3.2 Le montant total est calculé en fonction du nombre de dates réservées.</p>
-                                <p>3.3 Le paiement est effectué intégralement à la réservation par carte bancaire via la plateforme de paiement sécurisée Stripe.</p>
-
-                                <h6 class="fw-bold">Article 4 – Dépôt de garantie</h6>
-                                <p>4.1 Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>400 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
-                                <p>4.2 Ce dépôt est remboursable dans son intégralité dans un délai de 7 jours ouvrés suivant la fin du séjour, sous réserve de l'état du logement.</p>
-                                <p>4.3 En cas de dégradations constatées, le bailleur se réserve le droit de conserver tout ou partie du dépôt de garantie.</p>
-
-                                <h6 class="fw-bold">Article 5 – Conditions d'annulation</h6>
+                                <h6 class="fw-bold">4. Réservation</h6>
+                                <p>La réservation est confirmée dès validation du paiement.</p>
+                                <p>Le client garantit :</p>
                                 <ul>
-                                    <li>Plus de 30 jours avant l'arrivée : remboursement intégral</li>
-                                    <li>Entre 15 et 30 jours avant l'arrivée : remboursement à 50 %</li>
-                                    <li>Moins de 15 jours avant l'arrivée : aucun remboursement</li>
-                                </ul>
-                                <p>En cas d'annulation par le bailleur : remboursement intégral du montant payé.</p>
-
-                                <h6 class="fw-bold">Article 6 – Obligations du locataire</h6>
-                                <ul>
-                                    <li>Utiliser le logement en bon père de famille</li>
-                                    <li>Respecter le règlement intérieur fourni lors de l'entrée dans les lieux</li>
-                                    <li>Ne pas dépasser la capacité d'accueil maximale autorisée</li>
-                                    <li>Ne pas organiser de fêtes ou rassemblements sans accord préalable</li>
-                                    <li>Restituer le logement dans l'état de propreté et d'ordre initial</li>
-                                    <li>Il est strictement interdit de fumer à l'intérieur du logement</li>
+                                    <li>être majeur</li>
+                                    <li>utiliser des informations exactes</li>
+                                    <li>être responsable des occupants</li>
                                 </ul>
 
-                                <h6 class="fw-bold">Article 7 – Responsabilités</h6>
-                                <p>Le locataire est responsable de tous les dommages causés au logement et à son contenu durant son séjour. Il est vivement conseillé de souscrire une assurance villégiature couvrant sa responsabilité civile.</p>
+                                <h6 class="fw-bold">5. Séjour</h6>
+                                <ul>
+                                    <li>Check-in : à partir de 16h</li>
+                                    <li>Check-out : avant 11h</li>
+                                </ul>
+                                <p>Tout dépassement pourra être facturé.</p>
 
-                                <h6 class="fw-bold">Article 8 – Droit applicable</h6>
-                                <p class="mb-0">Le présent contrat est soumis au droit français. Tout litige sera soumis aux tribunaux compétents du ressort de la juridiction du lieu de situation du bien.</p>
+                                <h6 class="fw-bold">6. Prix</h6>
+                                <p>Le prix inclut :</p>
+                                <ul>
+                                    <li>logement meublé</li>
+                                    <li>charges (eau, électricité, internet)</li>
+                                </ul>
+                                <p>Peuvent s'ajouter :</p>
+                                <ul>
+                                    <li>ménage</li>
+                                    <li>frais additionnels spécifiques</li>
+                                </ul>
+
+                                <h6 class="fw-bold">7. Caution</h6>
+                                {% if payment %}
+                                <p>Un dépôt de garantie de <strong>{{ payment.caution_amount }} {{ payment.currency_symbol }}</strong> <small class="text-muted">(TVA incluses)</small> a été prélevé au moment de la réservation.</p>
+                                {% else %}
+                                <p>Un dépôt de garantie peut être exigé selon la durée du séjour.</p>
+                                {% endif %}
+                                <p>Le client autorise expressément la retenue en cas de :</p>
+                                <ul>
+                                    <li>dommages</li>
+                                    <li>non-respect du règlement</li>
+                                    <li>frais exceptionnels</li>
+                                </ul>
+                                <p>En cas de dommages constatés supérieurs au montant de la caution, le montant de l'indemnisation pourrait être prélevé directement via le moyen de paiement utilisé lors de la réservation. Dans l'éventualité d'absence des fonds nécessaires, le client s'engage à régler dans les meilleurs délais les préjudices subis par un autre moyen de paiement valide.</p>
+
+                                <h6 class="fw-bold">8. Utilisation</h6>
+                                <p>Le logement est destiné à un usage strictement privé.</p>
+                                <p>Interdictions :</p>
+                                <ul>
+                                    <li>fêtes non autorisées</li>
+                                    <li>nuisances sonores</li>
+                                    <li>dépassement de capacité</li>
+                                </ul>
+                                <p>En cas de non-respect : résiliation immédiate sans remboursement.</p>
+
+                                <h6 class="fw-bold">9. Règlement intérieur</h6>
+                                <p>Le règlement intérieur est opposable au client. Il comprend notamment :</p>
+                                <ul>
+                                    <li>règles de voisinage</li>
+                                    <li>tabac strictement interdit au sein de la structure</li>
+                                    <li>utilisation des équipements qui doivent être restitués dans leur état original</li>
+                                </ul>
+
+                                <h6 class="fw-bold">10. Politique d'annulation</h6>
+                                <p>L'annulation d'une réservation peut être effectuée :</p>
+                                <ul>
+                                    <li>jusqu'à 14 jours avant la date de check-in : remboursement intégral</li>
+                                    <li>jusqu'à 7 jours avant : remboursement de 50 % du montant de la réservation</li>
+                                </ul>
+                                <p>Aucune exception ne sera accordée sauf cas légal ou force majeure.</p>
+
+                                <h6 class="fw-bold">11. Responsabilité</h6>
+                                <p>Le locataire est responsable :</p>
+                                <ul>
+                                    <li>des dommages</li>
+                                    <li>des dégradations</li>
+                                    <li>des comportements des occupants</li>
+                                </ul>
+                                <p>Le propriétaire décline toute responsabilité en cas de :</p>
+                                <ul>
+                                    <li>vol</li>
+                                    <li>perte</li>
+                                    <li>accident</li>
+                                </ul>
+
+                                <h6 class="fw-bold">12. Force majeure</h6>
+                                <p>Aucun remboursement ne pourra être exigé en cas d'événements extérieurs indépendants :</p>
+                                <ul>
+                                    <li>catastrophes</li>
+                                    <li>restrictions gouvernementales</li>
+                                    <li>événements imprévisibles</li>
+                                </ul>
+
+                                <h6 class="fw-bold">13. Loi applicable</h6>
+                                <ul>
+                                    <li>Guadeloupe : droit français</li>
+                                    <li>Brésil : droit brésilien</li>
+                                </ul>
+                                <p>Litige : juridiction locale du bien.</p>
+
+                                <h6 class="fw-bold">14. Preuve</h6>
+                                <p class="mb-0">Les données électroniques (IP, timestamp, validation) font foi en cas de litige.</p>
                             </div>
                         </div>
                         <div class="modal-footer">
