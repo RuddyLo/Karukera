@@ -29,7 +29,7 @@
             <tbody>
                 {% for period in minimum_stay_periods %}
                     <tr>
-                        <td>{{ period.apartment.name }}</td>
+                        <td>{{ period.apartment ? period.apartment.name : 'N/A' }}</td>
                         <td>{{ period.startDate|date('d/m/Y') }}</td>
                         <td>{{ period.endDate|date('d/m/Y') }}</td>
                         <td>
@@ -39,6 +39,9 @@
                             <a href="{{ path('minimum_stay_period_show', {'id': period.id}) }}" class="btn btn-sm btn-info">Voir</a>
                             <a href="{{ path('minimum_stay_period_edit', {'id': period.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
                             <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ period.id }}')">Supprimer</button>
+                            <form id="delete-form-{{ period.id }}" method="post" action="{{ path('minimum_stay_period_delete', {'id': period.id}) }}" style="display: none;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ period.id) }}">
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}

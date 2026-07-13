@@ -31,7 +31,7 @@ class ApartmentController extends AbstractController
     #[Route('/', name: 'app.apartments')]
     public function index(): Response
     {
-        $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
+        $apartments = $this->apartmentRepository->findBy(['is_active' => true, 'is_deleted' => false]);
         return $this->render('apartments/apartments.html.twig', [
             'apartments' => $apartments,
         ]);
@@ -41,6 +41,10 @@ class ApartmentController extends AbstractController
     public function details(Apartment $apartment, Request $request,EntityManagerInterface $em,
          ReservationValidationService $validationService): Response
     {
+        if ($apartment->isDeleted()) {
+            throw $this->createNotFoundException();
+        }
+
         $reservation = new Reservation();
         $reservation->setApartment($apartment);
         $reservation->setUser($this->getUser());
@@ -80,6 +84,10 @@ class ApartmentController extends AbstractController
     #[Route('/{id}/price-for-date', name: 'app.apartment.price_for_date')]
     public function priceForDate(Apartment $apartment, Request $request): JsonResponse
     {
+        if ($apartment->isDeleted()) {
+            throw $this->createNotFoundException();
+        }
+
         $dateStr = $request->query->get('date');
         $date = $dateStr ? new \DateTime($dateStr) : new \DateTime('today');
 
@@ -97,6 +105,10 @@ class ApartmentController extends AbstractController
     #[Route('/{id}/reservations/json', name: 'reservations_json')]
     public function reservationsJson(ReservationRepository $repo, Apartment $apartment): JsonResponse
     {
+        if ($apartment->isDeleted()) {
+            throw $this->createNotFoundException();
+        }
+
         $reservations = $repo->findBy(['apartment' => $apartment]);
         $events = [];
 
@@ -119,6 +131,10 @@ class ApartmentController extends AbstractController
     #[Route('/{id}/minimumStay/json', name: 'minimumStay_json')]
     public function minimumStayJson(Apartment $apartment): JsonResponse
     {
+        if ($apartment->isDeleted()) {
+            throw $this->createNotFoundException();
+        }
+
         $minimumStayPeriods = $this->minimumStayPeriodRepository->findByApartment($apartment);
         $events = [];
 

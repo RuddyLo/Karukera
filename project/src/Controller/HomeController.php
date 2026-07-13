@@ -39,11 +39,11 @@ class HomeController extends AbstractController
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
 
-        $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
-        $apartments_on_top = $this->apartmentRepository->findBy(['on_top' => true, 'is_active' => true]);
+        $apartments = $this->apartmentRepository->findBy(['is_active' => true, 'is_deleted' => false]);
+        $apartments_on_top = $this->apartmentRepository->findBy(['on_top' => true, 'is_active' => true, 'is_deleted' => false]);
         $display_more = count($apartments) > count($apartments_on_top);
         $last_apartments = $this->apartmentRepository->findBy(
-            ['is_active' => true],
+            ['is_active' => true, 'is_deleted' => false],
             ['id' => 'DESC'],
             2
         );
@@ -84,7 +84,7 @@ public function search(Request $request, ApartmentRepository $repo): Response
     if ($startDate && $endDate) {
         $conflictIds = $this->reservationRepository->findOverlappingApartmentIds($startDate, $endDate);
     }
-    $apartments = $this->apartmentRepository->findBy(['is_active' => true]);
+    $apartments = $this->apartmentRepository->findBy(['is_active' => true, 'is_deleted' => false]);
 
     return $this->render('search/results.html.twig', [
         'results'     => $results,

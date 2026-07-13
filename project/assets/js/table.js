@@ -82,7 +82,7 @@ $(document).ready(() => {
 
         Swal.fire({
             title: 'Supprimer cet appartement ?',
-            text: 'Cette action est irréversible.',
+            text: 'L\'appartement sera masqué du site (les réservations existantes sont conservées).',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -151,22 +151,55 @@ $(document).ready(() => {
                     return `
                       <div class="d-flex justify-content-center list-action-group">
                           <span>
-                                <a title="Visualisation" href='${ajaxLink.apartment.show.replace('123456789', row[0])}' id='${data}' class='btn btn-primary'>
-                                   <i class="bi bi-eye-fill"></i>
-                                </a>
-        
-                                <button title="Suppression" id='delete-apartment' class='btn btn-danger event-delete-apartment' data-uuid=${data}>
+                                <button title="Suppression" class='btn btn-danger event-delete-user' data-uuid='${row[0]}'>
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>
                               </span>
                       </div>
-                      
-                      
+
+
                   `
                 }
             },
         ],
 
+    });
+
+    $(document).on('click', '.event-delete-user', function () {
+        const id = $(this).data('uuid');
+
+        Swal.fire({
+            title: 'Supprimer cet utilisateur ?',
+            text: 'Cette action est irréversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+        }).then(result => {
+            if (!result.isConfirmed) return;
+
+            const url = ajaxLink.user.delete.replace('123456789', id);
+            const formData = new FormData();
+            formData.append('_token', ajaxLink.user.deleteToken);
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData,
+            })
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
+                    userDataTable.ajax.reload(null, false);
+                    Swal.fire({ title: 'Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                } else {
+                    Swal.fire('Impossible', data.error || 'Échec de la suppression', 'warning');
+                }
+            })
+            .catch(() => Swal.fire('Erreur', 'Erreur réseau', 'error'));
+        });
     });
 
     let equipmentDataTable = $("#equipment-table").DataTable({

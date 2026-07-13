@@ -183,17 +183,10 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
             return $this->redirectToRoute('admin.apartment');
         }
 
-        try {
-            $entityManager->remove($apartment);
-            $entityManager->flush();
-        } catch (\Exception $e) {
-            if ($request->isXmlHttpRequest()) {
-                return new JsonResponse([
-                    'error' => 'Impossible de supprimer : cet appartement a des réservations associées.',
-                ], 409);
-            }
-            return $this->redirectToRoute('admin.apartment');
-        }
+        // Soft-delete : on conserve l'appartement (lié aux réservations existantes),
+        // on le retire simplement de l'affichage public.
+        $apartment->setIsDeleted(true);
+        $entityManager->flush();
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['success' => true]);

@@ -1,4 +1,4 @@
 <form method="post" action="{{ path('admin.apartment.delete', {'id': apartment.id}) }}" >
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ apartment.id) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete_apartment') }}">
     <button type='submit' class="btn btn-danger" style="display: none;" id ="delete-apartment-btn">Supprimer</button>
 </form>

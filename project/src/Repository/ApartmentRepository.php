@@ -56,7 +56,8 @@ class ApartmentRepository extends ServiceEntityRepository
             $entityName a
         WHERE
             a.name IS NOT NULL AND
-            a.name != ''
+            a.name != '' AND
+            a.is_deleted = false
         ";
 
         if ($search != '') {
@@ -105,9 +106,10 @@ class ApartmentRepository extends ServiceEntityRepository
             
             WHERE
                 apartment.name IS NOT NULL AND
-                apartment.name != '' 
-                
-                
+                apartment.name != '' AND
+                apartment.is_deleted = false
+
+
         ";
 
         if ($search != '') {
@@ -144,6 +146,7 @@ class ApartmentRepository extends ServiceEntityRepository
         SELECT *
         FROM apartment
         WHERE apartment.is_active = true
+        AND apartment.is_deleted = false
         AND (:name IS NULL OR LOWER(apartment.name) LIKE LOWER(CONCAT('%', :name, '%')))
     ";
 

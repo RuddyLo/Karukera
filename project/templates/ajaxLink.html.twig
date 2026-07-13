@@ -34,7 +34,8 @@
         },
         user: {
             list        :"{{ path('admin.ajax.user')}}",
-            delete      :"{{ path('admin.user.delete',{id: 123456789})}}"
+            delete      :"{{ path('admin.user.delete',{id: 123456789})}}",
+            deleteToken :"{{ csrf_token('delete_user') }}"
         },
         equipment: {
             list            :"{{path('admin.ajax.equipment')}}" ,

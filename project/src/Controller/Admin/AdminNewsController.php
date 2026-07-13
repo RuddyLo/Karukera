@@ -107,8 +107,16 @@ public function edit(News $news, Request $request, EntityManagerInterface $em): 
 }
 
     #[Route('/{id}/delete', name: 'admin.news.delete', methods: ['POST'])]
-    public function delete(News $news, EntityManagerInterface $em): Response
+    public function delete(Request $request, News $news, EntityManagerInterface $em): Response
     {
+        if (!$this->isCsrfTokenValid('delete' . $news->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide');
+            return $this->redirectToRoute('admin.news.index');
+        }
+
+        foreach ($news->getNewsImages() as $image) {
+            $em->remove($image);
+        }
         $em->remove($news);
         $em->flush();
         $this->addFlash('success', 'Nouveauté supprimée');

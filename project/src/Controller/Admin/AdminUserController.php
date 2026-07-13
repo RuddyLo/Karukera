@@ -33,12 +33,28 @@ class AdminUserController extends AbstractController
     #[Route('/{id}', name: 'admin.user.delete', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
+        if (!$this->isCsrfTokenValid('delete_user', $request->request->get('_token'))) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Token CSRF invalide'], 403);
+            }
+            return $this->redirectToRoute('admin.user');
         }
 
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        try {
+            $entityManager->remove($user);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Impossible de supprimer cet utilisateur.'], 409);
+            }
+            return $this->redirectToRoute('admin.user');
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
+
+        return $this->redirectToRoute('admin.user', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/ajax/list', name: 'admin.ajax.user')]

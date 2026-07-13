@@ -31,6 +31,9 @@ class Apartment  implements Translatable
     #[ORM\Column]
     private ?bool $is_active = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $is_deleted = false;
+
     #[ORM\Column]
     private ?bool $on_top = null;
 
@@ -116,6 +119,18 @@ class Apartment  implements Translatable
     public function setIsActive(bool $is_active): static
     {
         $this->is_active = $is_active;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->is_deleted;
+    }
+
+    public function setIsDeleted(bool $is_deleted): static
+    {
+        $this->is_deleted = $is_deleted;
 
         return $this;
     }

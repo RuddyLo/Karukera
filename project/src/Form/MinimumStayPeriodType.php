@@ -19,6 +19,9 @@ class MinimumStayPeriodType extends AbstractType
                 'class' => Apartment::class,
                 'choice_label' => 'name',
                 'label' => "Appartement",
+                'query_builder' => fn (\Doctrine\ORM\EntityRepository $er) => $er->createQueryBuilder('a')
+                    ->where('a.is_deleted = false')
+                    ->orderBy('a.name', 'ASC'),
                 'row_attr' => [
                     'class' => 'form-group col-sm-6 my-2',
                 ],

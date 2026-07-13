@@ -18,7 +18,7 @@ $(document).on('click', '#toggle-apartment-delete', function (event) {
 
     Swal.fire({
         title: "Êtes-vous sûr de vouloir supprimer?",
-        text: "Cette action est irréversible !",
+        text: "L'appartement sera masqué du site (les réservations existantes sont conservées).",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
@@ -90,7 +90,7 @@ $(document).on('click', '.event-delete-price-period', function () {
         if(result.isConfirmed) {
             
             $("#delete-price-period-form").find("#delete-price-period-id").val(dataUuid.data('uuid'));
-            $("#delete-equipment-form").submit();
+            $("#delete-price-period-form").submit();
         }
     })
 });
