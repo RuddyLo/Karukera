@@ -53,7 +53,7 @@ function initializeImageUploader(imageInputSelector, imageElementSelector, image
     });
 }
 
-initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 2);
+initializeImageUploader('#apartment_form_imagerUrl', '.rr-apartment-image', 10);
 initializeImageUploader('#equipment_form_iconUrl', '.rr-equipment-icon', 1);
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const previewContainer = document.getElementById("apartment-images-preview");
     const uploadStatus     = document.getElementById("upload-status");
     const allowedTypes     = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSizeMb        = 10;
     let pendingCount = 0;
 
     imageInput.addEventListener("change", function (event) {
@@ -72,6 +73,10 @@ document.addEventListener("DOMContentLoaded", function () {
         files.forEach(file => {
             if (!allowedTypes.includes(file.type)) {
                 toastr.error(`${file.name} : format non supporté (PNG, JPG, WEBP)`);
+                return;
+            }
+            if (file.size > maxSizeMb * 1024 * 1024) {
+                toastr.error(`${file.name} : la taille du fichier ne doit pas dépasser ${maxSizeMb} Mo.`);
                 return;
             }
 

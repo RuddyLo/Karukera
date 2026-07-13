@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class ApartmentFormType extends AbstractType
 {
@@ -95,7 +96,10 @@ class ApartmentFormType extends AbstractType
                     'accept' => 'image/*',
                     'class' => 'd-none',
 
-                ]
+                ],
+                'constraints' => [
+                    new File(maxSize: '10M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp']),
+                ],
             ])
             ->add('equipments', EntityType::class, [
                 'class' => Equipment::class, 
