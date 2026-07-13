@@ -25,9 +25,10 @@ class ApartmentFormType extends AbstractType
         $builder
             ->add('pricePeriod', PricePeriodType::class, [
                     'label' => 'Nouvelle période de prix (optionnel)',
-                    
+
                     'mapped' => false, // Important : non mappé à l'entité principale
                     'required' => false,
+                    'show_apartment_field' => false,
                 ])
             ->add('name', TextType::class, [
                 'label' => "Dénomination de l'appartement",

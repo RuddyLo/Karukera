@@ -19,7 +19,7 @@
             </thead>
             {% for price_period in price_periods %}
             <tr>
-                <td>{{ price_period.apartment.name }}</td>
+                <td>{{ price_period.apartment ? price_period.apartment.name : 'N/A' }}</td>
                 <td>{{ price_period.price }}</td>
                 <td>{{ price_period.startDate ? price_period.startDate|date('Y-m-d') : '' }}</td>
                 <td>{{ price_period.endDate ? price_period.endDate|date('Y-m-d') : '' }}</td>
