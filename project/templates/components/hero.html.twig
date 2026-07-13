@@ -252,11 +252,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-                const days        = Math.ceil((selectedDates[1] - selectedDates[0]) / 86400000) + 1;
+                const days        = Math.ceil((selectedDates[1] - selectedDates[0]) / 86400000);
                 const minRequired = getMaxMinStay(start, end);
                 if (days < minRequired) {
                     clearDates(instance);
-                    showTooltip(startUI, `Séjour minimum de ${minRequired -1 } nuit${minRequired > 1 ? 's' : ''} requis.`);
+                    showTooltip(startUI, `Séjour minimum de ${minRequired} nuit${minRequired > 1 ? 's' : ''} requis.`);
                     return;
                 }
 
