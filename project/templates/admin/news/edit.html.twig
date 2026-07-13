@@ -38,17 +38,19 @@
         Vous éditez la version : <strong>{{ locale == 'fr' ? '🇫🇷 Français' : '🇺🇸 English' }}</strong>
     </div>
 
+    {{ form_errors(form) }}
     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
         {# Locale cachée, forcée par le drapeau sélectionné #}
         {{ form_widget(form.locale, {'attr': {'style': 'display:none'}}) }}
 
         <div class="mb-3">{{ form_row(form.description) }}</div>
-        
+
         <div class="mb-3">
     <label class="form-label fw-bold">Ajouter des images</label>
     <div class="border rounded p-3 bg-light" style="border-style: dashed !important;">
         {{ form_widget(form.images) }}
+        {{ form_errors(form.images) }}
         <small class="text-muted mt-2 d-block">Formats acceptés : JPG, PNG, WEBP</small>
     </div>
 </div>

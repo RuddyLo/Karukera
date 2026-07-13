@@ -4,14 +4,16 @@
 <div class="container p-4">
     <h2 class="fw-bold mb-4">Nouvelle nouveauté</h2>
 
+    {{ form_errors(form) }}
     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
         <div class="mb-3">{{ form_row(form.locale) }}</div>
         <div class="mb-3">{{ form_row(form.description) }}</div>
-        
+
         <div class="mb-3">
     <label class="form-label fw-bold">Ajouter des images</label>
     <div class="border rounded p-3 bg-light" style="border-style: dashed !important;">
         {{ form_widget(form.images) }}
+        {{ form_errors(form.images) }}
         <small class="text-muted mt-2 d-block">Formats acceptés : JPG, PNG, WEBP</small>
     </div>
 </div>
