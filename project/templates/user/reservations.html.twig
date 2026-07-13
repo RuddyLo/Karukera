@@ -168,18 +168,9 @@
                                 </ul>
 
                                 <h6 class="fw-bold">7. Caution</h6>
-                                {% if payment %}
-                                <p>Un dépôt de garantie de <strong>{{ payment.caution_amount }} {{ payment.currency_symbol }}</strong> <small class="text-muted">(TVA incluses)</small> a été prélevé au moment de la réservation.</p>
-                                {% else %}
-                                <p>Un dépôt de garantie peut être exigé selon la durée du séjour.</p>
-                                {% endif %}
-                                <p>Le client autorise expressément la retenue en cas de :</p>
-                                <ul>
-                                    <li>dommages</li>
-                                    <li>non-respect du règlement</li>
-                                    <li>frais exceptionnels</li>
-                                </ul>
-                                <p>En cas de dommages constatés supérieurs au montant de la caution, le montant de l'indemnisation pourrait être prélevé directement via le moyen de paiement utilisé lors de la réservation. Dans l'éventualité d'absence des fonds nécessaires, le client s'engage à régler dans les meilleurs délais les préjudices subis par un autre moyen de paiement valide.</p>
+                                <p>Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>400 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
+                                <p>Ce dépôt est remboursable dans son intégralité dans un délai de 7 jours ouvrés suivant la fin du séjour, sous réserve de l'état du logement.</p>
+                                <p>En cas de dégradations constatées, le bailleur se réserve le droit de conserver tout ou partie du dépôt de garantie.</p>
 
                                 <h6 class="fw-bold">8. Utilisation</h6>
                                 <p>Le logement est destiné à un usage strictement privé.</p>
@@ -200,12 +191,12 @@
                                 </ul>
 
                                 <h6 class="fw-bold">10. Politique d'annulation</h6>
-                                <p>L'annulation d'une réservation peut être effectuée :</p>
                                 <ul>
-                                    <li>jusqu'à 14 jours avant la date de check-in : remboursement intégral</li>
-                                    <li>jusqu'à 7 jours avant : remboursement de 50 % du montant de la réservation</li>
+                                    <li>Plus de 30 jours avant l'arrivée : remboursement intégral</li>
+                                    <li>Entre 15 et 30 jours avant l'arrivée : remboursement à 50 %</li>
+                                    <li>Moins de 15 jours avant l'arrivée : aucun remboursement</li>
                                 </ul>
-                                <p>Aucune exception ne sera accordée sauf cas légal ou force majeure.</p>
+                                <p>En cas d'annulation par le bailleur : remboursement intégral du montant payé.</p>
 
                                 <h6 class="fw-bold">11. Responsabilité</h6>
                                 <p>Le locataire est responsable :</p>
