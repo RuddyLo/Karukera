@@ -82,7 +82,7 @@
                             <p class="fs-4 fw-bold text-success mb-1">{{ payment.rent_amount }} {{ payment.currency_symbol }}</p>
                             {% if reservation.couponCode %}
                                 <span class="badge bg-info text-dark">
-                                    Code {{ reservation.couponCode }} : -{{ reservation.discountAmount }} {{ payment.currency_symbol }}
+                                    Coupon {{ reservation.couponCode }} : -{{ reservation.discountAmount }} {{ payment.currency_symbol }}
                                 </span>
                                 <br>
                             {% endif %}

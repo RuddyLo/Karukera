@@ -135,27 +135,27 @@ class StripeController extends AbstractController
         $today = new \DateTime('today');
 
         if (!$coupon || !$coupon->isActive()) {
-            return ['coupon' => null, 'error' => 'Ce code promo est invalide.', 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => 'Ce coupon est invalide.', 'discountAmount' => 0.0];
         }
 
         if ($coupon->getValidFrom() && $today < $coupon->getValidFrom()) {
-            return ['coupon' => null, 'error' => "Ce code promo n'est pas encore valable.", 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => "Ce coupon n'est pas encore valable.", 'discountAmount' => 0.0];
         }
 
         if ($coupon->getValidUntil() && $today > $coupon->getValidUntil()) {
-            return ['coupon' => null, 'error' => 'Ce code promo a expiré.', 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => 'Ce coupon a expiré.', 'discountAmount' => 0.0];
         }
 
         if ($coupon->getApartments()->count() > 0 && !$coupon->getApartments()->contains($apartment)) {
-            return ['coupon' => null, 'error' => "Ce code promo n'est pas valable pour cet appartement.", 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => "Ce coupon n'est pas valable pour cet appartement.", 'discountAmount' => 0.0];
         }
 
         if ($coupon->getMaxUses() !== null && $couponRedemptionRepository->countByCoupon($coupon) >= $coupon->getMaxUses()) {
-            return ['coupon' => null, 'error' => "Ce code promo n'est plus disponible.", 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => "Ce coupon n'est plus disponible.", 'discountAmount' => 0.0];
         }
 
         if ($coupon->getMaxUsesPerUser() !== null && $couponRedemptionRepository->countByCouponAndUser($coupon, $user) >= $coupon->getMaxUsesPerUser()) {
-            return ['coupon' => null, 'error' => 'Vous avez déjà utilisé ce code promo.', 'discountAmount' => 0.0];
+            return ['coupon' => null, 'error' => 'Vous avez déjà utilisé ce coupon.', 'discountAmount' => 0.0];
         }
 
         $discountAmount = $coupon->getType() === Coupon::TYPE_PERCENTAGE
@@ -459,7 +459,7 @@ class StripeController extends AbstractController
         $discountRowHtml = '';
         if ($reservation->getDiscountAmount() > 0) {
             $discountRowHtml = sprintf(
-                '<tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">🏷️ Réduction (code %s)</td><td style="padding:10px 16px;border-bottom:1px solid #eee;color:#2c7a4b;"><strong>-%s €</strong></td></tr>',
+                '<tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">🏷️ Réduction (coupon %s)</td><td style="padding:10px 16px;border-bottom:1px solid #eee;color:#2c7a4b;"><strong>-%s €</strong></td></tr>',
                 htmlspecialchars($reservation->getCouponCode() ?? ''),
                 number_format($reservation->getDiscountAmount(), 2, ',', ' ')
             );
@@ -550,7 +550,7 @@ class StripeController extends AbstractController
             htmlspecialchars($userEmail),
             number_format($rentAmount, 2, ',', ' '),
             $reservation->getDiscountAmount() > 0
-                ? sprintf('<li>Réduction (code %s) : <strong>-%s €</strong></li>', htmlspecialchars($reservation->getCouponCode() ?? ''), number_format($reservation->getDiscountAmount(), 2, ',', ' '))
+                ? sprintf('<li>Réduction (coupon %s) : <strong>-%s €</strong></li>', htmlspecialchars($reservation->getCouponCode() ?? ''), number_format($reservation->getDiscountAmount(), 2, ',', ' '))
                 : '',
             number_format($cautionAmount, 2, ',', ' '),
             number_format($total, 2, ',', ' ')

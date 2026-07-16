@@ -99,7 +99,7 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
         document.getElementById('recap-discount').textContent = data.discountAmount.toFixed(2);
         document.getElementById('coupon-applied-code').textContent = data.couponCode || '';
         if (discountRow) discountRow.style.display = '';
-        if (couponMessageEl) { couponMessageEl.textContent = 'Code promo appliqué !'; couponMessageEl.className = 'small mt-1 text-success'; }
+        if (couponMessageEl) { couponMessageEl.textContent = 'Coupon appliqué !'; couponMessageEl.className = 'small mt-1 text-success'; }
     } else {
         if (discountRow) discountRow.style.display = 'none';
     }
