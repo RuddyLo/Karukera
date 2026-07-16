@@ -231,6 +231,8 @@ class StripeController extends AbstractController
             $discountAmount  = round($discountAmount * $rate, 2);
         }
 
+        $pricePerNight = round($price * $rate, 2);
+
         $paymentIntentRent = PaymentIntent::create([
             'amount' => (int) ($rentAmount * 100) + (int) ($cautionWithFees * 100),
             'currency' => $currency,
@@ -254,6 +256,7 @@ class StripeController extends AbstractController
 
         return new JsonResponse([
             'clientSecretRent' => $paymentIntentRent->client_secret,
+            'pricePerNight' => $pricePerNight,
             'rentAmount' => $rentAmount,
             'cautionAmount' => $caution,
             'cautionWithFees' => $cautionWithFees,

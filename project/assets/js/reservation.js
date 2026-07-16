@@ -85,7 +85,7 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
     updateCurrencySymbols();
     showExchangeRate(data.currency, data.exchangeRate);
 
-    const pricePerNight = data.days > 0 ? data.rentAmount / data.days : data.rentAmount;
+    const pricePerNight = data.pricePerNight ?? (data.days > 0 ? data.rentAmount / data.days : data.rentAmount);
     const recapPriceEl = document.getElementById('apartment_price');
     if (recapPriceEl) {
         const valEl = document.getElementById('apartment_price_value');
