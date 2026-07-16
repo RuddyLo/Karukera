@@ -175,6 +175,10 @@ apartment_details:
     price_per_night: "/ nuit"
     show_all_images: "Afficher toutes les images"
     login_to_book: "Se connecter pour réserver"
+    coupon_label: "Code promo"
+    coupon_placeholder: "Entrez votre code"
+    coupon_apply: "Appliquer"
+    coupon_discount_label: "Réduction"
 
 blog:
     title: "Notre Blog"

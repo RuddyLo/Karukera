@@ -200,6 +200,24 @@
                                 <span id="recap-rent"></span> <span class="currency-symbol">€</span> <small class="text-muted fw-normal fs-6">(TVA incluses)</small>
                             </div>
                         </div>
+
+                        {% if not is_granted('ROLE_ADMIN') %}
+                        <div class="row mb-2" id="coupon-discount-row" style="display:none;">
+                            <div class="col-8 text-success">{{ 'apartment_details.coupon_discount_label'|trans }} (<span id="coupon-applied-code"></span>)</div>
+                            <div class="col-4 text-end text-success">−<span id="recap-discount"></span> <span class="currency-symbol">€</span></div>
+                        </div>
+
+                        <div class="row mt-3 pt-3 border-top">
+                            <div class="col-12">
+                                <label class="text-muted small mb-1 d-block">{{ 'apartment_details.coupon_label'|trans }}</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="coupon-code-input" class="form-control text-uppercase" placeholder="{{ 'apartment_details.coupon_placeholder'|trans }}">
+                                    <button type="button" id="coupon-apply-btn" class="btn btn-outline-success">{{ 'apartment_details.coupon_apply'|trans }}</button>
+                                </div>
+                                <div id="coupon-message" class="small mt-1"></div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 

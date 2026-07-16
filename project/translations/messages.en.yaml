@@ -176,6 +176,10 @@ apartment_details:
     price_per_night: "/ night"
     show_all_images: "Show all images"
     login_to_book: "Log in to book"
+    coupon_label: "Promo code"
+    coupon_placeholder: "Enter your code"
+    coupon_apply: "Apply"
+    coupon_discount_label: "Discount"
 
 blog:
     title: "Our Blog"

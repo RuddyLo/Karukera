@@ -60,6 +60,36 @@ class Reservation
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $reference = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $couponCode = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $discountAmount = null;
+
+    public function getCouponCode(): ?string
+    {
+        return $this->couponCode;
+    }
+
+    public function setCouponCode(?string $couponCode): static
+    {
+        $this->couponCode = $couponCode;
+
+        return $this;
+    }
+
+    public function getDiscountAmount(): ?float
+    {
+        return $this->discountAmount;
+    }
+
+    public function setDiscountAmount(?float $discountAmount): static
+    {
+        $this->discountAmount = $discountAmount;
+
+        return $this;
+    }
+
     public function getReference(): ?string
     {
         return $this->reference;

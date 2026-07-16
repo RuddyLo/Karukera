@@ -1,0 +1,75 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}Coupons{% endblock %}
+
+{% block content %}
+
+<div class="m-4">
+    <div class="table-container container w-100">
+        <h1 class="py-4">Liste des Coupons</h1>
+        <table style="width: 100%;" class="table table-hover table-striped">
+            <thead class="table-dark text-white font-weight-bold">
+                <tr>
+                    <th>Code</th>
+                    <th>Réduction</th>
+                    <th>Appartements</th>
+                    <th>Validité</th>
+                    <th>Utilisations</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            {% for coupon in coupons %}
+            <tr>
+                <td><strong>{{ coupon.code }}</strong></td>
+                <td>
+                    {% if coupon.type == 'percentage' %}
+                        -{{ coupon.value }} %
+                    {% else %}
+                        -{{ coupon.value }} €
+                    {% endif %}
+                </td>
+                <td>
+                    {% if coupon.apartments|length > 0 %}
+                        {% for apartment in coupon.apartments %}
+                            <span class="badge bg-secondary">{{ apartment.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted">Tous</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ coupon.validFrom ? coupon.validFrom|date('d/m/Y') : '—' }}
+                    →
+                    {{ coupon.validUntil ? coupon.validUntil|date('d/m/Y') : '—' }}
+                </td>
+                <td>
+                    {{ usage_counts[coupon.id] ?? 0 }}{{ coupon.maxUses ? ' / ' ~ coupon.maxUses : '' }}
+                </td>
+                <td>
+                    {% if coupon.active %}
+                        <span class="badge bg-success">Actif</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactif</span>
+                    {% endif %}
+                </td>
+                <td class="d-flex gap-1">
+                    <a class="btn btn-primary btn-sm" href="{{ path('coupon_show', {'id': coupon.id}) }}"><i class="bi bi-eye-fill"></i></a>
+                    <a class="btn btn-warning btn-sm" href="{{ path('coupon_edit', {'id': coupon.id}) }}"><i class="bi bi-pencil-fill"></i></a>
+                    <form method="post" action="{{ path('coupon_toggle_active', {'id': coupon.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('toggle-active' ~ coupon.id) }}">
+                        <button class="btn btn-info btn-sm text-white">{{ coupon.active ? 'Désactiver' : 'Activer' }}</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">Pas encore de coupon</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <a class="btn btn-info text-white" href="{{ path('coupon_new') }}">Créer un nouveau coupon</a>
+    </div>
+</div>
+
+{% endblock %}

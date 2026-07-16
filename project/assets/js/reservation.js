@@ -4,6 +4,7 @@ import bootstrap from '../externals/bootstrap/js/bootstrap.bundle.min.js';
 let stripe;
 let elementsRent;
 let clientSecretRent = null;
+let appliedCouponCode = null;
 
 function getCurrencySymbol() {
     return (window.selectedCurrency || 'eur') === 'brl' ? 'R$' : '€';
@@ -61,7 +62,8 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
                 start_date: startDate,
                 end_date: endDate,
                 price: price,
-                currency: window.selectedCurrency || 'eur'
+                currency: window.selectedCurrency || 'eur',
+                coupon_code: appliedCouponCode
             })
         });
         data = await response.json();
@@ -89,6 +91,17 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
         const valEl = document.getElementById('apartment_price_value');
         if (valEl) valEl.textContent = pricePerNight.toFixed(2);
         recapPriceEl.dataset.price = pricePerNight.toFixed(2);
+    }
+
+    const discountRow = document.getElementById('coupon-discount-row');
+    const couponMessageEl = document.getElementById('coupon-message');
+    if (data.discountAmount && data.discountAmount > 0) {
+        document.getElementById('recap-discount').textContent = data.discountAmount.toFixed(2);
+        document.getElementById('coupon-applied-code').textContent = data.couponCode || '';
+        if (discountRow) discountRow.style.display = '';
+        if (couponMessageEl) { couponMessageEl.textContent = 'Code promo appliqué !'; couponMessageEl.className = 'small mt-1 text-success'; }
+    } else {
+        if (discountRow) discountRow.style.display = 'none';
     }
 
     document.getElementById('recap-days').textContent = data.days;
@@ -184,6 +197,31 @@ document.getElementById('preview-reservation-btn')?.addEventListener('click', as
 
     const modal = new bootstrap.Modal(document.getElementById('reservation-modal'));
     modal.show();
+});
+
+document.getElementById('coupon-apply-btn')?.addEventListener('click', async function() {
+    const input = document.getElementById('coupon-code-input');
+    const code = (input.value || '').trim().toUpperCase();
+    const messageEl = document.getElementById('coupon-message');
+    if (!code) return;
+
+    const startDate = document.getElementById('reservation_form_startDate').value;
+    const endDate = document.getElementById('reservation_form_endDate').value;
+    const price = parseFloat(document.getElementById('apartment_price').dataset.price);
+
+    const previousCoupon = appliedCouponCode;
+    appliedCouponCode = code;
+
+    this.disabled = true;
+    const ok = await fetchAndMountPaymentIntent(startDate, endDate, price);
+
+    if (!ok) {
+        appliedCouponCode = previousCoupon;
+        if (messageEl) { messageEl.textContent = ''; }
+        await fetchAndMountPaymentIntent(startDate, endDate, price);
+    }
+
+    this.disabled = false;
 });
 
 document.getElementById('checkout-button')?.addEventListener('click', async function() {

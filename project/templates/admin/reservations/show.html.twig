@@ -80,6 +80,12 @@
                         <div class="col-md-6">
                             <h6 class="text-muted">Location</h6>
                             <p class="fs-4 fw-bold text-success mb-1">{{ payment.rent_amount }} {{ payment.currency_symbol }}</p>
+                            {% if reservation.couponCode %}
+                                <span class="badge bg-info text-dark">
+                                    Code {{ reservation.couponCode }} : -{{ reservation.discountAmount }} {{ payment.currency_symbol }}
+                                </span>
+                                <br>
+                            {% endif %}
                             <small class="text-muted">Statut: {{ payment.rent_status }}</small>
                             <br>
                             <small class="text-muted">ID: {{ payment.rent_intent_id }}</small>
