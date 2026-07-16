@@ -179,6 +179,7 @@ apartment_details:
     coupon_placeholder: "Entrez votre coupon"
     coupon_apply: "Appliquer"
     coupon_discount_label: "Réduction"
+    coupon_applied: "Coupon appliqué :"
 
 blog:
     title: "Notre Blog"

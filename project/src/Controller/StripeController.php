@@ -263,6 +263,8 @@ class StripeController extends AbstractController
             'exchangeRate' => $rate,
             'discountAmount' => $discountAmount,
             'couponCode' => $coupon?->getCode(),
+            'couponType' => $coupon?->getType(),
+            'couponValue' => $coupon ? (float) $coupon->getValue() : null,
         ]);
     }
 

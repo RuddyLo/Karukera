@@ -95,13 +95,26 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
 
     const discountRow = document.getElementById('coupon-discount-row');
     const couponMessageEl = document.getElementById('coupon-message');
+    const appliedBanner = document.getElementById('coupon-applied-banner');
     if (data.discountAmount && data.discountAmount > 0) {
         document.getElementById('recap-discount').textContent = data.discountAmount.toFixed(2);
         document.getElementById('coupon-applied-code').textContent = data.couponCode || '';
         if (discountRow) discountRow.style.display = '';
-        if (couponMessageEl) { couponMessageEl.textContent = 'Coupon appliqué !'; couponMessageEl.className = 'small mt-1 text-success'; }
+        if (couponMessageEl) { couponMessageEl.textContent = ''; }
+
+        if (appliedBanner) {
+            document.getElementById('coupon-applied-code-2').textContent = data.couponCode || '';
+            const rateBadge = document.getElementById('coupon-rate-badge');
+            if (rateBadge) {
+                rateBadge.textContent = data.couponType === 'percentage'
+                    ? `-${data.couponValue}%`
+                    : `-${data.discountAmount.toFixed(2)} ${getCurrencySymbol()}`;
+            }
+            appliedBanner.style.display = 'flex';
+        }
     } else {
         if (discountRow) discountRow.style.display = 'none';
+        if (appliedBanner) appliedBanner.style.display = 'none';
     }
 
     document.getElementById('recap-days').textContent = data.days;

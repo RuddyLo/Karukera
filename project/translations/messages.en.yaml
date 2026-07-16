@@ -180,6 +180,7 @@ apartment_details:
     coupon_placeholder: "Enter your coupon"
     coupon_apply: "Apply"
     coupon_discount_label: "Discount"
+    coupon_applied: "Coupon applied:"
 
 blog:
     title: "Our Blog"
