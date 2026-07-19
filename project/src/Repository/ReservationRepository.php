@@ -76,4 +76,48 @@ class ReservationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array{0: Reservation[], 1: int}
+     */
+    public function findAllFiltered(int $page, int $length, ?string $orderBy, string $search, string $statusFilter): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.user', 'u')->addSelect('u')
+            ->leftJoin('r.apartment', 'a')->addSelect('a');
+
+        if ($search !== '') {
+            $qb->andWhere('u.email LIKE :search OR a.name LIKE :search OR r.reference LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        $now = new \DateTime('today');
+        if ($statusFilter === 'canceled') {
+            $qb->andWhere('r.status = :status')->setParameter('status', 'canceled');
+        } elseif (\in_array($statusFilter, ['upcoming', 'ongoing', 'finished'], true)) {
+            $qb->andWhere('r.status != :status')->setParameter('status', 'canceled');
+            if ($statusFilter === 'upcoming') {
+                $qb->andWhere('r.startDate > :now')->setParameter('now', $now);
+            } elseif ($statusFilter === 'ongoing') {
+                $qb->andWhere('r.startDate <= :now')->andWhere('r.endDate >= :now')->setParameter('now', $now);
+            } else {
+                $qb->andWhere('r.endDate < :now')->setParameter('now', $now);
+            }
+        }
+
+        $total = (int) (clone $qb)->select('COUNT(DISTINCT r.id)')->getQuery()->getSingleScalarResult();
+
+        if ($orderBy) {
+            [$field, $dir] = array_pad(explode(' ', $orderBy), 2, 'DESC');
+        } else {
+            $field = 'r.startDate';
+            $dir = 'DESC';
+        }
+
+        $qb->orderBy($field, $dir)
+            ->setFirstResult($page)
+            ->setMaxResults($length);
+
+        return [$qb->getQuery()->getResult(), $total];
+    }
 }

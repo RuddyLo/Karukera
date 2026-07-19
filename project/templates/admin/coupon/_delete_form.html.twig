@@ -1,0 +1,6 @@
+<div>
+<form method="post" action="{{ path('coupon_delete', {'id': coupon.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce coupon ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ coupon.id) }}">
+    <button class="btn btn-danger">Supprimer</button>
+</form>
+</div>

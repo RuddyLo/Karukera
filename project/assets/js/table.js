@@ -258,4 +258,132 @@ $(document).ready(() => {
 
     });
 
+    if ($("#reservation-table").length) {
+        let reservationStatusFilter = '';
+
+        let reservationDataTable = $("#reservation-table").DataTable({
+            responsive: true,
+            "aaSorting": [],
+            "bProcessing": true,
+            "bFilter": true,
+            "bServerSide": true,
+            "iDisplayLength": 10,
+            order: [[3, 'desc']],
+
+            "ajax": {
+                url: ajaxLink.reservation.list,
+                data: function (data) {
+                    if (data.order && data?.order[0]) {
+                        data.order_by = data.columns[data.order[0].column].name + ' ' + data.order[0].dir;
+                    }
+                    data.status_filter = reservationStatusFilter;
+                },
+            },
+            "columnDefs": [
+                { targets: 0, name: 'r.id', orderable: true },
+                { targets: 1, name: 'u.email', orderable: true },
+                { targets: 2, name: 'a.name', orderable: true },
+                { targets: 3, name: 'r.startDate', orderable: true },
+                { targets: 4, name: 'reservation.rent', orderable: false },
+                {
+                    targets: 5,
+                    name: 'reservation.caution',
+                    orderable: false,
+                    render: function (data) {
+                        if (!data || !data.amount) return '<span class="text-muted">-</span>';
+                        const labels = {
+                            refunded: `<span class="badge bg-info">${data.amount} remboursés</span>`,
+                            conserved: `<span class="badge bg-warning text-dark">${data.amount} conservée</span>`,
+                            pending: '<span class="badge bg-secondary text-white">Caution non traitée</span>',
+                        };
+                        return labels[data.status] || data.amount;
+                    }
+                },
+                {
+                    targets: 6,
+                    name: 'reservation.status',
+                    orderable: false,
+                    render: function (data) {
+                        const labels = {
+                            upcoming: '<span class="badge bg-primary">À venir</span>',
+                            ongoing: '<span class="badge bg-success">En cours</span>',
+                            finished: '<span class="badge bg-secondary">Terminée</span>',
+                            canceled: '<span class="badge bg-dark">Annulée</span>',
+                        };
+                        return labels[data] || data;
+                    }
+                },
+                {
+                    targets: 7,
+                    name: 'reservation.action',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        const id = row[0];
+                        const status = row[6];
+                        const isFinished = row[7];
+                        const reviewToken = row[8];
+
+                        let buttons = `<a title="Détails" href='${ajaxLink.reservation.show.replace('123456789', id)}' class='btn btn-primary'><i class="bi bi-eye-fill"></i></a>`;
+
+                        if (isFinished && status !== 'canceled') {
+                            buttons += `
+                                <form class="d-inline m-0 send-review-form" method="post" action="${ajaxLink.reservation.sendReview.replace('123456789', id)}">
+                                    <input type="hidden" name="_token" value="${reviewToken}">
+                                    <button type="submit" title="Envoyer email avis" class="btn btn-outline-success"><i class="bi bi-envelope"></i></button>
+                                </form>`;
+                        }
+
+                        if (status !== 'canceled') {
+                            buttons += ` <button title="Annuler" class='btn btn-danger event-cancel-reservation' data-uuid='${id}'><i class="bi bi-x-circle-fill"></i></button>`;
+                        }
+
+                        return `<div class="d-flex justify-content-center gap-1 list-action-group">${buttons}</div>`;
+                    }
+                },
+            ],
+        });
+
+        $("#reservation-status-filter").on('change', function () {
+            reservationStatusFilter = $(this).val();
+            reservationDataTable.ajax.reload();
+        });
+
+        $(document).on('click', '.event-cancel-reservation', function () {
+            const id = $(this).data('uuid');
+
+            Swal.fire({
+                title: 'Annuler cette réservation ?',
+                text: 'Cette action est irréversible. Les dates redeviendront disponibles sur le calendrier.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, annuler',
+                cancelButtonText: 'Retour',
+            }).then(result => {
+                if (!result.isConfirmed) return;
+
+                const url = ajaxLink.reservation.cancel.replace('123456789', id);
+                const formData = new FormData();
+                formData.append('_token', ajaxLink.reservation.cancelToken);
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData,
+                })
+                .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        reservationDataTable.ajax.reload(null, false);
+                        Swal.fire({ title: 'Réservation annulée !', icon: 'success', timer: 1500, showConfirmButton: false });
+                    } else {
+                        Swal.fire('Impossible', data.error || "Échec de l'annulation", 'warning');
+                    }
+                })
+                .catch(() => Swal.fire('Erreur', 'Erreur réseau', 'error'));
+            });
+        });
+    }
+
 });

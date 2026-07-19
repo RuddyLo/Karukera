@@ -133,7 +133,13 @@ class ApartmentController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $reservations = $repo->findBy(['apartment' => $apartment]);
+        $reservations = $repo->createQueryBuilder('r')
+            ->andWhere('r.apartment = :apartment')
+            ->andWhere('r.status != :canceled')
+            ->setParameter('apartment', $apartment)
+            ->setParameter('canceled', 'canceled')
+            ->getQuery()
+            ->getResult();
         $events = [];
 
         foreach ($reservations as $reservation) {

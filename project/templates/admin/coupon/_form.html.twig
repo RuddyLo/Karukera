@@ -1,0 +1,9 @@
+<div class="mb-4">
+{{ form_start(form) }}
+    <div class="row">
+        {{ form_widget(form) }}
+    </div>
+    <button class="btn btn-success">{{ button_label|default('Enregistrer') }}</button>
+    <a class="btn btn-info text-white" href="{{ path('coupon_index') }}">Retour</a>
+{{ form_end(form) }}
+</div>

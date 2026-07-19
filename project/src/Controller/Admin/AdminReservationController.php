@@ -9,40 +9,105 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Refund;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 #[Route('/admin/reservations')]
 class AdminReservationController extends AbstractController
 {
     #[Route('', name: 'admin_reservations_list')]
-    public function list(ReservationRepository $reservationRepository): Response
+    public function list(): Response
     {
+        return $this->render('admin/reservations/list.html.twig');
+    }
+
+    #[Route('/ajax/list', name: 'admin.ajax.reservation')]
+    public function ajaxList(Request $request, ReservationRepository $reservationRepository, CsrfTokenManagerInterface $csrfTokenManager): Response
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(['message' => 'method not allowed'], 403);
+        }
+
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
-        $reservations = $reservationRepository->findBy([], ['startDate' => 'DESC']);
-        
-        $reservationsWithPayments = [];
+        $page         = (int) $request->get('start', 0);
+        $length       = (int) $request->get('length', 10);
+        $search       = $request->get('search')['value'] ?? '';
+        $orderBy      = $request->get('order_by');
+        $statusFilter = $request->get('status_filter', '');
+
+        [$reservations, $total] = $reservationRepository->findAllFiltered($page, $length, $orderBy, $search, $statusFilter);
+
+        $now = new \DateTime('today');
+        $data = [];
         foreach ($reservations as $reservation) {
-            $paymentData = $this->getPaymentData($reservation);
-            
-            $reservationsWithPayments[] = [
-                'reservation' => $reservation,
-                'payment' => $paymentData
+            $payment = $this->getPaymentData($reservation);
+
+            if ($reservation->getStatus() === 'canceled') {
+                $statusKey = 'canceled';
+            } elseif ($reservation->getEndDate() < $now) {
+                $statusKey = 'finished';
+            } elseif ($reservation->getStartDate() > $now) {
+                $statusKey = 'upcoming';
+            } else {
+                $statusKey = 'ongoing';
+            }
+
+            $data[] = [
+                $reservation->getId(),
+                $reservation->getUser()?->getEmail(),
+                $reservation->getApartment()?->getName(),
+                $reservation->getStartDate()->format('d/m/Y') . ' → ' . $reservation->getEndDate()->format('d/m/Y'),
+                $payment ? number_format((float) $payment['rent_amount'], 2) . ' ' . $payment['currency_symbol'] : null,
+                [
+                    'status' => $reservation->isCautionRefunded()
+                        ? 'refunded'
+                        : ($reservation->isCautionConcerved() ? 'conserved' : 'pending'),
+                    'amount' => $payment ? number_format((float) $payment['caution_amount'], 2) . ' ' . $payment['currency_symbol'] : null,
+                ],
+                $statusKey,
+                $statusKey === 'finished',
+                $csrfTokenManager->getToken('send_review' . $reservation->getId())->getValue(),
             ];
-            
         }
-        
-        return $this->render('admin/reservations/list.html.twig', [
-            'reservations' => $reservationsWithPayments,
+
+        return new JsonResponse([
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $data,
         ]);
     }
 
-    #[Route('/{id}', name: 'admin_reservation_show')]
+    #[Route('/{id}/cancel', name: 'admin_reservation_cancel', methods: ['POST'])]
+    public function cancel(Reservation $reservation, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('cancel_reservation', $request->request->get('_token'))) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Token CSRF invalide'], 403);
+            }
+            return $this->redirectToRoute('admin_reservations_list');
+        }
+
+        // Annulation douce : la réservation est conservée (paiements Stripe, coupon utilisé),
+        // mais libère les dates dans le calendrier public.
+        $reservation->setStatus('canceled');
+        $reservation->setConfirmed(false);
+        $entityManager->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
+
+        return $this->redirectToRoute('admin_reservations_list');
+    }
+
+    #[Route('/{id}', name: 'admin_reservation_show', requirements: ['id' => '\d+'])]
     public function show(Reservation $reservation): Response
     {
         Stripe::setApiKey($this->getParameter('stripe_secret_key'));

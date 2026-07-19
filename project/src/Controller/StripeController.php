@@ -2,8 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Apartment;
+use App\Entity\Coupon;
+use App\Entity\CouponRedemption;
 use App\Entity\Reservation;
+use App\Entity\User;
 use App\Repository\ApartmentRepository;
+use App\Repository\CouponRedemptionRepository;
+use App\Repository\CouponRepository;
 use App\Repository\PricePeriodRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
@@ -110,11 +116,63 @@ class StripeController extends AbstractController
         }
     }
 
+    /**
+     * @return array{coupon: ?Coupon, error: ?string, discountAmount: float}
+     */
+    private function resolveCoupon(
+        ?string $code,
+        Apartment $apartment,
+        User $user,
+        float $rentAmount,
+        CouponRepository $couponRepository,
+        CouponRedemptionRepository $couponRedemptionRepository
+    ): array {
+        if (!$code) {
+            return ['coupon' => null, 'error' => null, 'discountAmount' => 0.0];
+        }
+
+        $coupon = $couponRepository->findByCode($code);
+        $today = new \DateTime('today');
+
+        if (!$coupon || !$coupon->isActive()) {
+            return ['coupon' => null, 'error' => 'Ce coupon est invalide.', 'discountAmount' => 0.0];
+        }
+
+        if ($coupon->getValidFrom() && $today < $coupon->getValidFrom()) {
+            return ['coupon' => null, 'error' => "Ce coupon n'est pas encore valable.", 'discountAmount' => 0.0];
+        }
+
+        if ($coupon->getValidUntil() && $today > $coupon->getValidUntil()) {
+            return ['coupon' => null, 'error' => 'Ce coupon a expiré.', 'discountAmount' => 0.0];
+        }
+
+        if ($coupon->getApartments()->count() > 0 && !$coupon->getApartments()->contains($apartment)) {
+            return ['coupon' => null, 'error' => "Ce coupon n'est pas valable pour cet appartement.", 'discountAmount' => 0.0];
+        }
+
+        if ($coupon->getMaxUses() !== null && $couponRedemptionRepository->countByCoupon($coupon) >= $coupon->getMaxUses()) {
+            return ['coupon' => null, 'error' => "Ce coupon n'est plus disponible.", 'discountAmount' => 0.0];
+        }
+
+        if ($coupon->getMaxUsesPerUser() !== null && $couponRedemptionRepository->countByCouponAndUser($coupon, $user) >= $coupon->getMaxUsesPerUser()) {
+            return ['coupon' => null, 'error' => 'Vous avez déjà utilisé ce coupon.', 'discountAmount' => 0.0];
+        }
+
+        $discountAmount = $coupon->getType() === Coupon::TYPE_PERCENTAGE
+            ? round($rentAmount * ((float) $coupon->getValue() / 100), 2)
+            : (float) $coupon->getValue();
+        $discountAmount = min($discountAmount, $rentAmount);
+
+        return ['coupon' => $coupon, 'error' => null, 'discountAmount' => $discountAmount];
+    }
+
     #[Route('/stripe/create-payment-intent', name: 'stripe_create_payment_intent', methods: ['POST'])]
     public function createPaymentIntent(
         Request $request,
         ApartmentRepository $apartmentRepository,
-        PricePeriodRepository $pricePeriodRepository
+        PricePeriodRepository $pricePeriodRepository,
+        CouponRepository $couponRepository,
+        CouponRedemptionRepository $couponRedemptionRepository
     ): JsonResponse {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -143,6 +201,23 @@ class StripeController extends AbstractController
         $caution     = $days <= 3 ? 400.0 : 500.0;
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
+        $couponResult = $this->resolveCoupon(
+            $data['coupon_code'] ?? null,
+            $apartment,
+            $this->getUser(),
+            $rentAmount,
+            $couponRepository,
+            $couponRedemptionRepository
+        );
+
+        if ($couponResult['error']) {
+            return new JsonResponse(['error' => $couponResult['error'], 'couponError' => true], 400);
+        }
+
+        $coupon = $couponResult['coupon'];
+        $discountAmount = $couponResult['discountAmount'];
+        $rentAmount = round($rentAmount - $discountAmount, 2);
+
         $rate = 1.0;
         if ($currency === 'brl') {
             try {
@@ -153,6 +228,7 @@ class StripeController extends AbstractController
             $rentAmount      = round($rentAmount * $rate, 2);
             $caution         = round($caution * $rate, 2);
             $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + (self::STRIPE_FEE_FIXED * $rate), 2);
+            $discountAmount  = round($discountAmount * $rate, 2);
             $breakdown       = array_map(
                 fn (array $night) => ['date' => $night['date'], 'price' => round($night['price'] * $rate, 2)],
                 $breakdown
@@ -162,6 +238,8 @@ class StripeController extends AbstractController
                 $groupedBreakdown
             );
         }
+
+        $pricePerNight = round($stay['pricePerNight'] * $rate, 2);
 
         $paymentIntentRent = PaymentIntent::create([
             'amount' => (int) ($rentAmount * 100) + (int) ($cautionWithFees * 100),
@@ -179,11 +257,14 @@ class StripeController extends AbstractController
                 'days' => $days,
                 'currency' => $currency,
                 'exchange_rate' => $rate,
+                'coupon_code' => $coupon?->getCode(),
+                'discount_amount' => $discountAmount,
             ],
         ]);
 
         return new JsonResponse([
             'clientSecretRent' => $paymentIntentRent->client_secret,
+            'pricePerNight' => $pricePerNight,
             'rentAmount' => $rentAmount,
             'cautionAmount' => $caution,
             'cautionWithFees' => $cautionWithFees,
@@ -193,6 +274,10 @@ class StripeController extends AbstractController
             'exchangeRate' => $rate,
             'breakdown' => $breakdown,
             'groupedBreakdown' => $groupedBreakdown,
+            'discountAmount' => $discountAmount,
+            'couponCode' => $coupon?->getCode(),
+            'couponType' => $coupon?->getType(),
+            'couponValue' => $coupon ? (float) $coupon->getValue() : null,
         ]);
     }
 
@@ -272,7 +357,8 @@ class StripeController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         ApartmentRepository $apartmentRepository,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        CouponRepository $couponRepository
     ): Response {
         $paymentIntentId = $request->query->get('payment_intent');
         $meta = null;
@@ -311,13 +397,34 @@ class StripeController extends AbstractController
                             $reservation->setCautionConcerved(false);
                             $reservation->setCautionRefunded(false);
                             $reservation->setReference($reservation->generateReference());
+
+                            $couponCode = $meta->coupon_code ?? null;
+                            $discountAmount = isset($meta->discount_amount) ? (float) $meta->discount_amount : null;
+                            if ($couponCode) {
+                                $reservation->setCouponCode($couponCode);
+                                $reservation->setDiscountAmount($discountAmount);
+                            }
+
                             $em->persist($reservation);
                             $em->flush();
+
+                            if ($couponCode) {
+                                $coupon = $couponRepository->findByCode($couponCode);
+                                if ($coupon) {
+                                    $redemption = new CouponRedemption();
+                                    $redemption->setCoupon($coupon);
+                                    $redemption->setUser($user);
+                                    $redemption->setReservation($reservation);
+                                    $redemption->setDiscountAmount($discountAmount);
+                                    $em->persist($redemption);
+                                    $em->flush();
+                                }
+                            }
 
                             $this->sendReservationConfirmationEmails($reservation, $mailer);
                         }
                     }
-                    
+
                 }
             } catch (\Exception $e) {
                 error_log('Payment success error: ' . $e->getMessage());
@@ -364,6 +471,15 @@ class StripeController extends AbstractController
             } catch (\Exception) {}
         }
 
+        $discountRowHtml = '';
+        if ($reservation->getDiscountAmount() > 0) {
+            $discountRowHtml = sprintf(
+                '<tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">🏷️ Réduction (coupon %s)</td><td style="padding:10px 16px;border-bottom:1px solid #eee;color:#2c7a4b;"><strong>-%s €</strong></td></tr>',
+                htmlspecialchars($reservation->getCouponCode() ?? ''),
+                number_format($reservation->getDiscountAmount(), 2, ',', ' ')
+            );
+        }
+
         $from = new Address($_ENV['MAILER_FROM_ADDRESS'] ?? 'no-reply@oasiskarurio.com', 'Oasis de Karurio');
 
         $clientSubject = 'Confirmation de votre réservation – Oasis de Karurio';
@@ -384,6 +500,7 @@ class StripeController extends AbstractController
       <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">📅 Arrivée</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong> à partir de 15h00</td></tr>
       <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">📅 Départ</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s</strong> avant 11h00</td></tr>
       <tr><td style="padding:10px 16px;border-bottom:1px solid #eee;">💳 Montant du séjour</td><td style="padding:10px 16px;border-bottom:1px solid #eee;"><strong>%s €</strong></td></tr>
+      %s
       <tr><td style="padding:10px 16px;">💰 Total payé</td><td style="padding:10px 16px;"><strong>%s €</strong></td></tr>
     </table>
 
@@ -420,6 +537,7 @@ class StripeController extends AbstractController
             $startDate,
             $endDate,
             number_format($rentAmount, 2, ',', ' '),
+            $discountRowHtml,
             number_format($total, 2, ',', ' '),
             number_format($cautionAmount, 2, ',', ' '),
             number_format($cautionAmount, 2, ',', ' ')
@@ -434,6 +552,7 @@ class StripeController extends AbstractController
                <li>Période : <strong>%s → %s</strong></li>
                <li>Client : <strong>%s %s</strong> (%s)</li>
                <li>Séjour : <strong>%s €</strong></li>
+               %s
                <li>Caution : <strong>%s €</strong></li>
                <li>Total : <strong>%s €</strong></li>
              </ul>',
@@ -445,6 +564,9 @@ class StripeController extends AbstractController
             htmlspecialchars($reservation->getUser()?->getLastName() ?? ''),
             htmlspecialchars($userEmail),
             number_format($rentAmount, 2, ',', ' '),
+            $reservation->getDiscountAmount() > 0
+                ? sprintf('<li>Réduction (coupon %s) : <strong>-%s €</strong></li>', htmlspecialchars($reservation->getCouponCode() ?? ''), number_format($reservation->getDiscountAmount(), 2, ',', ' '))
+                : '',
             number_format($cautionAmount, 2, ',', ' '),
             number_format($total, 2, ',', ' ')
         );

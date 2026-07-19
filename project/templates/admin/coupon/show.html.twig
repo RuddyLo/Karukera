@@ -1,0 +1,93 @@
+{% extends 'admin/admin.base.html.twig' %}
+
+{% block title %}Coupon {{ coupon.code }}{% endblock %}
+
+{% block content %}
+<div class="m-4">
+    <h1>Coupon {{ coupon.code }}</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Code</th>
+                <td>{{ coupon.code }}</td>
+            </tr>
+            <tr>
+                <th>Réduction</th>
+                <td>
+                    {% if coupon.type == 'percentage' %}
+                        -{{ coupon.value }} %
+                    {% else %}
+                        -{{ coupon.value }} €
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ coupon.active ? 'Actif' : 'Inactif' }}</td>
+            </tr>
+            <tr>
+                <th>Appartements concernés</th>
+                <td>
+                    {% if coupon.apartments|length > 0 %}
+                        {% for apartment in coupon.apartments %}
+                            <span class="badge bg-secondary">{{ apartment.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        Tous les appartements
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Valable du</th>
+                <td>{{ coupon.validFrom ? coupon.validFrom|date('d/m/Y') : 'Sans limite' }}</td>
+            </tr>
+            <tr>
+                <th>Valable jusqu'au</th>
+                <td>{{ coupon.validUntil ? coupon.validUntil|date('d/m/Y') : 'Sans limite' }}</td>
+            </tr>
+            <tr>
+                <th>Utilisations</th>
+                <td>{{ usage_count }}{{ coupon.maxUses ? ' / ' ~ coupon.maxUses : ' (illimité)' }}</td>
+            </tr>
+            <tr>
+                <th>Utilisations max par client</th>
+                <td>{{ coupon.maxUsesPerUser ?? 'Illimité' }}</td>
+            </tr>
+            <tr>
+                <th>Créé le</th>
+                <td>{{ coupon.createdAt|date('d/m/Y H:i') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h5 class="mt-4">Historique d'utilisation</h5>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Réservation</th>
+                <th>Réduction</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        {% for redemption in coupon.redemptions %}
+        <tr>
+            <td>{{ redemption.user.email }}</td>
+            <td>{{ redemption.reservation.reference ?? redemption.reservation.id }}</td>
+            <td>{{ redemption.discountAmount }} €</td>
+            <td>{{ redemption.createdAt|date('d/m/Y H:i') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">Ce coupon n'a pas encore été utilisé</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ path('coupon_index') }}">Retour à la liste</a>
+    <a href="{{ path('coupon_edit', {'id': coupon.id}) }}">Modifier</a>
+
+    {{ include('admin/coupon/_delete_form.html.twig') }}
+</div>
+{% endblock %}

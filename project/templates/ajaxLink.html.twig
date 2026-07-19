@@ -45,6 +45,13 @@
             list            :"{{ path('admin.ajax.social_media') }}",
             show            :"{{ path('admin.social_media.show', {id:123456789}) }}",
             edit            :"{{ path('admin.social_media.edit', {id:123456789}) }}"
+        },
+        reservation: {
+            list        : "{{ path('admin.ajax.reservation') }}" ,
+            show        : "{{ path('admin_reservation_show', {id : 123456789}) }}" ,
+            sendReview  : "{{ path('admin_reservation_send_review', {id : 123456789}) }}" ,
+            cancel      : "{{ path('admin_reservation_cancel', {id : 123456789}) }}" ,
+            cancelToken : "{{ csrf_token('cancel_reservation') }}" ,
         }
     });
 
