@@ -72,6 +72,61 @@ class PricePeriodRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * Calcule le montant du séjour nuit par nuit : chaque nuit prend le prix de la
+     * PricePeriod qui la couvre (sinon le prix de base de l'appartement), pour gérer
+     * correctement un séjour qui chevauche le début/la fin d'une période tarifaire.
+     */
+    public function calculateStayPrice(Apartment $apartment, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        $nights = max(1, $startDate->diff($endDate)->days);
 
-   
+        $periods = $this->createQueryBuilder('p')
+            ->andWhere('p.apartment = :apartment')
+            ->andWhere('p.startDate <= :end')
+            ->andWhere('p.endDate >= :start')
+            ->setParameter('apartment', $apartment)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->orderBy('p.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $basePrice = (float) $apartment->getPrice();
+        $total = 0.0;
+        $breakdown = [];
+        $groupedBreakdown = [];
+        $night = \DateTime::createFromInterface($startDate);
+
+        for ($i = 0; $i < $nights; $i++) {
+            $applicablePeriod = null;
+            foreach ($periods as $period) {
+                if ($period->getStartDate() <= $night && $period->getEndDate() >= $night) {
+                    $applicablePeriod = $period;
+                    break;
+                }
+            }
+            $nightPrice = $applicablePeriod ? (float) $applicablePeriod->getPrice() : $basePrice;
+            $total += $nightPrice;
+            $nightStr = $night->format('Y-m-d');
+            $breakdown[] = ['date' => $nightStr, 'price' => $nightPrice];
+
+            $lastGroupIndex = array_key_last($groupedBreakdown);
+            if ($lastGroupIndex !== null && $groupedBreakdown[$lastGroupIndex]['price'] === $nightPrice) {
+                $groupedBreakdown[$lastGroupIndex]['endDate'] = $nightStr;
+            } else {
+                $groupedBreakdown[] = ['startDate' => $nightStr, 'endDate' => $nightStr, 'price' => $nightPrice];
+            }
+
+            $night->modify('+1 day');
+        }
+
+        return [
+            'total' => $total,
+            'nights' => $nights,
+            'pricePerNight' => $total / $nights,
+            'breakdown' => $breakdown,
+            'groupedBreakdown' => $groupedBreakdown,
+        ];
+    }
 }

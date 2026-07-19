@@ -9,6 +9,7 @@
 
         <!-- LEFT COLUMN: RESULTS -->
         <div class="col-12 col-lg-7 d-flex flex-column">
+            <div class="section-label"><i class="bi bi-houses-fill me-1"></i> Appartements ({{ results|length }})</div>
             <div class="results-container flex-fill">
 
                 <!-- RESULTS -->
@@ -21,7 +22,7 @@
 
                 <div class="row justify-content-center">
                     {% for apartment_result in results %}
-                        <div class="card-container d-flex col-md-10 col-sm-12 mx-auto mb-4">
+                        <div class="card-container d-flex col-12 mb-4">
                             <a href="{{ path('app.apartment.details', {
                                     id: apartment_result.id,
                                     _locale: app.request.locale,
@@ -33,13 +34,21 @@
                                     <div class="appart-image-wrapper">
                                         <img src="{{ asset(apartment_result.image_url) }}"
                                              alt="{{ apartment_result.name }}"
-                                             class="appart-image"
-                                             style="max-width: 600px; max-height: 600px;">
+                                             class="appart-image">
                                     </div>
                                     <div class="card-body p-3">
                                         <h2 class="appart-title mb-1">{{ apartment_result.name }}</h2>
                                         <p class="appart-price mb-2">
-                                            <strong>{{ apartment_result.price }} €</strong> / nuit <small class="text-muted">(TVA incluses)</small>
+                                            {% if apartment_result.isMixed is defined and apartment_result.isMixed %}
+                                                <small class="text-muted">
+                                                    {% for group in apartment_result.groupedBreakdown %}
+                                                        <span class="d-block">{{ group.startDate == group.endDate ? group.startDate|date('d/m') : group.startDate|date('d/m') ~ ' → ' ~ group.endDate|date('d/m') }} : {{ group.price|number_format(2, '.', '') }} €</span>
+                                                    {% endfor %}
+                                                </small>
+                                                <strong class="d-block mt-1">Total : {{ apartment_result.total|number_format(2, '.', '') }} €</strong> pour {{ apartment_result.nights }} nuit{{ apartment_result.nights > 1 ? 's' : '' }} <small class="text-muted">(TVA incluses)</small>
+                                            {% else %}
+                                                <strong>{{ apartment_result.price }} €</strong> / nuit <small class="text-muted">(TVA incluses)</small>
+                                            {% endif %}
                                         </p>
                                         {% if filters.startDate and filters.endDate %}
                                             {% if apartment_result.id in conflictIds %}
@@ -78,6 +87,7 @@
 
         <!-- RIGHT COLUMN: MAP -->
         <div class="col-12 col-lg-5">
+            <div class="section-label"><i class="bi bi-geo-alt-fill me-1"></i> Localisation</div>
             <div class="map-wrapper rounded overflow-hidden">
                 <div id="map" class="map-responsive"></div>
             </div>

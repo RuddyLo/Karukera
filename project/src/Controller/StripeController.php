@@ -134,12 +134,12 @@ class StripeController extends AbstractController
 
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
-        $days      = max(1, $startDate->diff($endDate)->days);
 
-        $pricePeriod = $pricePeriodRepository->findCurrentPricePeriod($startDate, $apartment);
-        $price = $pricePeriod ? (float) $pricePeriod->getPrice() : (float) $apartment->getPrice();
-
-        $rentAmount  = $price * $days;
+        $stay       = $pricePeriodRepository->calculateStayPrice($apartment, $startDate, $endDate);
+        $days       = $stay['nights'];
+        $rentAmount = $stay['total'];
+        $breakdown  = $stay['breakdown'];
+        $groupedBreakdown = $stay['groupedBreakdown'];
         $caution     = $days <= 3 ? 400.0 : 500.0;
         $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
 
@@ -153,6 +153,14 @@ class StripeController extends AbstractController
             $rentAmount      = round($rentAmount * $rate, 2);
             $caution         = round($caution * $rate, 2);
             $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + (self::STRIPE_FEE_FIXED * $rate), 2);
+            $breakdown       = array_map(
+                fn (array $night) => ['date' => $night['date'], 'price' => round($night['price'] * $rate, 2)],
+                $breakdown
+            );
+            $groupedBreakdown = array_map(
+                fn (array $group) => ['startDate' => $group['startDate'], 'endDate' => $group['endDate'], 'price' => round($group['price'] * $rate, 2)],
+                $groupedBreakdown
+            );
         }
 
         $paymentIntentRent = PaymentIntent::create([
@@ -183,6 +191,8 @@ class StripeController extends AbstractController
             'days' => $days,
             'currency' => $currency,
             'exchangeRate' => $rate,
+            'breakdown' => $breakdown,
+            'groupedBreakdown' => $groupedBreakdown,
         ]);
     }
 

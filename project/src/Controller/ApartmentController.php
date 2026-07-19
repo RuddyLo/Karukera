@@ -88,8 +88,32 @@ class ApartmentController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $dateStr = $request->query->get('date');
-        $date = $dateStr ? new \DateTime($dateStr) : new \DateTime('today');
+        $dateStr    = $request->query->get('date');
+        $endDateStr = $request->query->get('end');
+        $date       = $dateStr ? new \DateTime($dateStr) : new \DateTime('today');
+
+        if ($endDateStr) {
+            $endDate = new \DateTime($endDateStr);
+            $stay    = $this->repo->calculateStayPrice($apartment, $date, $endDate);
+
+            $lastNight = (clone $endDate)->modify('-1 day');
+            $startPeriod = $this->repo->findCurrentPricePeriod($date, $apartment);
+            $endPeriod   = $this->repo->findCurrentPricePeriod($lastNight, $apartment);
+            $uniformPeriod = ($startPeriod && $endPeriod && $startPeriod->getId() === $endPeriod->getId())
+                ? $startPeriod
+                : null;
+
+            return $this->json([
+                'price'       => round($stay['pricePerNight'], 2),
+                'total'       => round($stay['total'], 2),
+                'nights'      => $stay['nights'],
+                'breakdown'   => $stay['breakdown'],
+                'groupedBreakdown' => $stay['groupedBreakdown'],
+                'hasPeriod'   => round($stay['pricePerNight'], 2) !== round((float) $apartment->getPrice(), 2),
+                'periodStart' => $uniformPeriod?->getStartDate()?->format('d/m/Y'),
+                'periodEnd'   => $uniformPeriod?->getEndDate()?->format('d/m/Y'),
+            ]);
+        }
 
         $pricePeriod = $this->repo->findCurrentPricePeriod($date, $apartment);
         $price = $pricePeriod ? (float) $pricePeriod->getPrice() : (float) $apartment->getPrice();

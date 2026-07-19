@@ -18,6 +18,7 @@ class AppAdminFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->createUser($manager);
+        $this->createOasisKarurioAdmin($manager);
 
         $manager->flush();
     }
@@ -31,6 +32,22 @@ class AppAdminFixtures extends Fixture
 
 
         // hash the password (based on the security.yaml config for the $user class)
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $plaintextPassword
+        );
+        $user->setPassword($hashedPassword);
+        $manager->persist($user);
+    }
+
+    private function createOasisKarurioAdmin(ObjectManager $manager): void
+    {
+        $user = new User();
+        $user->setEmail("contact@oasiskarurio.com");
+        $user->setRoles(['ROLE_ADMIN']);
+        $user->setIsVerified(true);
+        $plaintextPassword = "oasiskarurio2026!\$";
+
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
             $plaintextPassword

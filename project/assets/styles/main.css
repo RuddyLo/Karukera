@@ -845,7 +845,7 @@ section {
 /* Search bar layout */
 .hero-search {
   display: grid;
-  grid-template-columns: 1fr 1.4fr 1fr 0.8fr;
+  grid-template-columns: 1.7fr 1.4fr 1fr 90px;
   gap: 14px;
   margin: 0 auto;
   align-items: center;
@@ -939,17 +939,19 @@ section {
 
 .search-btn {
   height: 70px;
+  width: 70px;
+  padding: 0;
   background: var(--color-primary);
   border: none;
   color: white;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
-  gap: 8px;
   align-items: center;
   justify-content: center;
+  justify-self: center;
 }
 
 .search-btn:hover {
@@ -1100,21 +1102,30 @@ svg {
   height: auto;
 }
 
+.search-results-page .section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
 .search-results-page .results-container {
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(100vh - 180px);
+  padding-right: 6px;
 }
 
 .search-results-page .map-wrapper {
-  min-height: 70vh;
-  height: 100%;
+  height: calc(100vh - 180px);
   background: #f8f9fa;
 }
 
 .search-results-page .map-responsive {
   width: 100%;
   height: 100%;
-  min-height: 65vh;
 }
 
 .card-container {
@@ -1127,15 +1138,20 @@ svg {
 
 .appart-image-wrapper {
   width: 100%;
-  height: auto;
+  height: 360px;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
+}
+
+@media (max-width: 576px) {
+  .appart-image-wrapper {
+    height: 260px;
+  }
 }
 
 .appart-image {
   width: 100%;
-  height: auto;
-  max-height: 600px;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -1144,14 +1160,13 @@ svg {
 }
 
 @media (max-width: 992px) {
-  .search-results-page .results-container,
-  .search-results-page .map-wrapper {
+  .search-results-page .results-container {
     max-height: none;
-    min-height: auto;
+    overflow: visible;
   }
 
-  .map-responsive {
-    min-height: 45vh;
+  .search-results-page .map-wrapper {
+    height: 45vh;
   }
 }
 
@@ -1428,19 +1443,6 @@ a.text-decoration-none:hover {
 .appart-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-/* Image */
-.appart-image-wrapper {
-    width: auto;
-    height: auto;
-    overflow: hidden;
-}
-
-.appart-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 /* Text */

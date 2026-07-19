@@ -43,6 +43,31 @@ function showExchangeRate(currency, rate) {
     }
 }
 
+function renderPriceBreakdown(groupedBreakdown) {
+    const recapPriceEl = document.getElementById('apartment_price');
+    if (!recapPriceEl || !groupedBreakdown || !groupedBreakdown.length) return;
+
+    const symbol = getCurrencySymbol();
+    const average = groupedBreakdown.reduce((sum, g) => {
+        const nights = (new Date(g.endDate) - new Date(g.startDate)) / 86400000 + 1;
+        return sum + g.price * nights;
+    }, 0);
+    const totalNights = groupedBreakdown.reduce((sum, g) => sum + ((new Date(g.endDate) - new Date(g.startDate)) / 86400000 + 1), 0);
+    recapPriceEl.dataset.price = (average / totalNights).toFixed(2);
+
+    if (groupedBreakdown.length === 1) {
+        recapPriceEl.innerHTML = `<span id="apartment_price_value">${groupedBreakdown[0].price.toFixed(2)}</span> <span class="currency-symbol">${symbol}</span> <small class="text-muted">(TVA incluses)</small>`;
+        return;
+    }
+
+    const formatLabel = d => new Date(d + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+    const detail = groupedBreakdown.map(g => {
+        const range = g.startDate === g.endDate ? formatLabel(g.startDate) : `${formatLabel(g.startDate)} → ${formatLabel(g.endDate)}`;
+        return `<span class="d-block">${range} : ${g.price.toFixed(2)} ${symbol}</span>`;
+    }).join('');
+    recapPriceEl.innerHTML = `<small>${detail}</small>`;
+}
+
 async function fetchAndMountPaymentIntent(startDate, endDate, price) {
     clientSecretRent = null;
     const container = document.getElementById('payment-element-rent');
@@ -83,13 +108,7 @@ async function fetchAndMountPaymentIntent(startDate, endDate, price) {
     updateCurrencySymbols();
     showExchangeRate(data.currency, data.exchangeRate);
 
-    const pricePerNight = data.days > 0 ? data.rentAmount / data.days : data.rentAmount;
-    const recapPriceEl = document.getElementById('apartment_price');
-    if (recapPriceEl) {
-        const valEl = document.getElementById('apartment_price_value');
-        if (valEl) valEl.textContent = pricePerNight.toFixed(2);
-        recapPriceEl.dataset.price = pricePerNight.toFixed(2);
-    }
+    renderPriceBreakdown(data.groupedBreakdown);
 
     document.getElementById('recap-days').textContent = data.days;
     document.getElementById('recap-rent').textContent = data.rentAmount.toFixed(2);

@@ -6,6 +6,7 @@ use App\Entity\News;
 use App\Form\ContactFormType;
 use App\Repository\ApartmentRepository;
 use App\Repository\Blog\ArticleRepository;
+use App\Repository\PricePeriodRepository;
 use App\Repository\ReservationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,7 +64,7 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/{_locale}/search', name: 'app.search_apartment', requirements: ['_locale' => 'fr|en'])]
-public function search(Request $request, ApartmentRepository $repo): Response
+public function search(Request $request, ApartmentRepository $repo, PricePeriodRepository $pricePeriodRepository): Response
 {
     $form = $this->createForm(SearchFormType::class);
     $form->handleRequest($request);
@@ -84,6 +85,30 @@ public function search(Request $request, ApartmentRepository $repo): Response
     if ($startDate && $endDate) {
         $conflictIds = $this->reservationRepository->findOverlappingApartmentIds($startDate, $endDate);
     }
+
+    foreach ($results as &$result) {
+        $apartmentEntity = $this->apartmentRepository->find($result['id']);
+        if (!$apartmentEntity) {
+            continue;
+        }
+
+        if ($startDate && $endDate) {
+            $stay = $pricePeriodRepository->calculateStayPrice($apartmentEntity, new \DateTime($startDate), new \DateTime($endDate));
+            $result['price']     = round($stay['pricePerNight'], 2);
+            $result['total']     = round($stay['total'], 2);
+            $result['nights']    = $stay['nights'];
+            $result['breakdown']        = $stay['breakdown'];
+            $result['groupedBreakdown'] = $stay['groupedBreakdown'];
+            $result['isMixed']          = count($stay['groupedBreakdown']) > 1;
+        } else {
+            $pricePeriod = $pricePeriodRepository->findCurrentPricePeriod(null, $apartmentEntity);
+            if ($pricePeriod) {
+                $result['price'] = $pricePeriod->getPrice();
+            }
+        }
+    }
+    unset($result);
+
     $apartments = $this->apartmentRepository->findBy(['is_active' => true, 'is_deleted' => false]);
 
     return $this->render('search/results.html.twig', [

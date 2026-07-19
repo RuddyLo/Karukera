@@ -573,18 +573,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setBookingValid(false);
 
-    function fetchAndShowPrice(startStr, showSwal = true) {
-        fetch(window.priceForDateUrl + '?date=' + startStr)
+    function formatDayLabel(dateStr) {
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+    }
+
+    function formatGroupedBreakdown(groupedBreakdown) {
+        return groupedBreakdown.map(g => {
+            const range = g.startDate === g.endDate
+                ? formatDayLabel(g.startDate)
+                : `${formatDayLabel(g.startDate)} → ${formatDayLabel(g.endDate)}`;
+            return `<span class="d-block">${range} : ${g.price.toFixed(2)} €</span>`;
+        }).join('');
+    }
+
+    function fetchAndShowPrice(startStr, showSwal = true, endStr = null) {
+        const url = window.priceForDateUrl + '?date=' + startStr + (endStr ? '&end=' + endStr : '');
+        fetch(url)
             .then(r => r.json())
             .then(data => {
+                const groupedBreakdown = data.groupedBreakdown || null;
+                const isMixed = groupedBreakdown && groupedBreakdown.length > 1;
+
                 const priceEl = document.getElementById('page-price-display');
                 if (priceEl) {
-                    priceEl.innerHTML = data.price + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small> <small class="text-muted fs-6">(TVA incluses)</small>';
+                    if (isMixed) {
+                        priceEl.innerHTML = `${data.total.toFixed(2)} € <small class="text-muted fs-6" id="page-price-label">pour ${data.nights} nuits</small> <small class="text-muted fs-6">(TVA incluses)</small>`;
+                    } else {
+                        priceEl.innerHTML = data.price + ' € <small class="text-muted fs-6" id="page-price-label">' + (window.trans?.pricePerNight || '/ nuit') + '</small> <small class="text-muted fs-6">(TVA incluses)</small>';
+                    }
                 }
                 const recapPriceEl = document.getElementById('apartment_price');
                 if (recapPriceEl) {
-                    const valEl = document.getElementById('apartment_price_value');
-                    if (valEl) valEl.textContent = data.price;
+                    if (isMixed) {
+                        recapPriceEl.innerHTML = `<small>${formatGroupedBreakdown(groupedBreakdown)}</small>`;
+                    } else {
+                        const valEl = document.getElementById('apartment_price_value');
+                        if (valEl) valEl.textContent = data.price;
+                    }
                     recapPriceEl.dataset.price = data.price;
                 }
                 ['cgv-price-1', 'cgv-price-2'].forEach(id => {
@@ -592,13 +617,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (el) el.textContent = data.price;
                 });
                 if (showSwal && window.Swal) {
-                    const periodInfo = data.hasPeriod
-                        ? `<br><small class="text-muted">Période tarifaire : ${data.periodStart} → ${data.periodEnd}</small>`
-                        : '';
+                    let html;
+                    if (isMixed) {
+                        html = `Votre séjour de <strong>${data.nights} nuits</strong> chevauche plusieurs tarifs :<br>` +
+                            `<small class="text-muted">${formatGroupedBreakdown(groupedBreakdown)}</small>` +
+                            `Total : <strong>${data.total.toFixed(2)} €</strong> <small class="text-muted">(TVA incluses)</small>`;
+                    } else {
+                        const periodInfo = (data.hasPeriod && data.periodStart && data.periodEnd)
+                            ? `<br><small class="text-muted">Période tarifaire : ${data.periodStart} → ${data.periodEnd}</small>`
+                            : '';
+                        html = `Le tarif applicable est de <strong>${data.price} € / nuit</strong> <small class="text-muted">(TVA incluses)</small>${periodInfo}`;
+                    }
                     window.Swal.fire({
                         icon: 'info',
                         title: 'Prix pour votre séjour',
-                        html: `Le tarif applicable est de <strong>${data.price} € / nuit</strong> <small class="text-muted">(TVA incluses)</small>${periodInfo}`,
+                        html,
                         confirmButtonText: 'OK',
                     });
                 }
@@ -716,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('reservation_form_endDate').value = searchEndDate;
             setBookingValid(true, searchStartDate, searchEndDate);
             selectionComplete = true;
-            fetchAndShowPrice(searchStartDate, false);
+            fetchAndShowPrice(searchStartDate, false, searchEndDate);
         },
 
         eventDidMount(info) {
@@ -809,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setBookingValid(true, startDate, endDate);
                 selectionComplete = true;
                 hideTooltip();
-                fetchAndShowPrice(startDate);
+                fetchAndShowPrice(startDate, true, endDate);
                 startDate = null;
                 isSelecting = false;
                 lastHoveredDate = null;
