@@ -107,6 +107,26 @@ class AdminReservationController extends AbstractController
         return $this->redirectToRoute('admin_reservations_list');
     }
 
+    #[Route('/{id}/delete', name: 'admin_reservation_delete', methods: ['POST'])]
+    public function delete(Reservation $reservation, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_reservation', $request->request->get('_token'))) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Token CSRF invalide'], 403);
+            }
+            return $this->redirectToRoute('admin_reservations_list');
+        }
+
+        $entityManager->remove($reservation);
+        $entityManager->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
+
+        return $this->redirectToRoute('admin_reservations_list');
+    }
+
     #[Route('/{id}', name: 'admin_reservation_show', requirements: ['id' => '\d+'])]
     public function show(Reservation $reservation): Response
     {
@@ -295,7 +315,6 @@ public function sendReviewInvite(
 
             
         } catch (\Exception $e) {
-            dd($e);
             error_log('Error fetching payment data: ' . $e->getMessage());
             return null;
         }

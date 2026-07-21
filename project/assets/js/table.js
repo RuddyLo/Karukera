@@ -337,6 +337,8 @@ $(document).ready(() => {
                             buttons += ` <button title="Annuler" class='btn btn-danger event-cancel-reservation' data-uuid='${id}'><i class="bi bi-x-circle-fill"></i></button>`;
                         }
 
+                        buttons += ` <button title="Supprimer" class='btn btn-danger event-delete-reservation' data-uuid='${id}'><i class="bi bi-trash3-fill"></i></button>`;
+
                         return `<div class="d-flex justify-content-center gap-1 list-action-group">${buttons}</div>`;
                     }
                 },
@@ -379,6 +381,43 @@ $(document).ready(() => {
                         Swal.fire({ title: 'Réservation annulée !', icon: 'success', timer: 1500, showConfirmButton: false });
                     } else {
                         Swal.fire('Impossible', data.error || "Échec de l'annulation", 'warning');
+                    }
+                })
+                .catch(() => Swal.fire('Erreur', 'Erreur réseau', 'error'));
+            });
+        });
+
+        $(document).on('click', '.event-delete-reservation', function () {
+            const id = $(this).data('uuid');
+
+            Swal.fire({
+                title: 'Supprimer cette réservation ?',
+                text: 'Cette action est irréversible et supprime définitivement la réservation et ses paiements associés.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler',
+            }).then(result => {
+                if (!result.isConfirmed) return;
+
+                const url = ajaxLink.reservation.delete.replace('123456789', id);
+                const formData = new FormData();
+                formData.append('_token', ajaxLink.reservation.deleteToken);
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData,
+                })
+                .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        reservationDataTable.ajax.reload(null, false);
+                        Swal.fire({ title: 'Supprimé !', icon: 'success', timer: 1500, showConfirmButton: false });
+                    } else {
+                        Swal.fire('Impossible', data.error || 'Échec de la suppression', 'warning');
                     }
                 })
                 .catch(() => Swal.fire('Erreur', 'Erreur réseau', 'error'));

@@ -52,6 +52,8 @@
             sendReview  : "{{ path('admin_reservation_send_review', {id : 123456789}) }}" ,
             cancel      : "{{ path('admin_reservation_cancel', {id : 123456789}) }}" ,
             cancelToken : "{{ csrf_token('cancel_reservation') }}" ,
+            delete      : "{{ path('admin_reservation_delete', {id : 123456789}) }}" ,
+            deleteToken : "{{ csrf_token('delete_reservation') }}" ,
         }
     });
 
