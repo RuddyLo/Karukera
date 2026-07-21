@@ -20,7 +20,7 @@
                             <span class="text-primary"><i class="bi bi-open"></i></span>
                         </div>
                         <span class="appart-name">{{apartment.name}}</span></br>
-                        <span>{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' : '') }}</span>
+                        <span style="white-space: pre-wrap;">{{ apartment.description|slice(0, 100) ~ (apartment.description|length > 100 ? '...' : '') }}</span>
                     </div>
                 </div>
             </a>
