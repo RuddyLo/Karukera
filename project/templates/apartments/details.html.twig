@@ -950,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const img = e.target.closest('.clickable-image');
         if (img) {
             document.getElementById('preview-modal-img').src = img.dataset.src;
-            const modal = bootstrap.Modal.getOrCreate(document.getElementById('image-preview-modal'));
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('image-preview-modal'));
             modal.show();
         }
     });
