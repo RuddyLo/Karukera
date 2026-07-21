@@ -5,6 +5,8 @@ use App\Entity\User;
 use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
 use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -41,6 +43,16 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('birthDate', DateType::class, [
+                'label' => 'register.form.birth_date',
+                'widget' => 'single_text',
+                'html5' => true,
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'register.validation.birth_date_required']),
+                    new Assert\LessThanOrEqual(value: 'today', message: 'register.validation.birth_date_future'),
+                ],
+            ])
             ->add('phone', TextType::class, [
                 'label' => 'register.form.phone',
                 'attr' => ['class' => 'form-control', 'placeholder' => '+33612345678'],
@@ -61,6 +73,14 @@ class RegistrationFormType extends AbstractType
                         'max' => 255,
                         'maxMessage' => 'register.validation.address_max',
                     ]),
+                ],
+            ])
+            ->add('country', CountryType::class, [
+                'label' => 'register.form.country',
+                'attr' => ['class' => 'form-control'],
+                'placeholder' => 'register.form.country_placeholder',
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'register.validation.country_required']),
                 ],
             ])
             ->add('email', EmailType::class, [

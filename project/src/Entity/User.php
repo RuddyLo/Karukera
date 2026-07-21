@@ -65,6 +65,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $birthDate = null;
+
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $country = null;
+
     public function isVerified(): bool { return $this->isVerified; }
     public function setIsVerified(bool $isVerified): static { $this->isVerified = $isVerified; return $this; }
     public function getVerificationToken(): ?string { return $this->verificationToken; }
@@ -81,6 +87,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAddress(): ?string { return $this->address; }
     public function setAddress(?string $address): static { $this->address = $address; return $this; }
+
+    public function getBirthDate(): ?\DateTimeImmutable { return $this->birthDate; }
+    public function setBirthDate(?\DateTimeImmutable $birthDate): static { $this->birthDate = $birthDate; return $this; }
+
+    public function getCountry(): ?string { return $this->country; }
+    public function setCountry(?string $country): static { $this->country = $country; return $this; }
 
     public function __construct()
     {

@@ -86,6 +86,11 @@ footer:
         contact: "Contact"
         register: "S'inscrire"
         login: "Se connecter"
+    legal:
+        title: "Informations légales"
+        privacy: "Politique de confidentialité"
+        cgv: "Conditions générales de vente"
+        mentions: "Mentions légales"
 
 register:
     title: "Inscrivez-vous et profitez de nos services"
@@ -103,6 +108,9 @@ register:
     form:
         first_name: "Prénom"
         last_name: "Nom"
+        birth_date: "Date de naissance"
+        country: "Pays de résidence"
+        country_placeholder: "Sélectionnez un pays"
         phone: "Numéro de téléphone"
         address: "Adresse"
         email: "Adresse e-mail"

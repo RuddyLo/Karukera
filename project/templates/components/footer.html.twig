@@ -25,6 +25,15 @@
             </ul>
           </div>
 
+          <div class="col-lg-2 col-md-6 footer-links">
+            <h4>{{ 'footer.legal.title'|trans }}</h4>
+            <ul>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.legal.privacy', {_locale: app.request.locale}) }}">{{ 'footer.legal.privacy'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.legal.cgv', {_locale: app.request.locale}) }}">{{ 'footer.legal.cgv'|trans }}</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="{{ path('app.legal.mentions', {_locale: app.request.locale}) }}">{{ 'footer.legal.mentions'|trans }}</a></li>
+            </ul>
+          </div>
+
           <div class="social-links col-lg-3">
             {% if social_medias is defined and social_medias|length > 0 %}
                 {% for social in social_medias %}

@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+<section class="legal-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <h2 class="fw-bold mb-1">Politique de Confidentialité</h2>
+                <p class="text-muted small mb-4">Mise à jour le {{ "now"|date("d/m/Y") }}</p>
+
+                <h6 class="fw-bold">1. Collecte des données personnelles</h6>
+                <p>Nous collectons les informations suivantes lors de votre utilisation de notre plateforme :</p>
+                <ul>
+                    <li>Nom et prénom</li>
+                    <li>Adresse email</li>
+                    <li>Numéro de téléphone</li>
+                    <li>Adresse postale</li>
+                    <li>Date de naissance et pays de résidence</li>
+                    <li>Données de paiement (traitées de manière sécurisée par Stripe)</li>
+                    <li>Historique des réservations</li>
+                </ul>
+
+                <h6 class="fw-bold">2. Utilisation des données</h6>
+                <p>Vos données personnelles sont utilisées pour :</p>
+                <ul>
+                    <li>Gérer vos réservations et votre compte</li>
+                    <li>Traiter les paiements</li>
+                    <li>Vous contacter concernant vos séjours</li>
+                    <li>Respecter nos obligations légales</li>
+                </ul>
+
+                <h6 class="fw-bold">3. Conservation des données</h6>
+                <p>Vos données sont conservées pendant la durée nécessaire à la fourniture de nos services, dans le respect des obligations légales applicables.</p>
+
+                <h6 class="fw-bold">4. Vos droits (RGPD)</h6>
+                <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                <ul>
+                    <li><strong>Droit d'accès</strong> à vos données personnelles</li>
+                    <li><strong>Droit de rectification</strong> des informations inexactes</li>
+                    <li><strong>Droit à l'effacement</strong> ("droit à l'oubli")</li>
+                    <li><strong>Droit d'opposition</strong> au traitement de vos données</li>
+                    <li><strong>Droit à la portabilité</strong> de vos données</li>
+                </ul>
+
+                <h6 class="fw-bold">5. Sécurité des données</h6>
+                <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre tout accès non autorisé, toute perte ou destruction.</p>
+
+                <h6 class="fw-bold">6. Partage des données</h6>
+                <p>Nous ne vendons pas vos données à des tiers. Vos données peuvent être partagées uniquement avec nos prestataires de services (notamment Stripe pour le traitement des paiements) dans le cadre strict de la fourniture de nos services.</p>
+
+                <h6 class="fw-bold">7. Cookies</h6>
+                <p>Notre site utilise des cookies techniques nécessaires à son fonctionnement. Aucun cookie de tracking tiers n'est utilisé sans votre consentement préalable.</p>
+
+                <h6 class="fw-bold">8. Contact</h6>
+                <p class="mb-0">Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter via la <a href="{{ path('app.contact', {_locale: app.request.locale}) }}">page de contact</a>.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

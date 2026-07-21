@@ -55,6 +55,16 @@
                                 {{ form_widget(registrationForm.lastName) }}
                                 {{ form_errors(registrationForm.lastName) }}
                             </div>
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.birthDate) }}
+                                {{ form_widget(registrationForm.birthDate) }}
+                                {{ form_errors(registrationForm.birthDate) }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.country) }}
+                                {{ form_widget(registrationForm.country) }}
+                                {{ form_errors(registrationForm.country) }}
+                            </div>
                         </div>
 
                         <p class="section-label mt-3">{{ 'register.section.contact'|trans }}</p>
