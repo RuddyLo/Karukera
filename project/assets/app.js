@@ -11,7 +11,7 @@ import './externals/bootstrap-icons/bootstrap-icons.css';
 
 import './externals/swiper/swiper-bundle.min.css';
 
-import './externals/bootstrap/js/bootstrap.bundle.min.js';
+import bootstrap from './externals/bootstrap/js/bootstrap.bundle.min.js';
 import './externals/isotope-layout/isotope.pkgd.min.js';
 import './externals/php-email-form/validate.js';
 
@@ -21,6 +21,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 import $ from 'jquery';
 global.$ = global.jQuery = $;
 global.flatpickr = flatpickr;
+global.bootstrap = bootstrap;
 
 
 import 'datatables.net-bs5';
