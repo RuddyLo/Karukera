@@ -188,6 +188,8 @@ apartment_details:
     coupon_apply: "Appliquer"
     coupon_discount_label: "Réduction"
     coupon_applied: "Coupon appliqué :"
+    read_more: "Lire la suite"
+    description_title: "Description"
 
 blog:
     title: "Notre Blog"

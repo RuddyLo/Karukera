@@ -75,6 +75,10 @@ class StripeController extends AbstractController
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
 
+        if ($endDate <= $startDate) {
+            return new JsonResponse(['error' => 'La date de départ doit être postérieure à la date d\'arrivée'], 400);
+        }
+
         // Check for existing reservation in same period
         $existingReservation = $em->getRepository(Reservation::class)
             ->findOneBy([
@@ -192,6 +196,10 @@ class StripeController extends AbstractController
 
         $startDate = new \DateTime($data['start_date']);
         $endDate   = new \DateTime($data['end_date']);
+
+        if ($endDate <= $startDate) {
+            return new JsonResponse(['error' => 'La date de départ doit être postérieure à la date d\'arrivée'], 400);
+        }
 
         $stay       = $pricePeriodRepository->calculateStayPrice($apartment, $startDate, $endDate);
         $days       = $stay['nights'];
