@@ -84,7 +84,7 @@
         <div class="p-4">
             <div style="white-space: pre-wrap;">{% if isDescLong %}{{ descWords|slice(0, 100)|join(' ') }}…{% else %}{{ apartment.description }}{% endif %}</div>
             {% if isDescLong %}
-                <button type="button" class="btn btn-link p-0 mt-2" data-bs-toggle="modal" data-bs-target="#description-modal">
+                <button type="button" class="btn mt-2" style="background-color: var(--color-primary); color: #fff;" data-bs-toggle="modal" data-bs-target="#description-modal">
                     {{ 'apartment_details.read_more'|trans }}
                 </button>
             {% endif %}
@@ -93,8 +93,8 @@
         {% if isDescLong %}
         {# Modale description complète #}
         <div class="modal fade" id="description-modal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
-                <div class="modal-content">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+                <div class="modal-content" style="background: #fff; backdrop-filter: none;">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ 'apartment_details.description_title'|trans }}</h5>
                         <button class="btn-close" data-bs-dismiss="modal"></button>
