@@ -268,7 +268,7 @@ $(document).ready(() => {
             "bFilter": true,
             "bServerSide": true,
             "iDisplayLength": 10,
-            order: [[3, 'desc']],
+            order: [[4, 'desc']],
 
             "ajax": {
                 url: ajaxLink.reservation.list,
@@ -281,12 +281,13 @@ $(document).ready(() => {
             },
             "columnDefs": [
                 { targets: 0, name: 'r.id', orderable: true },
-                { targets: 1, name: 'u.email', orderable: true },
-                { targets: 2, name: 'a.name', orderable: true },
-                { targets: 3, name: 'r.startDate', orderable: true },
-                { targets: 4, name: 'reservation.rent', orderable: false },
+                { targets: 1, name: 'r.reference', orderable: true },
+                { targets: 2, name: 'u.email', orderable: true },
+                { targets: 3, name: 'a.name', orderable: true },
+                { targets: 4, name: 'r.startDate', orderable: true },
+                { targets: 5, name: 'reservation.rent', orderable: false },
                 {
-                    targets: 5,
+                    targets: 6,
                     name: 'reservation.caution',
                     orderable: false,
                     render: function (data) {
@@ -300,7 +301,7 @@ $(document).ready(() => {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 7,
                     name: 'reservation.status',
                     orderable: false,
                     render: function (data) {
@@ -314,14 +315,14 @@ $(document).ready(() => {
                     }
                 },
                 {
-                    targets: 7,
+                    targets: 8,
                     name: 'reservation.action',
                     orderable: false,
                     render: function (data, type, row) {
                         const id = row[0];
-                        const status = row[6];
-                        const isFinished = row[7];
-                        const reviewToken = row[8];
+                        const status = row[7];
+                        const isFinished = row[8];
+                        const reviewToken = row[9];
 
                         let buttons = `<a title="Détails" href='${ajaxLink.reservation.show.replace('123456789', id)}' class='btn btn-primary'><i class="bi bi-eye-fill"></i></a>`;
 

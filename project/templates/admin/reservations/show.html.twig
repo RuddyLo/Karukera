@@ -25,7 +25,11 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Référence</h6>
+                            <p class="fw-bold">{{ reservation.reference ?: '-' }}</p>
+                        </div>
+                        <div class="col-md-4">
                             <h6 class="text-muted">Client</h6>
                             <p class="fw-bold">
                                 {{ reservation.user.email }}
@@ -33,7 +37,7 @@
                                 <small class="text-muted">{{ reservation.user.email }}</small>
                             </p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6 class="text-muted">Appartement</h6>
                             <p class="fw-bold">{{ reservation.apartment.name }}</p>
                         </div>

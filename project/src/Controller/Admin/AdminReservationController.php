@@ -61,6 +61,7 @@ class AdminReservationController extends AbstractController
 
             $data[] = [
                 $reservation->getId(),
+                $reservation->getReference(),
                 $reservation->getUser()?->getEmail(),
                 $reservation->getApartment()?->getName(),
                 $reservation->getStartDate()->format('d/m/Y') . ' → ' . $reservation->getEndDate()->format('d/m/Y'),
