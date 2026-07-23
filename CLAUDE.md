@@ -49,11 +49,14 @@ Plateforme de location saisonnière (Guadeloupe). Symfony 7 + Docker + Stripe.
 6. Redirection `/payment/success`
 
 **Constantes dans `StripeController.php` :**
-- `CAUTION_RATE = 0.30` (caution = 30% du loyer)
 - `STRIPE_FEE_RATE = 0.015` (1.5%)
 - `STRIPE_FEE_FIXED = 0.25` (€0.25 fixe)
 - `STRIPE_FX_RATE = 0.02` (2% frais conversion devise Stripe — ⚠️ susceptible d'évoluer)
 - Les frais Stripe sont appliqués sur la caution uniquement et payés par le client
+
+⚠️ **Montant de la caution : PAS 30% du loyer.** `createPaymentIntent` calcule un montant **fixe** selon la durée du séjour : `$caution = $days <= 3 ? 400.0 : 500.0;`. La constante `CAUTION_RATE = 0.30` existe dans le code mais n'est utilisée nulle part (constante morte) — corrigé dans la doc le 2026-07-22, ne pas se fier à l'ancienne mention "30% du loyer".
+
+⚠️ **Garde-fou dates** : `createPaymentIntent` et `createAdminReservation` rejettent (400) toute requête où `endDate <= startDate` (empêche une "réservation" 0 nuit facturée au prix d'1 nuit). Même garde côté front dans `details.html.twig` (`dateClick` + préremplissage URL).
 
 **Admin bypass** : les admins peuvent créer des réservations sans paiement via `/stripe/create-admin-reservation`.
 
@@ -112,6 +115,8 @@ RECAPTCHA3_SECRET=...
 DATABASE_URL=mysql://root:@mysql_karukera:3306/karukera
 ```
 
+⚠️ **`project/.env` est suivi par git** (seul `.env.local` est ignoré) — n'y mettre que des placeholders, jamais de vrais secrets. Un secret leak (Stripe, SMTP OVH, reCAPTCHA) a été nettoyé le 2026-07-22 (commit `031d6eb`), historique git conservé tel quel (repo privé).
+
 ## Lancer le projet
 
 ```bash
@@ -122,7 +127,22 @@ docker compose up -d          # démarrer les conteneurs (sans tiret)
 
 ## Gestion caution (backoffice admin)
 
-Après le séjour, l'admin peut depuis le backoffice :
-- **Rembourser intégralement** : client reçoit le montant caution (sans les frais Stripe)
-- **Rembourser partiellement** : saisir le montant des dégâts
-- **Conserver la caution** : en cas de gros dégâts
+Route : `AdminReservationController::refundCaution` (`/admin/reservation/{id}/refund-caution`). Après le séjour, l'admin peut depuis le backoffice :
+- **Rembourser intégralement** : client reçoit le montant caution (sans les frais Stripe) — fonctionnel
+- **Conserver la caution** : en cas de gros dégâts — fonctionnel
+
+⚠️ **Remboursement partiel NON implémenté**, malgré l'UI qui le suggère : `templates/admin/reservations/show.html.twig` a un champ `amount` dans `#partial-amount-container`, mais il reste en `display:none` (rien ne le révèle, aucun script ne le montre) et `refundCaution()` ne lit jamais ce paramètre — si "conserver" n'est pas coché, le remboursement est **toujours intégral**. À finir si le besoin de remboursement partiel est confirmé (champ front à révéler + lecture `amount` côté controller + `Refund::create(['amount' => ...])` avec le montant partiel au lieu du montant plein).
+
+## Calendrier de réservation — turnover le jour du checkout
+
+Le jour de checkout d'une réservation redevient disponible en check-in pour le client suivant (rotation le même jour, ex: résa A 01→03 juillet, résa B peut commencer le 03).
+
+- `ApartmentController::reservationsJson` : envoie `endDate` tel quel à FullCalendar (pas de `+1 day`), FullCalendar traite `end` comme exclusif nativement
+- `details.html.twig` : `hasReservedInRange()` ne vérifie plus le jour de checkout de la sélection candidate (sinon un enchaînement à 3 réservations ou plus casserait sur la 2e transition)
+- Corrigé le 2026-07-22 — avant ce fix, le jour de checkout apparaissait à tort bloqué pour tout le monde
+
+## Description appartement — troncature + modal
+
+`templates/apartments/details.html.twig` : la description est tronquée à 100 mots (`split(' ')|slice(0,100)|join(' ')`), avec un bouton "Lire la suite" (fond `var(--color-primary)`, texte blanc) qui ouvre une modale Bootstrap (`#description-modal`, `modal-xl`) affichant le texte complet.
+⚠️ `.modal-content` a un style global semi-transparent + flou (`main.css:138`) — cette modale override en `background:#fff; backdrop-filter:none` pour rester lisible. Toute nouvelle modale avec du texte dense devrait faire pareil.
+Clés de traduction : `apartment_details.read_more`, `apartment_details.description_title` (FR/EN).

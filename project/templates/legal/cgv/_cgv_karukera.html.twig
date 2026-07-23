@@ -1,0 +1,148 @@
+{% set cgv_price = cgv_price|default(price|default(null)) %}
+{% set cgv_currency_symbol = cgv_currency_symbol|default('€') %}
+{% set cgv_price_unit = cgv_price_unit|default('/ nuit') %}
+{% set cgv_reservation_ref = cgv_reservation_ref|default(null) %}
+{% set cgv_conclusion_date = cgv_conclusion_date|default('now') %}
+{% set cgv_start_date = cgv_start_date|default(null) %}
+{% set cgv_end_date = cgv_end_date|default(null) %}
+
+<h5 class="fw-bold text-center mb-1">CONTRAT DE LOCATION SAISONNIÈRE MEUBLÉE</h5>
+<p class="text-center fw-bold mb-1">Oasis de Karukera — Sainte-Anne, Guadeloupe</p>
+<p class="text-muted small text-center mb-4">
+    Numéro de réservation : {{ cgv_reservation_ref ?: 'attribué à la confirmation' }} —
+    Date de conclusion : {{ cgv_conclusion_date|date('d/m/Y') }}
+</p>
+
+<h6 class="fw-bold">Article 1 — Identification des parties</h6>
+<p class="mb-1"><strong>1.1 Le Loueur</strong></p>
+<div class="border rounded p-3 mb-3 bg-light">
+    <p class="mb-0">Nom commercial : Oasis de Karukera</p>
+    <p class="mb-0">Forme juridique : Entrepreneur individuel</p>
+    <p class="mb-0">SIRET : 908 240 815</p>
+    <p class="mb-0">Adresse du siège : 12 rue du Morne Tricolore, 97180 Sainte-Anne</p>
+    <p class="mb-0">Représentant légal : Olivier Didier Bicep</p>
+    <p class="mb-0">Email : contact@oasiskarurio.com</p>
+    <p class="mb-0">Téléphone/WhatsApp : +33 7 55 50 30 86</p>
+    <p class="mb-0">Statut du loueur : non professionnel</p>
+    <p class="mb-0">Numéro de déclaration du meublé en mairie : 971280010557A</p>
+</div>
+<p class="mb-1"><strong>1.2 Le Locataire principal</strong></p>
+<div class="border rounded p-3 mb-3 bg-light">
+    {% if app.user %}
+        <p class="mb-0">Nom et prénom : {{ app.user.firstName }} {{ app.user.lastName }}</p>
+        {% if app.user.address %}<p class="mb-0">Adresse : {{ app.user.address }}</p>{% endif %}
+        <p class="mb-0">Email : {{ app.user.email }}</p>
+        {% if app.user.phone %}<p class="mb-0">Téléphone : {{ app.user.phone }}</p>{% endif %}
+        {% if app.user.birthDate %}<p class="mb-0">Date de naissance : {{ app.user.birthDate|date('d/m/Y') }}</p>{% endif %}
+        {% if app.user.country %}<p class="mb-0">Pays de résidence : {{ app.user.country }}</p>{% endif %}
+    {% endif %}
+</div>
+<p>Le Locataire certifie être âgé d'au moins 18 ans et disposer de la capacité juridique nécessaire pour conclure le présent contrat. Il agit en son nom et pour le compte de l'ensemble des personnes autorisées à occuper le logement, et répond du respect du contrat et du règlement intérieur par chacun des occupants.</p>
+
+<h6 class="fw-bold">Article 2 — Désignation du logement</h6>
+<p>Le présent contrat porte exclusivement sur la location saisonnière du logement suivant :</p>
+<div class="border rounded p-3 mb-3 bg-light">
+    <p class="mb-0">Nom commercial : Oasis de Karukera</p>
+    <p class="mb-0">Adresse : 12 rue du Morne Tricolore, 97180 Sainte-Anne</p>
+    <p class="mb-0">Nature : appartement meublé de tourisme (penthouse)</p>
+    <p class="mb-0">Surface habitable : 110 m² (+ 30 m² de terrasse couverte)</p>
+    <p class="mb-0">Capacité maximale absolue : 4 personnes</p>
+    <p class="mb-0">Couchages : un lit King Size et un canapé convertible</p>
+    <p class="mb-0">Salle de bain : 1</p>
+</div>
+<p>La description détaillée des pièces, couchages, meubles, équipements, services, accès et éventuelles particularités figure dans l'Annexe 1 — État descriptif, qui fait partie intégrante du contrat. Les photographies contractuelles applicables à la réservation correspondent à la version de l'annonce archivée à la date de conclusion du contrat.</p>
+
+<h6 class="fw-bold">Article 3 — Nature et destination de la location</h6>
+<p>Le logement est loué exclusivement à titre de résidence temporaire de tourisme ou de courte durée. Il ne pourra en aucun cas constituer la résidence principale ou secondaire permanente du Locataire, son domicile fiscal, administratif ou professionnel, le siège d'une société ou d'une activité, ni un local destiné à recevoir une clientèle ou du public.</p>
+<p>Le présent contrat ne constitue ni un bail d'habitation soumis à la loi du 6 juillet 1989, ni un bail commercial, ni un bail professionnel. Toute cession du contrat, sous-location ou mise à disposition à un tiers non déclaré est interdite sans accord écrit préalable du Loueur.</p>
+
+<h6 class="fw-bold">Article 4 — Durée du séjour</h6>
+{% if cgv_start_date and cgv_end_date %}
+    <p class="mb-0">Date d'arrivée : {{ cgv_start_date|date('d/m/Y') }} — Heure d'arrivée autorisée : à partir de 16h</p>
+    <p>Date de départ : {{ cgv_end_date|date('d/m/Y') }} — Heure limite de départ : 11h</p>
+{% else %}
+    <p>Les dates du séjour sont celles indiquées dans le récapitulatif de réservation. Heure d'arrivée autorisée : à partir de 16h. Heure limite de départ : 11h.</p>
+{% endif %}
+<p>Le contrat prend fin automatiquement à la date et à l'heure convenues, sans qu'il soit nécessaire de délivrer un congé. Aucune prolongation n'est acquise de plein droit : elle doit être demandée et acceptée par écrit, sous réserve de disponibilité et du paiement du tarif complémentaire. Un départ tardif non autorisé pourra donner lieu à la facturation d'une indemnité proportionnée, notamment lorsque ce retard entraîne des frais de personnel, compromet le ménage ou empêche l'arrivée des voyageurs suivants.</p>
+
+<h6 class="fw-bold">Article 5 — Occupants autorisés</h6>
+<p>Le nombre total d'occupants, enfants et bébés compris, ne pourra jamais dépasser quatre personnes. Toute modification de la liste des occupants doit être signalée et approuvée avant l'arrivée. Les visiteurs extérieurs ne peuvent ni séjourner la nuit ni être présents en nombre susceptible de provoquer des nuisances ou de dépasser la capacité sécuritaire du logement.</p>
+
+<h6 class="fw-bold">Article 6 — Formation électronique du contrat</h6>
+<p>La réservation est définitivement formée lorsque les opérations suivantes ont été accomplies : renseignement des informations demandées, accès au présent contrat et à ses annexes, validation expresse de la case d'acceptation, activation du bouton comportant une obligation de paiement, authentification selon le procédé retenu par la plateforme, validation du paiement, et envoi au Locataire d'une confirmation et d'une copie du contrat sur un support durable.</p>
+<p>Le système conserve notamment la version acceptée du contrat, la date et l'heure de validation, la référence de réservation et de paiement, ainsi que les éléments techniques nécessaires à l'identification du signataire.</p>
+
+<h6 class="fw-bold">Article 7 — Prix de la location</h6>
+<div class="border rounded p-3 mb-3 bg-light">
+    <p class="mb-0">Prix de l'hébergement : <strong><span id="cgv-price-1">{{ cgv_price }}</span> {{ cgv_currency_symbol }} {{ cgv_price_unit }}</strong> {% if cgv_price_unit == '/ nuit' %}<small class="text-muted">(le montant total dépend du nombre de nuits, voir le récapitulatif de réservation)</small>{% endif %}</p>
+</div>
+<p>Le prix comprend, dans le cadre d'un usage normal : la mise à disposition du logement meublé, l'eau, l'électricité, l'accès internet, le linge expressément mentionné dans l'état descriptif et les équipements inclus dans la réservation. Aucun supplément non annoncé avant la réservation ne pourra être imposé, sauf prestation supplémentaire demandée par le Locataire, dommage, consommation manifestement anormale ou frais directement causés par un manquement contractuel.</p>
+
+<h6 class="fw-bold">Article 8 — Paiement</h6>
+<p>Les sommes versées au titre de la réservation ont expressément la nature d'un acompte et non d'arrhes, sous réserve de la politique d'annulation prévue à l'article 18. À défaut de règlement du solde à la date prévue, le Loueur pourra, après une relance restée sans effet, annuler la réservation conformément aux conditions d'annulation applicables au Locataire.</p>
+
+<h6 class="fw-bold">Article 9 — Absence de droit de rétractation</h6>
+<p>Le Locataire est informé qu'il ne bénéficie pas du délai de rétractation de quatorze jours pour une prestation d'hébergement non résidentiel fournie à une date ou pendant une période déterminée. Cette absence de droit de rétractation n'empêche pas l'application de la politique contractuelle d'annulation prévue à l'article 18.</p>
+
+<h6 class="fw-bold">Article 10 — Dépôt de garantie</h6>
+<p>Un dépôt de garantie est exigé : <strong>400 € pour un séjour de 1 à 3 nuits</strong> ; <strong>500 € au-delà de 3 nuits</strong>. Ce dépôt est prélevé par carte bancaire via Stripe au moment de la réservation.</p>
+<p>Le dépôt garantit notamment : les dégradations imputables aux occupants, les objets manquants, la perte de clés, badges ou télécommandes, les frais de remise en état résultant du tabac, d'une fête, d'un animal non autorisé ou d'une salissure anormale, les frais directement occasionnés par un manquement au règlement intérieur, et les consommations exceptionnellement excessives lorsqu'elles résultent d'un usage manifestement abusif et objectivement établi.</p>
+<p>Le dépôt de garantie ne constitue pas une limitation de responsabilité : lorsque le dommage excède son montant, le Locataire demeure redevable du solde justifié. Le montant non retenu est libéré ou remboursé au plus tard dans les 7 jours ouvrés suivant le départ, sauf nécessité légitime de recueillir un devis ou de déterminer l'étendue du dommage. Toute retenue devra être communiquée au Locataire avec la nature du dommage, les photographies ou constats disponibles, le montant réclamé, les justificatifs pertinents et la prise en compte de la vétusté normale.</p>
+
+<h6 class="fw-bold">Article 11 — État des lieux et inventaire</h6>
+<p>Un état des lieux et un inventaire sont établis, contradictoirement à l'arrivée et au départ et/ou électroniquement au moyen de photographies horodatées et d'un inventaire accessible au Locataire. Lorsque l'arrivée est autonome, le Locataire dispose de quatre heures après son entrée dans les lieux pour signaler par écrit toute anomalie visible ou tout objet manquant, avec photographies lorsque cela est possible. L'absence de signalement ne prive pas le Locataire de ses droits concernant un défaut non apparent, un dysfonctionnement ultérieur ou une non-conformité qui ne pouvait raisonnablement être constatée à l'arrivée.</p>
+
+<h6 class="fw-bold">Article 12 — Obligations du Loueur</h6>
+<p>Le Loueur s'engage notamment à délivrer un logement conforme à la description contractuelle, propre, meublé et en état normal d'usage, à assurer la disponibilité des équipements annoncés sous réserve des pannes imprévisibles, à effectuer dans les meilleurs délais les réparations nécessaires non imputables au Locataire, à garantir une jouissance paisible des lieux, à respecter la vie privée des occupants et à transmettre les informations d'accès et de sécurité utiles. Le Loueur ne pourra accéder au logement pendant le séjour qu'avec l'accord du Locataire, après un préavis raisonnable, ou sans préavis en cas d'urgence, de danger ou de nécessité de protéger les personnes et les biens.</p>
+
+<h6 class="fw-bold">Article 13 — Obligations du Locataire</h6>
+<p>Le Locataire s'engage à utiliser paisiblement le logement, à respecter le règlement de copropriété et le voisinage, à maintenir les lieux dans un état raisonnable de propreté, à utiliser correctement les équipements, à informer rapidement le Loueur de toute panne, fuite, dommage ou incident, à fermer les portes et fenêtres lors de ses absences, à restituer les clés et dispositifs d'accès, à ne pas déplacer durablement les meubles ni démonter, neutraliser ou modifier les équipements électriques, de sécurité, internet ou domotiques, à ne commettre aucune activité illégale, et à répondre des dommages causés par lui-même, ses accompagnants et ses visiteurs.</p>
+
+<h6 class="fw-bold">Article 14 — Interdictions</h6>
+<p>Sont notamment interdits : les fêtes, réceptions et événements sans accord écrit ; les nuisances sonores, notamment entre 22h et 8h ; le dépassement du nombre d'occupants autorisés ; la sous-location ; les activités commerciales ou professionnelles recevant du public ; les tournages ou séances photographiques commerciales non autorisés ; l'usage du logement à des fins illicites ; le stockage de substances dangereuses ; le branchement d'équipements à forte consommation non prévus ; le fait de jeter des produits susceptibles d'obstruer les canalisations.</p>
+<p><strong>Tabac et vapotage</strong> : il est strictement interdit de fumer ou de vapoter à l'intérieur du logement.<br><strong>Animaux</strong> : interdits.</p>
+
+<h6 class="fw-bold">Article 15 — Internet et équipements techniques</h6>
+<p>L'accès internet est fourni pour un usage personnel licite. Le Locataire s'interdit tout téléchargement illicite, toute atteinte à un système informatique, toute diffusion de contenu illégal ou toute utilisation susceptible d'entraîner la responsabilité du Loueur. Les interruptions temporaires d'internet, d'eau, d'électricité ou d'un service collectif non imputables au Loueur ne donnent pas automatiquement droit à indemnisation. Toutefois, si une panne substantielle, durable et imputable au Loueur empêche une partie importante de l'usage prévu, les droits légaux du Locataire restent applicables.</p>
+
+<h6 class="fw-bold">Article 16 — Assurance</h6>
+<p>Le Locataire déclare disposer d'une assurance responsabilité civile couvrant les risques locatifs et la villégiature pendant toute la durée du séjour. Le Loueur pourra demander une attestation avant la remise des accès.</p>
+
+<h6 class="fw-bold">Article 17 — Responsabilité</h6>
+<p>Le Locataire est responsable des dommages directs causés au logement, aux équipements, aux parties communes ou aux tiers par lui-même, les occupants et les visiteurs autorisés. Le Loueur demeure responsable des dommages résultant de sa faute, d'un manquement à ses obligations contractuelles, d'un défaut du logement dont il répond légalement, ou de toute responsabilité qui ne peut légalement être exclue. Sous réserve de ces cas, le Loueur ne répond pas des pertes ou vols d'effets personnels imputables à la négligence du Locataire, à un tiers ou à un événement extérieur échappant à son contrôle.</p>
+
+<h6 class="fw-bold">Article 18 — Annulation par le Locataire</h6>
+<p>Toute annulation doit être adressée par écrit à contact@oasiskarurio.com. La date retenue est celle de la réception de la demande.</p>
+<ul>
+    <li>Plus de 30 jours avant l'arrivée : remboursement de 100 % des sommes payées.</li>
+    <li>De 15 à 30 jours inclus avant l'arrivée : remboursement de 50 % du prix de l'hébergement ; la taxe de séjour et les services non exécutés sont remboursés intégralement.</li>
+    <li>Moins de 15 jours avant l'arrivée : le prix de l'hébergement n'est pas remboursable ; les prestations optionnelles non exécutées sont remboursées.</li>
+    <li>Non-présentation ou départ anticipé : aucun remboursement du prix des nuits réservées n'est dû, sauf disposition légale impérative ou accord commercial écrit du Loueur.</li>
+</ul>
+
+<h6 class="fw-bold">Article 19 — Annulation ou indisponibilité imputable au Loueur</h6>
+<p>Lorsque le Loueur ne peut fournir le logement pour une cause qui lui est imputable, il propose, selon les possibilités, un hébergement équivalent ou supérieur sans supplément, ou le remboursement intégral des sommes payées dans un délai maximal de sept jours. Cette clause est sans préjudice des droits à indemnisation que le Locataire pourrait tenir de la loi en cas de préjudice démontré.</p>
+
+<h6 class="fw-bold">Article 20 — Force majeure</h6>
+<p>Constitue un cas de force majeure un événement qui échappe au contrôle de la partie concernée, ne pouvait raisonnablement être prévu lors de la conclusion du contrat, ne peut être évité par des mesures appropriées, et empêche réellement l'exécution de l'obligation. En cas d'empêchement temporaire, l'exécution du contrat est suspendue lorsque cette suspension reste compatible avec l'objet et la durée du séjour. Lorsque l'empêchement est définitif ou rend le séjour sans objet, le contrat pourra être résolu conformément aux règles légales, avec remboursement des prestations qui ne peuvent être exécutées.</p>
+
+<h6 class="fw-bold">Article 21 — Résiliation pour manquement grave</h6>
+<p>En cas de violation grave du contrat ou du règlement intérieur, le Loueur pourra adresser au Locataire une mise en demeure de faire cesser immédiatement le manquement. Lorsque le comportement met en danger les personnes ou les biens, constitue une activité illégale, provoque des nuisances graves, correspond à une fête non autorisée, entraîne un dépassement substantiel de capacité, ou rend impossible la poursuite normale du séjour, le Loueur pourra prononcer la résiliation du contrat et demander le départ des occupants, sans préjudice de la saisine des autorités ou du juge compétent.</p>
+
+<h6 class="fw-bold">Article 22 — Réclamations</h6>
+<p>Toute difficulté doit être signalée sans délai au Loueur, à contact@oasiskarurio.com{% if cgv_reservation_ref %} en indiquant le numéro de réservation {{ cgv_reservation_ref }}{% endif %}, avec une description précise, des photographies ou vidéos lorsque cela est pertinent, et la solution demandée. L'obligation de signaler rapidement un problème ne réduit pas les délais légaux de recours.</p>
+
+<h6 class="fw-bold">Article 23 — Données personnelles et preuves électroniques</h6>
+<p>Les données collectées sont utilisées notamment pour la gestion de la réservation, la conclusion et l'exécution du contrat, le paiement, la sécurité des accès, la gestion des réclamations, le respect des obligations comptables, fiscales et administratives, et la défense des droits en cas de litige. Le responsable du traitement est Oasis de Karukera (Olivier Didier Bicep, SIRET 908 240 815). Les modalités détaillées, durées de conservation, destinataires et droits des personnes sont présentés dans la <a href="{{ path('app.legal.privacy', {'_locale': app.request.locale}) }}">politique de confidentialité</a>, accessible avant la réservation. Contact relatif aux données personnelles : contact@oasiskarurio.com</p>
+
+<h6 class="fw-bold">Article 24 — Droit applicable et règlement des litiges</h6>
+<p>Le contrat relatif au logement de Sainte-Anne est soumis au droit français applicable en Guadeloupe, sous réserve des dispositions impératives éventuellement applicables au consommateur dans son pays de résidence. Les parties rechercheront en priorité une solution amiable ; à défaut, le litige sera porté devant les juridictions compétentes selon les règles légales de procédure et de protection du consommateur.</p>
+
+<h6 class="fw-bold">Article 25 — Hiérarchie des documents</h6>
+<p>Les documents contractuels sont, par ordre de priorité : les conditions particulières de la réservation, le présent contrat, l'état descriptif, l'inventaire et l'état des lieux, le règlement intérieur, le récapitulatif tarifaire, la politique de confidentialité, et les informations d'accès. En cas de contradiction, le document placé au rang supérieur prévaut, sauf disposition légale impérative.</p>
+
+<h6 class="fw-bold">Article 26 — Nullité partielle</h6>
+<p>Si une clause est déclarée nulle, abusive ou inapplicable, les autres dispositions demeurent applicables dans la mesure où le contrat peut subsister sans la clause concernée. Le fait qu'une partie n'exerce pas immédiatement un droit ne constitue pas une renonciation définitive à ce droit.</p>
+
+<h6 class="fw-bold">Article 27 — Acceptation</h6>
+<p class="mb-0">Le Locataire reconnaît avoir reçu, avant son engagement : le présent contrat, l'état descriptif complet, le prix total, les conditions d'annulation, le règlement intérieur, les informations relatives au dépôt de garantie, l'information sur l'absence de droit de rétractation, et la politique de confidentialité. La validation de la réservation via le paiement et la case cochée vaut acceptation pleine et entière des présentes conditions et constitue une signature électronique juridiquement valable.</p>
