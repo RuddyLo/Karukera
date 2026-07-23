@@ -5,117 +5,29 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-9">
-                <h2 class="fw-bold text-center mb-1">Conditions Générales de Location Courte Durée</h2>
-                <p class="text-muted small text-center mb-4">Document généré le {{ "now"|date("d/m/Y") }}</p>
+                <h2 class="fw-bold text-center mb-4">Conditions Générales de Location</h2>
 
-                <h6 class="fw-bold">1. Parties</h6>
-                <div class="border rounded p-3 mb-4 bg-light">
-                    <p class="mb-1"><strong>Le Bailleur :</strong></p>
-                    <p class="mb-0">Nom : Oasis de Karukera</p>
-                    <p class="mb-0">Adresse : 12 rue du morne tricolore 97180 Sainte Anne</p>
-                    <p class="mb-0">Email : contact@oasiskarurio.com</p>
-                    <p class="mb-0">WhatsApp : +33 7 55 50 30 86</p>
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-karukera-btn" data-bs-toggle="tab" data-bs-target="#tab-karukera" type="button" role="tab" aria-controls="tab-karukera" aria-selected="true">
+                            Oasis de Karukera
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-rio-btn" data-bs-toggle="tab" data-bs-target="#tab-rio" type="button" role="tab" aria-controls="tab-rio" aria-selected="false">
+                            Oasis do Rio
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-karukera" role="tabpanel" aria-labelledby="tab-karukera-btn">
+                        {% include 'legal/cgv/_cgv_karukera.html.twig' %}
+                    </div>
+                    <div class="tab-pane fade" id="tab-rio" role="tabpanel" aria-labelledby="tab-rio-btn">
+                        {% include 'legal/cgv/_cgv_rio.html.twig' %}
+                    </div>
                 </div>
-                <p>Le Locataire est la personne procédant à la réservation d'un logement via la plateforme, dont l'identité et les coordonnées sont celles renseignées lors de son inscription.</p>
-
-                <h6 class="fw-bold">2. Objet du contrat</h6>
-                <p>Le présent contrat concerne la location saisonnière du logement réservé par le locataire parmi les biens proposés par le bailleur, à l'adresse 12 rue du morne tricolore 97180 Sainte Anne, pour la période et au tarif indiqués lors de la réservation.</p>
-                <p>Le logement est loué à titre de résidence temporaire et de courte durée, à usage exclusif d'habitation.</p>
-
-                <h6 class="fw-bold">3. Acceptation</h6>
-                <p>La validation de la réservation via le paiement et la case cochée vaut acceptation pleine et entière des présentes conditions.</p>
-                <p>Cette acceptation constitue une signature électronique juridiquement valable.</p>
-
-                <h6 class="fw-bold">4. Réservation</h6>
-                <p>La réservation est confirmée dès validation du paiement.</p>
-                <p>Le client garantit :</p>
-                <ul>
-                    <li>être majeur</li>
-                    <li>utiliser des informations exactes</li>
-                    <li>être responsable des occupants</li>
-                </ul>
-
-                <h6 class="fw-bold">5. Séjour</h6>
-                <ul>
-                    <li>Check-in : à partir de 16h</li>
-                    <li>Check-out : avant 11h</li>
-                </ul>
-                <p>Tout dépassement pourra être facturé.</p>
-
-                <h6 class="fw-bold">6. Prix</h6>
-                <p>Le prix de la location est celui affiché lors de la réservation, par nuit, selon la période tarifaire applicable. Le prix inclut :</p>
-                <ul>
-                    <li>logement meublé</li>
-                    <li>charges (eau, électricité, internet)</li>
-                </ul>
-                <p>Peuvent s'ajouter :</p>
-                <ul>
-                    <li>ménage</li>
-                    <li>frais additionnels spécifiques</li>
-                </ul>
-
-                <h6 class="fw-bold">7. Caution</h6>
-                <p>Un dépôt de garantie forfaitaire est prélevé au moment de la réservation selon la durée du séjour : <strong>400 € pour 1 à 3 nuits</strong> et <strong>500 € au-delà de 3 nuits</strong>.</p>
-                <p>Ce dépôt est remboursable dans son intégralité dans un délai de 7 jours ouvrés suivant la fin du séjour, sous réserve de l'état du logement.</p>
-                <p>En cas de dégradations constatées, le bailleur se réserve le droit de conserver tout ou partie du dépôt de garantie.</p>
-
-                <h6 class="fw-bold">8. Utilisation</h6>
-                <p>Le logement est destiné à un usage strictement privé.</p>
-                <p>Interdictions :</p>
-                <ul>
-                    <li>fêtes non autorisées</li>
-                    <li>nuisances sonores</li>
-                    <li>dépassement de capacité</li>
-                </ul>
-                <p>En cas de non-respect : résiliation immédiate sans remboursement.</p>
-
-                <h6 class="fw-bold">9. Règlement intérieur</h6>
-                <p>Le règlement intérieur est opposable au client. Il comprend notamment :</p>
-                <ul>
-                    <li>règles de voisinage</li>
-                    <li>tabac strictement interdit au sein de la structure</li>
-                    <li>utilisation des équipements qui doivent être restitués dans leur état original</li>
-                </ul>
-
-                <h6 class="fw-bold">10. Politique d'annulation</h6>
-                <ul>
-                    <li>Plus de 30 jours avant l'arrivée : remboursement intégral</li>
-                    <li>Entre 15 et 30 jours avant l'arrivée : remboursement à 50 %</li>
-                    <li>Moins de 15 jours avant l'arrivée : aucun remboursement</li>
-                </ul>
-                <p>En cas d'annulation par le bailleur : remboursement intégral du montant payé.</p>
-
-                <h6 class="fw-bold">11. Responsabilité</h6>
-                <p>Le locataire est responsable :</p>
-                <ul>
-                    <li>des dommages</li>
-                    <li>des dégradations</li>
-                    <li>des comportements des occupants</li>
-                </ul>
-                <p>Le propriétaire décline toute responsabilité en cas de :</p>
-                <ul>
-                    <li>vol</li>
-                    <li>perte</li>
-                    <li>accident</li>
-                </ul>
-
-                <h6 class="fw-bold">12. Force majeure</h6>
-                <p>Aucun remboursement ne pourra être exigé en cas d'événements extérieurs indépendants :</p>
-                <ul>
-                    <li>catastrophes</li>
-                    <li>restrictions gouvernementales</li>
-                    <li>événements imprévisibles</li>
-                </ul>
-
-                <h6 class="fw-bold">13. Loi applicable</h6>
-                <ul>
-                    <li>Guadeloupe : droit français</li>
-                    <li>Brésil : droit brésilien</li>
-                </ul>
-                <p>Litige : juridiction locale du bien.</p>
-
-                <h6 class="fw-bold">14. Preuve</h6>
-                <p class="mb-0">Les données électroniques (IP, timestamp, validation) font foi en cas de litige.</p>
             </div>
         </div>
     </div>

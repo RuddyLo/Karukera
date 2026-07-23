@@ -88,10 +88,40 @@
                            class="btn btn-outline-primary btn-sm w-100">
                             {{ 'reservations.see_apartment'|trans }}
                         </a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#annexe-modal-{{ reservation.id }}"
+                           class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="bi bi-house-door"></i> Annexe descriptif du logement
+                        </a>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#cgv-modal-{{ reservation.id }}"
                            class="btn btn-outline-secondary btn-sm w-100">
                             <i class="bi bi-file-text"></i> Consulter les CGV
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Modal Annexe descriptif du logement pour la réservation #}
+            <div class="modal fade" id="annexe-modal-{{ reservation.id }}" tabindex="-1" aria-labelledby="annexeModalLabel-{{ reservation.id }}">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content" style="background-color: #f8f9fa;">
+                        <div class="modal-header" style="background-color: #ffffff;">
+                            <h5 class="modal-title fw-bold" id="annexeModalLabel-{{ reservation.id }}">Annexe descriptif du logement</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" style="background-color: #f8f9fa;">
+                            <div class="container py-2">
+                                {% if 'Karukera' in reservation.apartment.name %}
+                                    {% include 'legal/annexe/_annexe_karukera.html.twig' %}
+                                {% elseif 'Rio' in reservation.apartment.name %}
+                                    {% include 'legal/annexe/_annexe_rio.html.twig' %}
+                                {% else %}
+                                    <p class="text-danger">Aucune annexe descriptif n'est configurée pour cet appartement. Merci de contacter le support.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,9 +137,9 @@
                         <div class="modal-body" style="background-color: #f8f9fa;">
                             <div class="container py-2">
                                 {% set cgv_vars = {
-                                    cgv_price: payment.rent_amount,
+                                    cgv_price: payment ? payment.rent_amount : null,
                                     cgv_price_unit: 'pour l\'ensemble du séjour',
-                                    cgv_currency_symbol: payment.currency_symbol,
+                                    cgv_currency_symbol: payment ? payment.currency_symbol : '€',
                                     cgv_reservation_ref: reservation.reference ?: reservation.id,
                                     cgv_conclusion_date: reservation.createdAt,
                                     cgv_start_date: reservation.startDate,

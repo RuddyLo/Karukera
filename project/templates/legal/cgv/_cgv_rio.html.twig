@@ -9,7 +9,7 @@
 <h5 class="fw-bold text-center mb-1">CONTRAT DE LOCATION SAISONNIÈRE MEUBLÉE</h5>
 <p class="text-center fw-bold mb-1">Oasis do Rio — Rio de Janeiro, Brésil</p>
 <p class="text-muted small text-center mb-4">
-    Numéro de réservation : {{ cgv_reservation_ref ?: 'attribué à la confirmation' }} —
+    Numéro de réservation : {% if cgv_reservation_ref %}{{ cgv_reservation_ref }}{% else %}<em>[attribué à la confirmation]</em>{% endif %} —
     Date de conclusion : {{ cgv_conclusion_date|date('d/m/Y') }}
 </p>
 
@@ -29,11 +29,18 @@
 <div class="border rounded p-3 mb-3 bg-light">
     {% if app.user %}
         <p class="mb-0">Nom et prénom : {{ app.user.firstName }} {{ app.user.lastName }}</p>
-        {% if app.user.address %}<p class="mb-0">Adresse : {{ app.user.address }}</p>{% endif %}
+        <p class="mb-0">Adresse : {{ app.user.address ?: '[à compléter lors de la réservation]' }}</p>
         <p class="mb-0">Email : {{ app.user.email }}</p>
-        {% if app.user.phone %}<p class="mb-0">Téléphone : {{ app.user.phone }}</p>{% endif %}
-        {% if app.user.birthDate %}<p class="mb-0">Date de naissance : {{ app.user.birthDate|date('d/m/Y') }}</p>{% endif %}
-        {% if app.user.country %}<p class="mb-0">Pays de résidence : {{ app.user.country }}</p>{% endif %}
+        <p class="mb-0">Téléphone : {{ app.user.phone ?: '[à compléter lors de la réservation]' }}</p>
+        <p class="mb-0">Date de naissance : {{ app.user.birthDate ? app.user.birthDate|date('d/m/Y') : '[à compléter lors de la réservation]' }}</p>
+        <p class="mb-0">Pays de résidence : {{ app.user.country ?: '[à compléter lors de la réservation]' }}</p>
+    {% else %}
+        <p class="mb-0">Nom et prénom : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+        <p class="mb-0">Adresse : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+        <p class="mb-0">Email : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+        <p class="mb-0">Téléphone : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+        <p class="mb-0">Date de naissance : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+        <p class="mb-0">Pays de résidence : <em class="text-muted">[à compléter lors de la réservation]</em></p>
     {% endif %}
 </div>
 <p>Le Locataire certifie être âgé d'au moins 18 ans et disposer de la capacité juridique nécessaire pour conclure le présent contrat. Il agit en son nom et pour le compte de l'ensemble des personnes autorisées à occuper le logement, et répond du respect du contrat et du règlement intérieur par chacun des occupants.</p>
@@ -60,7 +67,8 @@
     <p class="mb-0">Date d'arrivée : {{ cgv_start_date|date('d/m/Y') }} — Heure d'arrivée autorisée : à partir de 16h</p>
     <p>Date de départ : {{ cgv_end_date|date('d/m/Y') }} — Heure limite de départ : 11h</p>
 {% else %}
-    <p>Les dates du séjour sont celles indiquées dans le récapitulatif de réservation. Heure d'arrivée autorisée : à partir de 16h. Heure limite de départ : 11h.</p>
+    <p class="mb-0">Date d'arrivée : <em class="text-muted">[à compléter lors de la réservation]</em> — Heure d'arrivée autorisée : à partir de 16h</p>
+    <p>Date de départ : <em class="text-muted">[à compléter lors de la réservation]</em> — Heure limite de départ : 11h</p>
 {% endif %}
 <p>Le contrat prend fin automatiquement à la date et à l'heure convenues, sans qu'il soit nécessaire de délivrer un congé. Aucune prolongation n'est acquise de plein droit : elle doit être demandée et acceptée par écrit, sous réserve de disponibilité et du paiement du tarif complémentaire. Un départ tardif non autorisé pourra donner lieu à la facturation d'une indemnité proportionnée, notamment lorsque ce retard entraîne des frais de personnel, compromet le ménage ou empêche l'arrivée des voyageurs suivants.</p>
 
@@ -73,7 +81,11 @@
 
 <h6 class="fw-bold">Article 7 — Prix de la location</h6>
 <div class="border rounded p-3 mb-3 bg-light">
-    <p class="mb-0">Prix de l'hébergement : <strong><span id="cgv-price-1">{{ cgv_price }}</span> {{ cgv_currency_symbol }} {{ cgv_price_unit }}</strong> {% if cgv_price_unit == '/ nuit' %}<small class="text-muted">(le montant total dépend du nombre de nuits, voir le récapitulatif de réservation)</small>{% endif %}</p>
+    {% if cgv_price is not null %}
+        <p class="mb-0">Prix de l'hébergement : <strong><span id="cgv-price-1">{{ cgv_price }}</span> {{ cgv_currency_symbol }} {{ cgv_price_unit }}</strong> {% if cgv_price_unit == '/ nuit' %}<small class="text-muted">(le montant total dépend du nombre de nuits, voir le récapitulatif de réservation)</small>{% endif %}</p>
+    {% else %}
+        <p class="mb-0">Prix de l'hébergement : <em class="text-muted">[à compléter lors de la réservation]</em></p>
+    {% endif %}
 </div>
 <p>Le prix comprend, dans le cadre d'un usage normal : la mise à disposition du logement meublé, l'eau, l'électricité, l'accès internet, le linge expressément mentionné dans l'état descriptif et les équipements inclus dans la réservation. Aucun supplément non annoncé avant la réservation ne pourra être imposé, sauf prestation supplémentaire demandée par le Locataire, dommage, consommation manifestement anormale ou frais directement causés par un manquement contractuel.</p>
 
