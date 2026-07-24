@@ -48,6 +48,10 @@ Plateforme de location saisonnière (Guadeloupe). Symfony 7 + Docker + Stripe.
 5. Webhook `payment_intent.succeeded` → crée la `Reservation` en BDD
 6. Redirection `/payment/success`
 
+**Fallback si le webhook ne se déclenche pas** : la route `/payment/success` (`StripeController::success`) re-vérifie elle-même le statut du PaymentIntent auprès de Stripe et crée la `Reservation` si elle n'existe pas encore — même logique de `findOneBy(['user','apartment','startDate'])` que le webhook pour éviter les doublons. Donc même si le webhook est en retard/absent, la page success crée la réservation à la place.
+
+⚠️ **Piège test → live** : `UserReservationsController::index` (page "Mes réservations") appelle `Stripe::setApiKey(...)` **hors du try/catch** qui protège les `PaymentIntent::retrieve()` juste après — une clé mal formée (espace, retour à la ligne, guillemets collés par erreur) y plante en 500 direct, sans être rattrapée. Et les anciennes réservations créées avec des PaymentIntent **test** ne seront plus jamais récupérables via une clé **live** (Stripe sépare les deux univers) — déjà géré proprement par le try/catch existant (affiche juste "paiement indisponible"), ce n'est pas un bug. Un webhook live nécessite un **nouvel endpoint** créé dans le Dashboard Stripe (mode Live) → nouveau `whsec_...`, celui de test ne fonctionne pas.
+
 **Constantes dans `StripeController.php` :**
 - `STRIPE_FEE_RATE = 0.015` (1.5%)
 - `STRIPE_FEE_FIXED = 0.25` (€0.25 fixe)
@@ -140,6 +144,22 @@ Le jour de checkout d'une réservation redevient disponible en check-in pour le 
 - `ApartmentController::reservationsJson` : envoie `endDate` tel quel à FullCalendar (pas de `+1 day`), FullCalendar traite `end` comme exclusif nativement
 - `details.html.twig` : `hasReservedInRange()` ne vérifie plus le jour de checkout de la sélection candidate (sinon un enchaînement à 3 réservations ou plus casserait sur la 2e transition)
 - Corrigé le 2026-07-22 — avant ce fix, le jour de checkout apparaissait à tort bloqué pour tout le monde
+
+## Logo & navbar
+
+Logo actuel : `project/public/images/logo-crop.png` (référencé dans `templates/components/navbar.html.twig`), lockup "OK" (icône ronde) + "LES OASIS DE KARURIO" en navy/teal.
+
+- `.navbar-container` (desktop ≥991px, `main.css`) : fond passé de navy translucide (`rgba(var(--color-secondary-rgb), 0.9)`) à blanc uni (`var(--color-white)`) + ombre légère — le texte navy du logo était illisible sur l'ancien fond navy.
+- `.navbar a` : couleur passée de blanc à `var(--color-secondary-dark)` (`#3a4753`) pour rester lisible sur le nouveau fond blanc (le blanc était déjà invisible aussi en mode "sticked", bug préexistant corrigé au passage).
+- ⚠️ Cette section CSS n'existe que dans la media query `@media (min-width: 991px)` — la navbar mobile (`.mobile-nav-active .navbar`) garde son propre fond navy (menu plein écran séparé), non concerné par ce changement.
+- Corrigé le 2026-07-25.
+
+## Page détails appartement — responsive calendrier
+
+`templates/apartments/details.html.twig` :
+- FullCalendar (`#calendar`) n'avait pas de `headerToolbar` explicite → affichait la toolbar par défaut (prev/next + titre + boutons Mois/Semaine/Jour), inutile ici (calendrier lecture seule pour choisir des dates) et trop large sur mobile → calendrier écrasé. Simplifié en `{ left: 'prev,next', center: 'title', right: '' }`.
+- 3 niveaux de padding imbriqués autour du calendrier (`row p-4` → `bg-white p-3` → `border p-4`) restaient identiques sur mobile, cumulant ~176px de padding horizontal sur un écran de 375px. Passés en `p-2 p-md-4` / `p-2 p-md-3` (Bootstrap responsive) pour ne réduire qu'en dessous de `md`, desktop inchangé.
+- Corrigé le 2026-07-25.
 
 ## Description appartement — troncature + modal
 
