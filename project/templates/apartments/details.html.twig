@@ -105,7 +105,7 @@
         </div>
         {% endif %}
 
-        <div class="row mt-3 p-4 shadow rounded">
+        <div class="row mt-3 p-2 p-md-4 shadow rounded">
             <div class="col-md-6 card p-4">
                 <h5>{{ 'apartment_details.equipments_title'|trans }}</h5>
                 <div class="row g-3 mt-2">
@@ -119,10 +119,10 @@
             </div>
 
             <div class="col-md-6">
-                <div class="bg-white rounded p-3">
+                <div class="bg-white rounded p-2 p-md-3">
                     {{ form_start(form, {'attr': {'id':'reservation-form'}}) }}
 
-                    <div class="border p-4 rounded">
+                    <div class="border p-2 p-md-4 rounded">
                         <h4 class="fw-bold text-muted mb-2">{{ 'apartment_details.book_title'|trans }}</h4>
                         <div id="calendar"></div>
 
@@ -636,6 +636,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         locale: window.appLocale || 'fr',
         selectable: false,
+        headerToolbar: {
+            left: 'prev,next',
+            center: 'title',
+            right: ''
+        },
         initialDate: searchStartDate || undefined,
         validRange: {
             start: new Date()
