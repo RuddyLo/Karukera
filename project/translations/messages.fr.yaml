@@ -8,7 +8,10 @@ nav:
     my_reservations: "Mes réservations"
 
 hero:
-  title: "Louez votre appartement au meilleur prix !"
+  title: "Réservez en direct, simplement"
+  badge_price: "Tarif avantageux"
+  badge_secure: "Paiement sécurisé"
+  badge_contact: "Contact direct"
 
   apartment:
     placeholder: "Sélectionnez un appartement"

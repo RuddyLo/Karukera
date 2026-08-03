@@ -479,6 +479,14 @@ section {
 # Desktop Navigation 
 --------------------------------------------------------------*/
 @media (min-width: 991px) {
+  .header nav {
+    padding: 8px 0;
+  }
+
+  .header .logo img {
+    height: 70px;
+  }
+
   .navbar {
     padding: 0;
     position: relative;
@@ -494,9 +502,7 @@ section {
   .navbar-container {
     background-color: var(--color-white);
     width: 100%;
-    padding: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 0 10px;
     box-shadow: 0px 2px 20px rgba(var(--color-secondary-rgb), 0.15);
   }
 
@@ -838,9 +844,22 @@ section {
 .hero-content h1 {
   font-size: 3.2rem;
   font-weight: 700;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   opacity: 0;
   animation: fadeInUp 1s ease-in-out forwards;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 40px;
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeInUp 1s ease-in-out forwards;
+  animation-delay: 0.15s;
 }
 
 /* Search bar layout */
@@ -1082,6 +1101,11 @@ section {
 
   .hero-content h1 {
     font-size: 2.2rem;
+  }
+
+  .hero-badges {
+    gap: 12px;
+    font-size: 0.85rem;
   }
 }
 

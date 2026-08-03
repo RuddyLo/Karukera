@@ -8,7 +8,10 @@ nav:
     my_reservations: "My reservations"
 
 hero:
-  title: "Rent your apartment at the best price!"
+  title: "Book direct, made simple"
+  badge_price: "Great rates"
+  badge_secure: "Secure payment"
+  badge_contact: "Direct contact"
 
   apartment:
     placeholder: "Select an apartment"
