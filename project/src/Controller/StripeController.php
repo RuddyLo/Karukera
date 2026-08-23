@@ -206,8 +206,8 @@ class StripeController extends AbstractController
         $rentAmount = $stay['total'];
         $breakdown  = $stay['breakdown'];
         $groupedBreakdown = $stay['groupedBreakdown'];
-        $caution     = $days <= 3 ? 400.0 : 500.0;
-        $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + self::STRIPE_FEE_FIXED, 2);
+        $caution     = 0.0;
+        $cautionWithFees = 0.0;
 
         $couponResult = $this->resolveCoupon(
             $data['coupon_code'] ?? null,
@@ -234,8 +234,6 @@ class StripeController extends AbstractController
                 return new JsonResponse(['error' => 'Impossible de récupérer le taux de change. Veuillez réessayer.'], 503);
             }
             $rentAmount      = round($rentAmount * $rate, 2);
-            $caution         = round($caution * $rate, 2);
-            $cautionWithFees = round($caution + ($caution * self::STRIPE_FEE_RATE) + (self::STRIPE_FEE_FIXED * $rate), 2);
             $discountAmount  = round($discountAmount * $rate, 2);
             $breakdown       = array_map(
                 fn (array $night) => ['date' => $night['date'], 'price' => round($night['price'] * $rate, 2)],

@@ -213,10 +213,12 @@ public function sendReviewInvite(
             $currency = $intent->metadata->currency ?? 'eur';
             $symbol = $currency === 'brl' ? 'R$' : '€';
 
-            Refund::create([
-                'payment_intent' => $cautionIntentId,
-                'amount' => (int)($cautionAmount * 100),
-            ]);
+            if ((float) $cautionAmount > 0) {
+                Refund::create([
+                    'payment_intent' => $cautionIntentId,
+                    'amount' => (int)($cautionAmount * 100),
+                ]);
+            }
 
             $reservation->setCautionRefunded(true);
             $reservation->setCautionConcerved(false);

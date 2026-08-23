@@ -58,7 +58,9 @@ Plateforme de location saisonnière (Guadeloupe). Symfony 7 + Docker + Stripe.
 - `STRIPE_FX_RATE = 0.02` (2% frais conversion devise Stripe — ⚠️ susceptible d'évoluer)
 - Les frais Stripe sont appliqués sur la caution uniquement et payés par le client
 
-⚠️ **Montant de la caution : PAS 30% du loyer.** `createPaymentIntent` calcule un montant **fixe** selon la durée du séjour : `$caution = $days <= 3 ? 400.0 : 500.0;`. La constante `CAUTION_RATE = 0.30` existe dans le code mais n'est utilisée nulle part (constante morte) — corrigé dans la doc le 2026-07-22, ne pas se fier à l'ancienne mention "30% du loyer".
+⚠️ **Caution mise à 0€ (2026-08-23).** `createPaymentIntent` fixe désormais `$caution = 0.0` et `$cautionWithFees = 0.0` (plus de calcul 400€/500€ selon la durée, plus de frais Stripe appliqués dessus). Les constantes `CAUTION_RATE = 0.30` (déjà morte avant ce changement), `STRIPE_FEE_RATE` et `STRIPE_FEE_FIXED` (devenues mortes suite à ce changement) sont laissées en place dans le code mais ne sont plus utilisées nulle part. CGV (`_cgv_karukera.html.twig`, `_cgv_rio.html.twig`, Article 10) mises à jour en conséquence ("Un dépôt de garantie de 0 € est exigé", reste de l'article inchangé — retenues en cas de dégâts, délai de remboursement 7j). Les fichiers `.docx` sources ("contrat location oasis de Karukera.docx", "Contrat de location Oasis do Rio.docx", à la racine du repo) mentionnent encore 400€/500€ — non mis à jour à la demande explicite de l'utilisateur (considérés comme archive, pas la source affichée aux clients). Templates admin/user, JS, emails et traductions n'avaient aucun montant en dur : ils affichent maintenant 0€ automatiquement, sans modification nécessaire.
+
+⚠️ **Piège évité** : `AdminReservationController::refundCaution` appelait `Refund::create(['amount' => 0])` pour une caution à 0€ — Stripe refuse un montant à 0 (erreur API, rattrapée par le try/catch existant mais visible en flash "Erreur Stripe"). Corrigé : l'appel à `Refund::create` est maintenant sauté (`if ((float) $cautionAmount > 0)`) et la réservation est directement marquée `setCautionRefunded(true)` sans transaction Stripe.
 
 ⚠️ **Garde-fou dates** : `createPaymentIntent` et `createAdminReservation` rejettent (400) toute requête où `endDate <= startDate` (empêche une "réservation" 0 nuit facturée au prix d'1 nuit). Même garde côté front dans `details.html.twig` (`dateClick` + préremplissage URL).
 
@@ -137,6 +139,18 @@ Route : `AdminReservationController::refundCaution` (`/admin/reservation/{id}/re
 
 ⚠️ **Remboursement partiel NON implémenté**, malgré l'UI qui le suggère : `templates/admin/reservations/show.html.twig` a un champ `amount` dans `#partial-amount-container`, mais il reste en `display:none` (rien ne le révèle, aucun script ne le montre) et `refundCaution()` ne lit jamais ce paramètre — si "conserver" n'est pas coché, le remboursement est **toujours intégral**. À finir si le besoin de remboursement partiel est confirmé (champ front à révéler + lecture `amount` côté controller + `Refund::create(['amount' => ...])` avec le montant partiel au lieu du montant plein).
 
+### Évolution prévue (non implémentée) : caution en J-2, débit + remboursement manuel
+
+Idée validée avec l'utilisateur le 2026-08-14, à implémenter dans une session dédiée ultérieure.
+
+- Le client recevrait un mail **2 jours avant sa date d'arrivée** l'invitant à payer la caution, au lieu du prélèvement actuel fait au moment de la réservation (fusionné avec le loyer dans le même PaymentIntent, cf. `createPaymentIntent`, `StripeController.php:252-271`).
+- Ce n'est **pas** une vraie empreinte bancaire (pré-autorisation `capture_method: manual`) : Stripe annule automatiquement toute autorisation non capturée au bout de ~7 jours, trop court pour couvrir des séjours plus longs. À la place : **capture automatique classique** (un vrai débit) déclenchée à J-2, puis remboursement ou conservation **manuel** en fin de séjour via le mécanisme existant (`AdminReservationController::refundCaution`, section ci-dessus) — pas de changement nécessaire sur cette partie.
+- Implique de **désolidariser le PaymentIntent caution du PaymentIntent loyer** : seule la part loyer serait prélevée à la réservation, la caution étant créée et prélevée séparément à J-2.
+- Nécessite une **tâche planifiée** (Symfony Command + cron) qui identifie chaque jour les réservations à J+2 et déclenche l'envoi du mail avec un lien de paiement dédié à la caution.
+- Cas limite à gérer : réservation faite à **moins de 2 jours** de l'arrivée → pas de J-2 possible, prélever la caution immédiatement comme aujourd'hui.
+- Paiement caution pensé "on-session" (client présent, saisit sa carte / passe le 3DS) pour éviter les complications SCA d'un prélèvement off-session automatique sur carte enregistrée.
+- **Question ouverte non tranchée** : que faire si le client ne paie pas après le mail (carte refusée, lien ignoré) — bloquer le check-in ? relancer ? annuler la réservation ?
+
 ## Calendrier de réservation — turnover le jour du checkout
 
 Le jour de checkout d'une réservation redevient disponible en check-in pour le client suivant (rotation le même jour, ex: résa A 01→03 juillet, résa B peut commencer le 03).
@@ -154,6 +168,11 @@ Logo actuel : `project/public/images/logo-crop.png` (référencé dans `template
 - ⚠️ Cette section CSS n'existe que dans la media query `@media (min-width: 991px)` — la navbar mobile (`.mobile-nav-active .navbar`) garde son propre fond navy (menu plein écran séparé), non concerné par ce changement.
 - Corrigé le 2026-07-25.
 
+**Hauteur réduite (desktop uniquement, 2026-08-03) :**
+- `.navbar-container` : `padding: 5px; padding-left/right: 10px` → `padding: 0 10px` (suppression du padding vertical)
+- `.header nav` : padding vertical `15px 0` → `8px 0`, override ajouté dans `@media (min-width: 991px)` (la règle de base hors media query reste à `15px 0` pour le mobile, non concerné par cette demande)
+- `.header .logo img` : hauteur `100px` → `70px`, même override desktop-only (le logo mobile garde ses `60px` définis dans `@media (max-width: 990px)`)
+
 ## Page détails appartement — responsive calendrier
 
 `templates/apartments/details.html.twig` :
@@ -166,3 +185,11 @@ Logo actuel : `project/public/images/logo-crop.png` (référencé dans `template
 `templates/apartments/details.html.twig` : la description est tronquée à 100 mots (`split(' ')|slice(0,100)|join(' ')`), avec un bouton "Lire la suite" (fond `var(--color-primary)`, texte blanc) qui ouvre une modale Bootstrap (`#description-modal`, `modal-xl`) affichant le texte complet.
 ⚠️ `.modal-content` a un style global semi-transparent + flou (`main.css:138`) — cette modale override en `background:#fff; backdrop-filter:none` pour rester lisible. Toute nouvelle modale avec du texte dense devrait faire pareil.
 Clés de traduction : `apartment_details.read_more`, `apartment_details.description_title` (FR/EN).
+
+## Hero — accroche & badges de confiance
+
+`templates/components/hero.html.twig` : titre changé de "Louez votre appartement au meilleur prix !" → "Réservez en direct, simplement" (EN : "Book direct, made simple"), avec une ligne `.hero-badges` juste dessous : ✓ Tarif avantageux · 🔒 Paiement sécurisé · 💬 Contact direct.
+
+- Nouvelles clés i18n (`messages.fr.yaml` / `messages.en.yaml`) : `hero.title`, `hero.badge_price`, `hero.badge_secure`, `hero.badge_contact`
+- CSS `.hero-badges` (`main.css`) : flex centré, même animation `fadeInUp` que le `h1` avec un léger délai (`animation-delay: 0.15s`), variante mobile (`@media max-width: 600px`) avec gap et font-size réduits
+- Corrigé le 2026-08-03.
